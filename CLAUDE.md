@@ -17,6 +17,7 @@ For additional context about technologies, project structure, shell commands, an
 ## Implementation Guardrails
 
 - Use Flutter MVVM with Riverpod dependency injection and immutable state.
+- Use Riverpod only through the official `flutter_riverpod` dependency declared in `pubspec.yaml`. Never create local substitutes or reimplement Riverpod classes, providers, refs, notifiers, widgets, or runtime behavior. Application-specific providers and ViewModels must import and use the package API.
 - Keep Firebase and SharedPreferences access behind repositories or data sources.
 - Keep business logic out of widgets.
 - Enforce authorization in Firebase rules and trusted backend code, not only in navigation.

@@ -83,6 +83,9 @@ The reviewed `Example-PRM393` project is a learning reference for `ProviderScope
 
 ## Riverpod Rules
 
+- Riverpod MUST be consumed from the official `flutter_riverpod` package declared in `pubspec.yaml`. Run `flutter pub add flutter_riverpod` and `flutter pub get`; do not copy framework source into the repository.
+- Coding agents MAY write application-specific provider, Notifier, AsyncNotifier, and ViewModel declarations using the official Riverpod API. They MUST NOT invent, imitate, vendor, or create project-local replacements for Riverpod types or behavior, including `Provider`, `Ref`, `Notifier`, `AsyncNotifier`, `ConsumerWidget`, or `ProviderScope`.
+- Riverpod imports MUST use `package:flutter_riverpod/flutter_riverpod.dart`. If annotation-based generation is approved in the plan, add the official `riverpod_annotation`, `riverpod_generator`, and `build_runner` packages instead of hand-writing generated framework code.
 - Wrap the root application in `ProviderScope`.
 - Use providers for dependency injection; do not instantiate repositories inside widgets or `build()` methods.
 - Prefer `ref.watch` for reactive dependencies and `ref.read` for commands.
@@ -94,12 +97,17 @@ The reviewed `Example-PRM393` project is a learning reference for `ProviderScope
 
 ## Firebase and Data Rules
 
-- Firebase Authentication UID is the identity key.
+- Firebase Authentication UID is the identity key. Firebase Authentication owns session persistence; never copy raw ID, refresh, or session tokens into SharedPreferences.
+- Registration validates full name, email, phone, a password of at least six characters, and matching confirmation before calling Firebase Authentication.
 - Admin status must come from a trusted claim or protected server-managed record. Never trust a client-writable `role` field.
+- Account disablement and the SRS rule of five failed attempts followed by a 15-minute lockout must be enforced by Firebase Authentication or trusted backend code, never by a resettable client counter alone.
 - Firestore rules must enforce Customer ownership and Admin-only writes independently of UI checks.
 - Use server timestamps for shared records.
 - Use Firestore transactions or equivalent atomic operations for order creation, cancellation, status transitions, and rating aggregate updates.
-- Copy item, price, option, recipient, and address snapshots into orders so history does not change when source records change.
+- Copy item, price, option, recipient, address, delivery-distance, and delivery-fee snapshots into orders so history does not change when source records change.
+- Recalculate delivery distance and fee whenever the checkout address changes. Apply 15,000 VND through 3 km, 20,000 VND above 3 km through 5 km, and 30,000 VND above 5 km through 8 km; block unknown distance and distances above 8 km.
+- Treat distance, delivery fee, and order total as authoritative values validated by trusted code or protected server-managed data. Never accept client-provided totals without revalidation.
+- Send registration welcome or verification email through Firebase Authentication or trusted backend code; never embed SMTP credentials in Flutter.
 - Send FCM messages only from trusted backend code. The Flutter client registers tokens and handles messages; it must not contain service-account credentials or server keys.
 - Store device tokens per user and device, refresh them, and deactivate invalid tokens.
 - Use soft deletion or publication flags for menu data referenced by historical orders.

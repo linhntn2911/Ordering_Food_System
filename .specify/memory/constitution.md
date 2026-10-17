@@ -8,7 +8,7 @@ Every material feature begins with an approved, independently testable user stor
 
 ### II. MVVM and Riverpod Boundaries
 
-Views render state and forward intent. ViewModels coordinate workflows and publish immutable state. Repository interfaces define data capabilities, and repository implementations own Firebase or local persistence. Riverpod provides state management and dependency injection. Business logic, Firebase calls, and repository construction are forbidden in widgets.
+Views render state and forward intent. ViewModels coordinate workflows and publish immutable state. Repository interfaces define data capabilities, and repository implementations own Firebase or local persistence. Riverpod provides state management and dependency injection. The project must consume the official `flutter_riverpod` package declared in `pubspec.yaml`; agents and contributors must never create a local substitute or reimplement Riverpod types or runtime behavior. Application-specific providers and ViewModels use the official package API. Business logic, Firebase calls, and repository construction are forbidden in widgets.
 
 ### III. Server-Enforced Data Integrity and Security
 
@@ -40,4 +40,4 @@ The project follows constitution -> specify -> clarify when needed -> plan -> ch
 
 This constitution overrides informal conventions and sample-code patterns. Amendments require an explicit rationale, version change, and updates to affected specifications, plans, tasks, and migration notes. Reviewers must verify architectural boundaries, security, scope, screen ownership, and test evidence before accepting a feature.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-10-17
+**Version**: 1.2.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-10-17

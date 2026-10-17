@@ -4,7 +4,7 @@
 **Created**: 2026-10-17  
 **Status**: Draft ready for clarification and planning  
 **Product**: Flutter mobile application for one restaurant  
-**Input**: Course requirements, the supplied Food Ordering System SRS, and the architecture patterns reviewed in `Example-PRM393`
+**Input**: Course requirements, the revised `Project_PRM (3).docx` Food Ordering System SRS, and the architecture patterns reviewed in `Example-PRM393`
 
 ## Scope Decision
 
@@ -22,7 +22,8 @@ The first release uses Cash on Delivery only. It does not include an online paym
 
 ### External Systems
 
-- **Firebase Authentication**: Authenticates customers and administrators and supports password reset.
+- **Firebase Authentication**: Authenticates customers and administrators, maintains the authenticated session, and supports password reset.
+- **Email delivery service**: Delivers password-reset and registration welcome or verification email initiated through Firebase Authentication or trusted backend code.
 - **Cloud Firestore**: Stores application data and provides real-time updates.
 - **Firebase Cloud Messaging**: Delivers order and operational push notifications.
 - **Firebase Storage**: Stores menu and optional review images.
@@ -50,14 +51,17 @@ As a Customer, I want to register, sign in, sign out, and reset my password so t
 
 **Why this priority**: Ordering and personal data require an authenticated identity.
 
-**Independent Test**: Register a new account, sign out, sign in again, and request a password reset email.
+**Independent Test**: Register with full name, email, phone, password, and matching confirmation; verify automatic Customer sign-in and registration email delivery; sign out, sign in again, and request a password reset email.
 
 **Acceptance Scenarios**:
 
-1. **Given** valid registration data, **When** a Guest submits registration, **Then** a Firebase account and Customer profile are created.
-2. **Given** valid credentials, **When** a user signs in, **Then** the app routes to the Customer or Admin area based on the trusted role.
-3. **Given** an existing email, **When** password reset is requested, **Then** Firebase initiates the reset flow and the app shows a neutral success message.
-4. **Given** invalid input or an authentication failure, **When** the form is submitted, **Then** field-level or actionable error feedback is shown without losing valid input.
+1. **Given** a Guest provides full name, a valid unique email, a valid phone number, a password of at least six characters, and matching confirmation, **When** registration succeeds, **Then** Firebase Authentication creates the account, Firestore creates a Customer profile, the session starts, and Home opens.
+2. **Given** registration succeeds, **When** the account is established, **Then** the configured email service sends a welcome or verification email without exposing mail credentials in the client.
+3. **Given** valid credentials for an active account, **When** a user signs in, **Then** the app retrieves the protected role and routes a Customer to Home or the previously requested flow and an Admin to the Order Queue or Management Dashboard.
+4. **Given** an existing email, **When** password reset is requested, **Then** Firebase initiates the reset flow and the app shows a neutral success message.
+5. **Given** invalid registration input or an authentication failure, **When** a form is submitted, **Then** field-level or actionable feedback is shown without losing valid input.
+6. **Given** a disabled or blocked account, **When** sign-in is attempted, **Then** access is denied with an actionable account-status message.
+7. **Given** five consecutive failed sign-in attempts, **When** another attempt occurs during the next 15 minutes, **Then** the trusted authentication layer rejects it and communicates the remaining lockout condition.
 
 ### User Story 3 - Build a Cart and Place a COD Order (Priority: P1)
 
@@ -71,8 +75,11 @@ As a Customer, I want to configure food items, manage quantities, choose an addr
 
 1. **Given** an available food item, **When** the Customer selects required options and a valid quantity, **Then** the configured line is added and totals are recalculated.
 2. **Given** an identical item configuration already exists, **When** it is added again, **Then** its quantity is increased rather than creating an ambiguous duplicate.
-3. **Given** a non-empty valid cart and delivery address, **When** the Customer confirms COD checkout, **Then** one `Pending` order is created and the submitted cart lines are cleared.
-4. **Given** price or availability changed before confirmation, **When** checkout validates the cart, **Then** submission stops and the Customer is shown which lines require attention.
+3. **Given** a non-empty valid cart and serviceable delivery address, **When** Checkout opens, **Then** the system calculates the restaurant-to-address distance, applies the matching delivery-fee band, and displays the resulting total.
+4. **Given** the selected address is changed, **When** its distance is resolved, **Then** the delivery fee and order total are recalculated before confirmation.
+5. **Given** the address is more than 8 km away or its distance cannot be determined, **When** confirmation is attempted, **Then** the system blocks the order and asks the Customer to choose or correct the address.
+6. **Given** a valid serviceable address, **When** the Customer confirms COD checkout, **Then** one `Pending` order is created with immutable distance and delivery-fee snapshots and the submitted cart lines are cleared.
+7. **Given** price or availability changed before confirmation, **When** checkout validates the cart, **Then** submission stops and the Customer is shown which lines require attention.
 
 ### User Story 4 - Track and Cancel an Order (Priority: P1)
 
@@ -100,8 +107,9 @@ As an Admin, I want a real-time order queue and controlled status actions so tha
 
 1. **Given** a new order, **When** it is created, **Then** it appears in the Admin queue without a manual refresh.
 2. **Given** a `Pending` order, **When** the Admin confirms or rejects it, **Then** only the selected valid transition is committed.
-3. **Given** a confirmed order, **When** the Admin processes it, **Then** statuses follow `Confirmed -> Preparing -> OutForDelivery -> Completed`.
-4. **Given** concurrent Admin and Customer actions, **When** both target the same order, **Then** a transaction prevents stale or conflicting state changes.
+3. **Given** the Admin rejects a `Pending` order, **When** the action is submitted, **Then** a non-empty rejection reason is required and stored for the Customer and audit history.
+4. **Given** a confirmed order, **When** the Admin processes it, **Then** statuses follow `Confirmed -> Preparing -> OutForDelivery -> Completed`.
+5. **Given** concurrent Admin and Customer actions, **When** both target the same order, **Then** a transaction prevents stale or conflicting state changes.
 
 ### User Story 6 - Receive Order Notifications (Priority: P1)
 
@@ -184,6 +192,8 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - The default delivery address is deleted while referenced by an open checkout; the order must store an immutable address snapshot.
 - A completed order is reopened after the review window expires.
 - Review image upload partially succeeds; unsaved files must not create a broken review.
+- Delivery distance cannot be resolved, falls exactly on a fee-band boundary, or exceeds the 8 km service radius.
+- A disabled account or temporarily locked account attempts to reuse an existing local session.
 
 ## Requirements
 
@@ -191,12 +201,14 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 
 #### Account and Access
 
-- **FR-001**: The system MUST allow Customer registration using Firebase Authentication email and password.
-- **FR-002**: The system MUST allow Customer and Admin sign-in and sign-out.
-- **FR-003**: The system MUST support password reset through Firebase Authentication.
-- **FR-004**: The system MUST create a Customer profile for a newly registered account.
-- **FR-005**: Admin accounts MUST be pre-provisioned; a mobile client MUST NOT promote itself to Admin.
-- **FR-006**: Protected screens and Firestore operations MUST enforce ownership and role authorization.
+- **FR-001**: The system MUST allow Customer registration through Firebase Authentication using full name, email, phone number, password, and password confirmation.
+- **FR-002**: Registration MUST validate required fields, email and phone formats, a password of at least six characters, matching confirmation, and email uniqueness.
+- **FR-003**: After successful registration, the system MUST create a Firestore profile with the protected default role `Customer`, establish the authenticated session, route to Home, and initiate a welcome or verification email.
+- **FR-004**: The system MUST allow active Customer and pre-provisioned Admin accounts to sign in and sign out and MUST route them by their protected Firestore role.
+- **FR-005**: The system MUST support password reset through Firebase Authentication email delivery.
+- **FR-006**: Protected screens and Firestore operations MUST enforce ownership, active-account status, and role authorization; a mobile client MUST NOT create or promote an Admin.
+- **FR-044**: After five consecutive failed sign-in attempts, the trusted authentication layer MUST enforce a 15-minute temporary lockout and the client MUST display the lockout state.
+- **FR-045**: Firebase Authentication MUST own and restore authentication sessions across application restarts until sign-out, revocation, disablement, or expiration; the app MUST NOT persist raw session tokens in SharedPreferences.
 
 #### Menu Discovery
 
@@ -212,7 +224,11 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **FR-013**: The system MUST validate required options, quantity limits, price, and current availability before checkout.
 - **FR-014**: Checkout MUST require one valid delivery address and a recipient phone number.
 - **FR-015**: The only payment method in scope MUST be Cash on Delivery.
-- **FR-016**: A successful submission MUST create exactly one immutable order snapshot with status `Pending` and clear only the submitted cart lines.
+- **FR-016**: A successful submission MUST create exactly one immutable order snapshot with status `Pending`, delivery distance, delivery fee, address, recipient, and item-price snapshots and clear only the submitted cart lines.
+- **FR-046**: Checkout MUST calculate the distance between the restaurant and selected delivery address and MUST recalculate it whenever the address changes.
+- **FR-047**: The delivery fee MUST be 15,000 VND for distance up to and including 3 km, 20,000 VND for distance greater than 3 km and up to and including 5 km, and 30,000 VND for distance greater than 5 km and up to and including 8 km.
+- **FR-048**: Checkout MUST block confirmation when delivery distance is greater than 8 km or cannot be determined and MUST request a different or corrected address.
+- **FR-049**: The order total MUST equal validated item subtotals plus the authoritative delivery fee.
 
 #### Addresses and Profile
 
@@ -225,17 +241,18 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **FR-020**: Customers MUST be able to view their own order history and order details.
 - **FR-021**: Customers MUST be able to cancel only their own `Pending` order and MUST provide a reason.
 - **FR-022**: Admins MUST receive and filter a real-time order queue.
-- **FR-023**: Admins MUST be able to confirm or reject a `Pending` order.
+- **FR-023**: Admins MUST be able to confirm or reject a `Pending` order, and rejection MUST require a non-empty reason.
 - **FR-024**: Admins MUST be able to apply only permitted sequential status transitions.
-- **FR-025**: Every order state transition MUST record actor, source state, target state, timestamp, and optional reason.
+- **FR-025**: Every order state transition MUST record actor, source state, target state, timestamp, and reason when required for cancellation or rejection.
 - **FR-026**: Historical orders MUST retain item name, price, selected options, recipient, phone, and delivery address snapshots.
+- **FR-050**: Every created order MUST receive a unique structured code in the form `ORD-YYYYMMDD-XXXX` or an equivalently collision-safe documented format.
 
 #### Reviews
 
-- **FR-027**: Only the owner of a completed order line MAY submit one review for that line within 30 days of completion.
+- **FR-027**: Only the owner of a completed order line MAY maintain one active review for that line within 30 days of completion.
 - **FR-028**: A review MUST contain a 1-5 star rating; text is required for 1-2 stars and limited to 500 characters.
 - **FR-029**: A review MAY contain at most three images, each no larger than 5 MB.
-- **FR-030**: A review MAY be edited once within 7 days and deleted within 30 days by its owner.
+- **FR-030**: A review MAY be edited once within 7 days and deleted within 30 days by its owner; deletion restores submission eligibility only while the original 30-day post-completion window remains open.
 - **FR-031**: Review create, update, and delete operations MUST keep item rating aggregates consistent.
 
 #### Menu Administration
@@ -247,7 +264,7 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 #### Notifications
 
 - **FR-035**: The app MUST register and refresh FCM device tokens for authenticated users.
-- **FR-036**: New and cancelled orders MUST notify active Admin devices.
+- **FR-036**: New and cancelled orders MUST notify every active registered Admin device.
 - **FR-037**: Confirmed, rejected, preparing, out-for-delivery, completed, and cancelled events MUST notify the affected Customer.
 - **FR-038**: Each push event MUST also create an in-app notification record.
 - **FR-039**: A notification tap MUST deep-link to an authorized relevant screen.
@@ -256,7 +273,7 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 #### Reporting and Local Configuration
 
 - **FR-041**: Admins MUST be able to view completed-order count, COD revenue, and top-selling items by date range.
-- **FR-042**: SharedPreferences MUST persist local non-sensitive configuration including onboarding completion, language or theme choice, and notification preference hints.
+- **FR-042**: SharedPreferences MUST persist local non-sensitive configuration including onboarding completion, language choice, notification preference hints, and other approved light-mode settings.
 - **FR-043**: Secrets, roles, order truth, and authentication tokens MUST NOT be stored as authoritative data in SharedPreferences.
 
 ### Business Rules
@@ -271,12 +288,21 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **BR-008**: Customer data is isolated by authenticated UID; Admin data access requires a trusted Admin role.
 - **BR-009**: Every order status change creates one notification event and one audit entry.
 - **BR-010**: Server timestamps are authoritative for orders, reviews, notifications, and audit events.
+- **BR-011**: A Customer must be authenticated before adding or modifying cart items.
+- **BR-012**: Every cart item must reference an available food item and contain a valid quantity, required size, selected toppings, and optional note.
+- **BR-013**: Cart line subtotals must be recalculated whenever quantity, size, or toppings change; an identical configuration increases quantity instead of creating an ambiguous duplicate.
+- **BR-014**: Delivery-fee bands are 15,000 VND for `0 < distance <= 3 km`, 20,000 VND for `3 < distance <= 5 km`, and 30,000 VND for `5 < distance <= 8 km`.
+- **BR-015**: Orders beyond 8 km or without a determinable delivery distance are not accepted.
+- **BR-016**: Self-registration always assigns `Customer`; Admin accounts are pre-provisioned and protected from client modification.
+- **BR-017**: Five consecutive failed sign-in attempts trigger a 15-minute lockout enforced by a trusted authentication layer.
 
 ### Required Technical Constraints
 
 - The client MUST be built with Flutter and Dart.
 - Presentation MUST follow MVVM: Views render state and forward intent; ViewModels coordinate use cases and expose immutable state; repositories own data access.
-- Riverpod MUST manage application state and dependency injection. Riverpod code generation MAY be used, and generated `.g.dart` files MUST NOT be edited manually.
+- Riverpod MUST manage application state and dependency injection through the official `flutter_riverpod` package declared in `pubspec.yaml` and imported with `package:flutter_riverpod/flutter_riverpod.dart`.
+- Agents and contributors MUST NOT invent, imitate, vendor, or create project-local replacements for Riverpod classes, providers, refs, notifiers, widgets, or runtime behavior. Application-specific providers and ViewModels MUST use the official package API.
+- Riverpod code generation MAY be used only through the official supporting packages, and generated `.g.dart` files MUST NOT be written or edited manually.
 - Firebase Authentication MUST provide login-related identity operations.
 - Cloud Firestore MUST be the primary shared database for this release.
 - Firebase Cloud Messaging MUST provide push notifications.
@@ -302,12 +328,12 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 ## Key Entities
 
 - **AppUser**: UID, email, display name, phone, photo URL, trusted role, account status, timestamps.
-- **Address**: Owner UID, label, recipient, phone, address lines, note, default flag, timestamps.
+- **Address**: Owner UID, label, recipient, phone, normalized address lines, coordinates or other approved distance input, default flag, timestamps.
 - **Category**: Name, image URL, sort order, published flag, timestamps.
 - **MenuItem**: Category ID, name, description, image URL, base price, option groups, availability, rating summary, timestamps.
 - **Favorite**: Customer UID and menu item ID pair.
 - **CartItem**: Customer UID, menu item reference, option snapshot, quantity, note, calculated preview price, timestamps.
-- **Order**: Customer UID, order code, recipient snapshot, address snapshot, COD payment state, monetary totals, current status, cancellation/rejection reason, timestamps.
+- **Order**: Customer UID, order code, recipient and address snapshots, delivery-distance and delivery-fee snapshots, COD payment state, monetary totals, current status, cancellation/rejection reason, timestamps.
 - **OrderItem**: Menu item ID plus immutable name, image, price, options, quantity, note, and review state snapshot.
 - **OrderStatusEvent**: Order ID, actor UID/type, from status, to status, reason, server timestamp.
 - **Review**: Customer UID, order ID, order item ID, menu item ID, rating, comment, media URLs, anonymous flag, edit state, timestamps.
@@ -332,7 +358,7 @@ Screen complexity is based on meaningful data state, validation, navigation, asy
 | Member 3 | Cart | High | Line editing, selection, totals, validation |
 | Member 3 | Checkout | High | Address selection, summary, atomic submit |
 | Member 3 | Address List | Medium | Default selection and CRUD navigation |
-| Member 3 | Add or Edit Address | Medium | Form validation and persistence |
+| Member 3 | Add or Edit Address | Medium | Form validation, normalization, serviceability, and persistence |
 | Member 4 | Order History | Medium | Status tabs, filters, real-time updates |
 | Member 4 | Order Details and Tracking | High | Timeline, cancellation, state actions |
 | Member 4 | Review Purchased Item | Medium | Rating, text, images, validation |
@@ -356,6 +382,7 @@ Each member owns at least three Medium-or-higher screens. Shared widgets, Fireba
 - **SC-006**: Unauthorized Customer reads or writes against another user's protected data fail in Firebase emulator or rules tests.
 - **SC-007**: `flutter analyze` completes without errors and the automated test suite passes before a feature is considered done.
 - **SC-008**: The 23-screen inventory uses the same centralized colors, type scale, spacing, radius, and reusable components.
+- **SC-009**: Checkout applies the three SRS delivery-fee bands correctly at 3 km, 5 km, and 8 km boundaries and rejects distances above 8 km.
 
 ## Assumptions
 
@@ -363,12 +390,14 @@ Each member owns at least three Medium-or-higher screens. Shared widgets, Fireba
 - The restaurant has one delivery operation and Admin users manually set `OutForDelivery`; there is no driver role.
 - COD payment collection occurs outside the app; the app records the selected payment method and completed order state.
 - Seed data may be used during early UI development, but completed features read and write Firestore through repositories.
-- Exact delivery fee and COD maximum are configuration values decided during planning.
+- The revised SRS fixes delivery fees at 15,000, 20,000, and 30,000 VND for the defined distance bands and fixes the delivery radius at 8 km.
+- The technical plan must choose and document how a normalized address is converted into an authoritative restaurant-to-address distance; the SRS does not name a map or geocoding provider.
+- The COD maximum, cart quantity limit, minimum review text for 1-2-star ratings, target Admin confirmation SLA, and merchant-reply authoring flow remain clarification items because the revised SRS does not provide complete usable values or use cases.
 
 ## Out of Scope
 
-- Online payment, QR payment, refunds, and payment gateway callbacks.
-- Driver or shipper accounts, driver assignment, GPS maps, and live location.
+- Online payment, QR payment, refunds, and payment gateway callbacks. The Payment Gateway row retained in the source SRS is not active in this COD-only release because it has no corresponding approved payment use case.
+- Driver or shipper accounts, driver assignment, and live GPS tracking. Checkout distance calculation is required, but a customer-facing live map is not required.
 - Multiple restaurants, restaurant onboarding, commissions, or marketplace settlement.
 - Customer-admin chat, voice calls, complex promotions, coupons, loyalty points, and scheduled delivery slots.
 - Web administration portal; Admin uses the role-based Flutter application.
@@ -378,7 +407,7 @@ Each member owns at least three Medium-or-higher screens. Shared widgets, Fireba
 This document completes the `specify` stage. Before implementation, the team must run or perform the equivalent of:
 
 1. `constitution` - confirm project principles in `.specify/memory/constitution.md`.
-2. `clarify` - resolve remaining delivery fee, quantity limit, COD cap, and review text minimum decisions.
+2. `clarify` - resolve the distance/geocoding implementation, quantity limit, COD cap, review text minimum, registration email type, trusted lockout implementation, Admin confirmation SLA, and merchant-reply authoring flow.
 3. `plan` - create `specs/001-food-ordering-system/plan.md` with Firebase schema, rules, architecture, navigation, and testing approach.
 4. `checklist` - validate requirement quality.
 5. `tasks` - create dependency-ordered, story-scoped tasks with exact file paths and member ownership.
