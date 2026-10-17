@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "455542165389",
+    "project_id": "ordering-food-system-65c7f",
+    "storage_bucket": "ordering-food-system-65c7f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:455542165389:android:90fc3d8da4149f754937c4",
+        "android_client_info": {
+          "package_name": "com.example.ordering_food_system"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV_4n_OcT9MKsg3LkXrViDpwiGhXFNEPo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

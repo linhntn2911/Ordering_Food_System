@@ -1,0 +1,127 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function currentUser() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && currentUser().data.role == 'admin'
+        && currentUser().data.status == 'active';
+    }
+
+    function validCustomerProfile(userId) {
+      return owns(userId)
+        && request.resource.data.keys().hasAll([
+          'fullName', 'email', 'phone', 'role', 'status', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.role == 'customer'
+        && request.resource.data.status == 'active'
+        && request.resource.data.fullName is string
+        && request.resource.data.email is string
+        && request.resource.data.phone is string;
+    }
+
+    match /users/{userId} {
+      allow create: if validCustomerProfile(userId);
+      allow read: if owns(userId) || isAdmin();
+      allow update: if owns(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'fullName', 'phone', 'avatarUrl', 'updatedAt'
+        ]);
+      allow update, delete: if isAdmin();
+
+      match /addresses/{addressId} {
+        allow read, create, update, delete: if owns(userId);
+      }
+
+      match /favorites/{menuItemId} {
+        allow read, create, delete: if owns(userId);
+        allow update: if false;
+      }
+
+      match /cart_items/{cartItemId} {
+        allow read, create, update, delete: if owns(userId);
+      }
+
+      match /notifications/{notificationId} {
+        allow read, delete: if owns(userId);
+        allow update: if owns(userId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'isRead', 'readAt'
+          ]);
+        allow create: if isAdmin();
+      }
+
+      match /devices/{deviceId} {
+        allow read, create, update, delete: if owns(userId);
+      }
+    }
+
+    match /categories/{categoryId} {
+      allow get, list: if isAdmin() || resource.data.isPublished == true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /menu_items/{menuItemId} {
+      allow get, list: if isAdmin()
+        || (resource.data.isPublished == true && resource.data.isAvailable == true);
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /restaurant_configs/{configId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read: if signedIn()
+        && (resource.data.customerId == request.auth.uid || isAdmin());
+
+      // Order creation and state transitions require trusted validation of
+      // prices, distance, fees, totals, ownership, and allowed transitions.
+      allow create, update, delete: if false;
+
+      match /items/{orderItemId} {
+        allow read: if signedIn()
+          && (
+            get(/databases/$(database)/documents/orders/$(orderId)).data.customerId
+              == request.auth.uid
+            || isAdmin()
+          );
+        allow write: if false;
+      }
+
+      match /status_events/{eventId} {
+        allow read: if signedIn()
+          && (
+            get(/databases/$(database)/documents/orders/$(orderId)).data.customerId
+              == request.auth.uid
+            || isAdmin()
+          );
+        allow write: if false;
+      }
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if true;
+      // Trusted code validates completed-order ownership, time windows,
+      // duplicate prevention, and rating aggregate updates atomically.
+      allow create, update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
