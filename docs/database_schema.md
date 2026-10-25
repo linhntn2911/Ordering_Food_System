@@ -56,7 +56,9 @@ Fields: `name`, `imageUrl`, `sortOrder`, `isPublished`, `createdAt`, `updatedAt`
 
 ### `menu_items/{menuItemId}`
 
-Fields: `categoryId`, `name`, `description`, `imageUrl`, `basePrice`, `isAvailable`, `isPublished`, `sortOrder`, `ratingAverage`, `reviewCount`, `sizes`, `toppings`, `createdAt`, `updatedAt`. Published and available items are publicly readable; Admin manages them.
+Fields: `categoryId`, `name`, `description`, `imageUrl`, `basePrice`, `isAvailable`, `isPublished`, `sortOrder`, `ratingAverage`, `reviewCount`, `sizes`, `toppings`, `createdAt`, `updatedAt`. `sizes` is an array of `{name, additionalPrice}` maps; the current Ngô Chicken form supports optional M/L values, with M equal to `basePrice`. Missing `sizes` is treated as an empty array for older records. Published and available items are publicly readable; Admin manages them.
+
+Menu images are stored under `menu_items/{menuItemId}/{timestamp}.{extension}` in Firebase Storage. The client writes image bytes only for an authenticated active Admin, while Firestore stores the resulting download URL.
 
 ### `orders/{orderId}`
 

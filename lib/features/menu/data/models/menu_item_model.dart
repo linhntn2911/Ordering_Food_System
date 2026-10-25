@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/entities/menu_item.dart';
+import '../../domain/entities/menu_size_option.dart';
 
 class MenuItemModel {
   const MenuItemModel({
@@ -15,6 +16,7 @@ class MenuItemModel {
     required this.sortOrder,
     required this.ratingAverage,
     required this.reviewCount,
+    this.sizes = const [],
   });
 
   final String id;
@@ -28,6 +30,7 @@ class MenuItemModel {
   final int sortOrder;
   final double ratingAverage;
   final int reviewCount;
+  final List<MenuSizeOption> sizes;
 
   factory MenuItemModel.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> document,
@@ -50,6 +53,7 @@ class MenuItemModel {
       sortOrder: (data['sortOrder'] as num?)?.toInt() ?? 0,
       ratingAverage: (data['ratingAverage'] as num?)?.toDouble() ?? 0,
       reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
+      sizes: _readSizes(data['sizes']),
     );
   }
 
@@ -65,6 +69,14 @@ class MenuItemModel {
       'sortOrder': sortOrder,
       'ratingAverage': ratingAverage,
       'reviewCount': reviewCount,
+      'sizes': sizes
+          .map(
+            (size) => {
+              'name': size.name,
+              'additionalPrice': size.additionalPrice,
+            },
+          )
+          .toList(growable: false),
     };
   }
 
@@ -81,6 +93,7 @@ class MenuItemModel {
       sortOrder: sortOrder,
       ratingAverage: ratingAverage,
       reviewCount: reviewCount,
+      sizes: List<MenuSizeOption>.unmodifiable(sizes),
     );
   }
 
@@ -98,5 +111,22 @@ class MenuItemModel {
       return value.toInt();
     }
     throw FormatException('Missing or invalid $field.');
+  }
+
+  static List<MenuSizeOption> _readSizes(Object? value) {
+    if (value is! List) return const [];
+    return List<MenuSizeOption>.unmodifiable(
+      value.whereType<Map>().map((raw) {
+        final name = raw['name'];
+        final additionalPrice = raw['additionalPrice'];
+        if (name is! String || name.trim().isEmpty || additionalPrice is! num) {
+          throw const FormatException('Invalid menu item size option.');
+        }
+        return MenuSizeOption(
+          name: name.trim(),
+          additionalPrice: additionalPrice.toInt(),
+        );
+      }),
+    );
   }
 }

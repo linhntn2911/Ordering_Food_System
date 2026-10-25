@@ -1,3 +1,5 @@
+import 'menu_size_option.dart';
+
 class MenuItem {
   const MenuItem({
     required this.id,
@@ -11,6 +13,7 @@ class MenuItem {
     required this.sortOrder,
     required this.ratingAverage,
     required this.reviewCount,
+    this.sizes = const [],
   });
 
   final String id;
@@ -24,4 +27,5 @@ class MenuItem {
   final int sortOrder;
   final double ratingAverage;
   final int reviewCount;
+  final List<MenuSizeOption> sizes;
 }

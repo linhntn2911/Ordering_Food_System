@@ -6,7 +6,10 @@ import '../../domain/entities/menu_item.dart';
 import '../../domain/repositories/menu_repository.dart';
 
 final menuRepositoryProvider = Provider<MenuRepository>((ref) {
-  return FirestoreMenuRepository(ref.watch(firebaseFirestoreProvider));
+  return FirestoreMenuRepository(
+    ref.watch(firebaseFirestoreProvider),
+    ref.watch(firebaseStorageProvider),
+  );
 });
 
 final publishedMenuProvider = StreamProvider.autoDispose
