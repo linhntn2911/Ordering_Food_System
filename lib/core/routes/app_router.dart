@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:oder_food/core/constants/app_routes.dart';
 import 'package:oder_food/features/notifications/views/screens/notification_detail_screen.dart';
 import 'package:oder_food/features/notifications/views/screens/notification_list_screen.dart';
-import 'package:oder_food/features/order_history/views/screens/order_history_screen.dart';
+import 'package:oder_food/features/order_history/presentation/views/order_history_view.dart';
 import 'package:oder_food/features/order_tracking/views/screens/order_detail_screen.dart';
 import 'package:oder_food/features/order_tracking/views/screens/order_tracking_timeline_screen.dart';
 import 'package:oder_food/features/review/views/screens/my_reviews_screen.dart';
@@ -11,10 +11,10 @@ import 'package:oder_food/features/review/views/screens/write_review_screen.dart
 
 class AppRouter {
   static final GoRouter router = GoRouter(
-    initialLocation: AppRoutes.home,
+    initialLocation: AppRoutes.orderHistory,
     routes: [
-      GoRoute(path: AppRoutes.home, name: 'home', builder: (context, state) => const OrderHistoryScreen()),
-      GoRoute(path: AppRoutes.orderHistory, name: 'orderHistory', builder: (context, state) => const OrderHistoryScreen()),
+      GoRoute(path: AppRoutes.home, name: 'home', builder: (context, state) => const OrderHistoryView()),
+      GoRoute(path: AppRoutes.orderHistory, name: 'orderHistory', builder: (context, state) => const OrderHistoryView()),
       GoRoute(path: AppRoutes.orderDetail, name: 'orderDetail', builder: (context, state) {
         final orderId = state.uri.queryParameters['orderId'] ?? '';
         return OrderDetailScreen(orderId: orderId);

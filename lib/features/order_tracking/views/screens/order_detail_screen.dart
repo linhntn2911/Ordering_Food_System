@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:oder_food/core/constants/app_colors.dart';
 import 'package:oder_food/core/constants/app_routes.dart';
-import 'package:oder_food/features/order_history/providers/order_history_provider.dart';
+import 'package:oder_food/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
 
 class OrderDetailScreen extends ConsumerWidget {
   const OrderDetailScreen({super.key, required this.orderId});
