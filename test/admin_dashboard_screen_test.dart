@@ -9,49 +9,50 @@ import 'package:ordering_food_system/features/order/presentation/viewmodels/admi
 import 'package:ordering_food_system/features/order/presentation/views/admin_dashboard_screen.dart';
 
 void main() {
-  testWidgets('renders AdminDashboardScreen with greeting, metrics and quick actions', (
-    tester,
-  ) async {
-    final categoryRepo = _FakeCategoryRepository([
-      const Category(
-        id: 'main',
-        name: 'Main dishes',
-        imageUrl: '',
-        sortOrder: 0,
-        isPublished: true,
-      ),
-    ]);
+  testWidgets(
+    'renders AdminDashboardScreen with greeting, metrics and quick actions',
+    (tester) async {
+      final categoryRepo = _FakeCategoryRepository([
+        const Category(
+          id: 'main',
+          name: 'Main dishes',
+          imageUrl: '',
+          sortOrder: 0,
+          isPublished: true,
+        ),
+      ]);
 
-    tester.view.physicalSize = const Size(390, 844);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          categoryRepositoryProvider.overrideWithValue(categoryRepo),
-          orderRepositoryProvider.overrideWith((ref) {
-            final repo = PreviewOrderRepository();
-            ref.onDispose(repo.dispose);
-            return repo;
-          }),
-        ],
-        child: const MaterialApp(home: AdminDashboardScreen()),
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            categoryRepositoryProvider.overrideWithValue(categoryRepo),
+            orderRepositoryProvider.overrideWith((ref) {
+              final repo = PreviewOrderRepository();
+              ref.onDispose(repo.dispose);
+              return repo;
+            }),
+          ],
+          child: const MaterialApp(home: AdminDashboardScreen()),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Good day, Admin 👋'), findsOneWidget);
-    expect(find.text('Total Revenue'), findsOneWidget);
-    expect(find.text('Active Queue'), findsOneWidget);
-    expect(find.text('Quick Actions'), findsOneWidget);
-    expect(find.text('Live Orders'), findsWidgets);
+      expect(find.text('Good day, Admin 👋'), findsOneWidget);
+      expect(find.text('Total Revenue'), findsOneWidget);
+      expect(find.text('Active Queue'), findsOneWidget);
+      expect(find.text('Quick Actions'), findsOneWidget);
+      expect(find.text('Live Orders'), findsWidgets);
 
-    final recentOrdersFinder = find.text('Recent Orders');
-    await tester.scrollUntilVisible(recentOrdersFinder, 200);
-    expect(recentOrdersFinder, findsOneWidget);
-  });
+      final recentOrdersFinder = find.text('Recent Orders');
+      await tester.scrollUntilVisible(recentOrdersFinder, 200);
+      expect(recentOrdersFinder, findsOneWidget);
+    },
+  );
 }
 
 class _FakeCategoryRepository implements CategoryRepository {

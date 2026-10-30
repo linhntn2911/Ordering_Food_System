@@ -66,13 +66,9 @@ abstract final class AppRoutes {
           builder: (_) => const AdminMenuItemListScreen(),
         );
       case adminOrders:
-        return MaterialPageRoute(
-          builder: (_) => const AdminOrderListScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const AdminOrderListScreen());
       case adminSalesReport:
-        return MaterialPageRoute(
-          builder: (_) => const SalesReportScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => const SalesReportScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

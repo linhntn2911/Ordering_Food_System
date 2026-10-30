@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ordering_food_system/app/app.dart';
 import 'package:ordering_food_system/core/widgets/admin_drawer.dart';
+import 'package:ordering_food_system/features/order/presentation/views/admin_dashboard_screen.dart';
 import 'package:ordering_food_system/features/category/domain/entities/category.dart';
 import 'package:ordering_food_system/features/category/domain/repositories/category_repository.dart';
 import 'package:ordering_food_system/features/category/presentation/viewmodels/category_management_view_model.dart';
@@ -38,7 +39,7 @@ void main() {
             return repo;
           }),
         ],
-        child: const FoodOrderingApp(),
+        child: const FoodOrderingApp(initialHome: AdminDashboardScreen()),
       ),
     );
     await tester.pumpAndSettle();

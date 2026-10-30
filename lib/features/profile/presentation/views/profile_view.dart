@@ -468,6 +468,49 @@ class ProfileView extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.p24),
+                      if (user.isAdmin) ...[
+                        Container(
+                          width: double.infinity,
+                          height: 54,
+                          decoration: const BoxDecoration(
+                            gradient: AppColors.primaryGradient,
+                            borderRadius: AppSpacing.roundedInput,
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                  AppRoutes.adminDashboard,
+                                  (route) => false,
+                                );
+                              },
+                              borderRadius: AppSpacing.roundedInput,
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.dashboard_customize_rounded,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: AppSpacing.p8),
+                                    Text(
+                                      'Admin Dashboard',
+                                      style: AppTextStyles.labelLarge.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.p16),
+                      ],
 
                       // Sign Out Button (Food Ninja Soft Error Card)
                       Container(

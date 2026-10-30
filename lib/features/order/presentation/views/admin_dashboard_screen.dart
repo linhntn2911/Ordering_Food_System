@@ -28,9 +28,7 @@ class AdminDashboardScreen extends ConsumerWidget {
     final allOrdersAsync = ref.watch(adminOrdersProvider);
 
     return Scaffold(
-      drawer: const AdminDrawer(
-        currentDestination: AdminDestination.dashboard,
-      ),
+      drawer: const AdminDrawer(currentDestination: AdminDestination.dashboard),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -89,10 +87,9 @@ class AdminDashboardScreen extends ConsumerWidget {
                       Text('Quick Actions', style: AppTextStyles.titleLarge),
                       const SizedBox(height: AppSpacing.sm),
                       _QuickActionGrid(
-                        pendingCount: allOrdersAsync.value
-                                ?.where(
-                                  (o) => o.status == OrderStatus.pending,
-                                )
+                        pendingCount:
+                            allOrdersAsync.value
+                                ?.where((o) => o.status == OrderStatus.pending)
                                 .length ??
                             0,
                       ),
@@ -209,8 +206,9 @@ class _PendingAlertBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pendingOrders =
-        orders.where((o) => o.status == OrderStatus.pending).toList();
+    final pendingOrders = orders
+        .where((o) => o.status == OrderStatus.pending)
+        .toList();
 
     if (pendingOrders.isEmpty) {
       return Container(
@@ -249,9 +247,7 @@ class _PendingAlertBanner extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppRadii.card),
       child: InkWell(
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => const AdminOrderListScreen(),
-          ),
+          MaterialPageRoute<void>(builder: (_) => const AdminOrderListScreen()),
         ),
         borderRadius: BorderRadius.circular(AppRadii.card),
         child: Container(
@@ -320,8 +316,9 @@ class _MetricsOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completedOrders =
-        orders.where((o) => o.status == OrderStatus.completed).toList();
+    final completedOrders = orders
+        .where((o) => o.status == OrderStatus.completed)
+        .toList();
     final totalRevenue = completedOrders.fold<int>(
       0,
       (sum, o) => sum + o.totalAmount,
@@ -631,7 +628,9 @@ class _RecentOrdersList extends StatelessWidget {
         child: Center(
           child: Text(
             'No orders yet.',
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textMuted),
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textMuted,
+            ),
           ),
         ),
       );

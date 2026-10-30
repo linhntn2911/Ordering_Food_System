@@ -53,9 +53,7 @@ class _AdminMenuItemListScreenState
     });
 
     return Scaffold(
-      drawer: const AdminDrawer(
-        currentDestination: AdminDestination.menuItems,
-      ),
+      drawer: const AdminDrawer(currentDestination: AdminDestination.menuItems),
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -158,8 +156,9 @@ class _AdminMenuItemListScreenState
                                 backgroundColor: AppColors.primarySoft,
                                 side: BorderSide.none,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(AppRadii.pill),
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadii.pill,
+                                  ),
                                 ),
                                 deleteIcon: const Icon(
                                   Icons.close_rounded,
@@ -395,7 +394,9 @@ class _CategoryFilterMenu extends StatelessWidget {
               smallSize: 8,
               child: Icon(
                 Icons.tune_rounded,
-                color: isFiltered ? AppColors.primaryEnd : AppColors.textPrimary,
+                color: isFiltered
+                    ? AppColors.primaryEnd
+                    : AppColors.textPrimary,
               ),
             ),
             itemBuilder: (context) => [

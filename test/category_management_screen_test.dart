@@ -38,9 +38,7 @@ void main() {
             _FakeCategoryRepository(const []),
           ),
         ],
-        child: const FoodOrderingApp(
-          initialHome: CategoryManagementScreen(),
-        ),
+        child: const FoodOrderingApp(initialHome: CategoryManagementScreen()),
       ),
     );
     await tester.pumpAndSettle();
@@ -75,9 +73,7 @@ void main() {
             ]),
           ),
         ],
-        child: const FoodOrderingApp(
-          initialHome: CategoryManagementScreen(),
-        ),
+        child: const FoodOrderingApp(initialHome: CategoryManagementScreen()),
       ),
     );
     await tester.pumpAndSettle();

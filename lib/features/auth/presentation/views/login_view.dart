@@ -277,24 +277,50 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.p20),
-
-                  // Continue as Guest (FR-007)
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        AppRoutes.home,
-                        (route) => false,
-                      );
-                    },
-                    child: Text(
-                      'Continue as Guest',
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textMuted,
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
+                  const SizedBox(
+                    height: AppSpacing.p20,
+                  ), // Guest & Admin quick navigation
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                            AppRoutes.home,
+                            (route) => false,
+                          );
+                        },
+                        child: Text(
+                          'Continue as Guest',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textMuted,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
                       ),
-                    ),
+                      Text(
+                        ' • ',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                      TextButton(
+                        key: const ValueKey('login-admin-portal-button'),
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed(AppRoutes.adminDashboard);
+                        },
+                        child: Text(
+                          'Admin Portal',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.primaryEnd,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: AppSpacing.p20),
 

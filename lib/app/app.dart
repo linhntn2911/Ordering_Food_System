@@ -36,7 +36,9 @@ class FoodOrderingApp extends StatelessWidget {
         );
       },
       home: initialHome,
-      initialRoute: initialHome == null ? (initialRoute ?? AppRoutes.login) : null,
+      initialRoute: initialHome == null
+          ? (initialRoute ?? AppRoutes.login)
+          : null,
       onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }

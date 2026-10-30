@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/router.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_gradients.dart';
 import '../theme/app_radii.dart';
@@ -11,19 +13,10 @@ import '../../features/order/presentation/views/admin_dashboard_screen.dart';
 import '../../features/order/presentation/views/admin_order_list_screen.dart';
 import '../../features/order/presentation/views/sales_report_screen.dart';
 
-enum AdminDestination {
-  dashboard,
-  categories,
-  menuItems,
-  orders,
-  salesReport,
-}
+enum AdminDestination { dashboard, categories, menuItems, orders, salesReport }
 
 class AdminDrawer extends StatelessWidget {
-  const AdminDrawer({
-    required this.currentDestination,
-    super.key,
-  });
+  const AdminDrawer({required this.currentDestination, super.key});
 
   final AdminDestination currentDestination;
 
@@ -39,9 +32,7 @@ class AdminDrawer extends StatelessWidget {
     switch (destination) {
       case AdminDestination.dashboard:
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute<void>(
-            builder: (_) => const AdminDashboardScreen(),
-          ),
+          MaterialPageRoute<void>(builder: (_) => const AdminDashboardScreen()),
           (route) => false,
         );
         return;
@@ -60,13 +51,11 @@ class AdminDrawer extends StatelessWidget {
     }
 
     if (currentDestination == AdminDestination.dashboard) {
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => target),
-      );
+      Navigator.of(context)
+          .push(MaterialPageRoute<void>(builder: (_) => target));
     } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute<void>(builder: (_) => target),
-      );
+      Navigator.of(context)
+          .pushReplacement(MaterialPageRoute<void>(builder: (_) => target));
     }
   }
 
@@ -172,8 +161,7 @@ class AdminDrawer extends StatelessWidget {
                     subtitle: 'Overview & metrics',
                     isSelected:
                         currentDestination == AdminDestination.dashboard,
-                    onTap: () =>
-                        _navigate(context, AdminDestination.dashboard),
+                    onTap: () => _navigate(context, AdminDestination.dashboard),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   const Divider(color: AppColors.surfaceMuted, height: 1),
@@ -199,7 +187,8 @@ class AdminDrawer extends StatelessWidget {
                     subtitle: 'Organize menu sections',
                     isSelected:
                         currentDestination == AdminDestination.categories,
-                    onTap: () => _navigate(context, AdminDestination.categories),
+                    onTap: () =>
+                        _navigate(context, AdminDestination.categories),
                   ),
                   const SizedBox(height: 4),
                   _DrawerItem(
@@ -244,6 +233,52 @@ class AdminDrawer extends StatelessWidget {
                         currentDestination == AdminDestination.salesReport,
                     onTap: () =>
                         _navigate(context, AdminDestination.salesReport),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.sm,
+                      vertical: AppSpacing.xs,
+                    ),
+                    child: Text(
+                      'ACCOUNT',
+                      style: AppTextStyles.labelSmall.copyWith(
+                        color: AppColors.textMuted,
+                        letterSpacing: 1.2,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  _DrawerItem(
+                    key: const ValueKey('admin-drawer-profile'),
+                    icon: Icons.person_outline_rounded,
+                    title: 'Profile',
+                    subtitle: 'View admin profile',
+                    isSelected: false,
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pushNamed(AppRoutes.profile);
+                    },
+                  ),
+                  const SizedBox(height: 4),
+                  _DrawerItem(
+                    key: const ValueKey('admin-drawer-logout'),
+                    icon: Icons.logout_rounded,
+                    title: 'Sign Out',
+                    subtitle: 'Exit admin workspace',
+                    isSelected: false,
+                    onTap: () async {
+                      Navigator.of(context).pop();
+                      try {
+                        await FirebaseAuth.instance.signOut();
+                      } catch (_) {}
+                      if (context.mounted) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.login,
+                          (route) => false,
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
@@ -334,8 +369,9 @@ class _DrawerItem extends StatelessWidget {
                       title,
                       style: AppTextStyles.titleMedium.copyWith(
                         fontSize: 15,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
                         color: isSelected
                             ? AppColors.primaryEnd
                             : AppColors.textPrimary,

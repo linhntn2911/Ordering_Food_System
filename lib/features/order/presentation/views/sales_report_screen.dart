@@ -74,10 +74,7 @@ class SalesReportScreen extends ConsumerWidget {
                             bottom: AppSpacing.xxl,
                           ),
                           children: [
-                            _RevenueHero(
-                              report: data,
-                              range: range,
-                            ),
+                            _RevenueHero(report: data, range: range),
                             const SizedBox(height: AppSpacing.md),
                             Row(
                               children: [
@@ -225,10 +222,7 @@ class _PeriodSelector extends StatelessWidget {
 }
 
 class _RevenueHero extends StatelessWidget {
-  const _RevenueHero({
-    required this.report,
-    required this.range,
-  });
+  const _RevenueHero({required this.report, required this.range});
 
   final SalesReport report;
   final ({DateTime start, DateTime end}) range;
@@ -456,9 +450,8 @@ class _TrendLinePainter extends CustomPainter {
     canvas.drawPath(fillPath, fillPaint);
 
     final strokePaint = Paint()
-      ..shader = LinearGradient(
-        colors: [lineColorStart, lineColorEnd],
-      ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..shader = LinearGradient(colors: [lineColorStart, lineColorEnd])
+          .createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.5
       ..strokeCap = StrokeCap.round
@@ -482,16 +475,8 @@ class _TrendLinePainter extends CustomPainter {
       8.0,
       Paint()..color = lineColorEnd.withValues(alpha: 0.2),
     );
-    canvas.drawCircle(
-      lastPoint,
-      5.5,
-      Paint()..color = Colors.white,
-    );
-    canvas.drawCircle(
-      lastPoint,
-      3.5,
-      Paint()..color = lineColorEnd,
-    );
+    canvas.drawCircle(lastPoint, 5.5, Paint()..color = Colors.white);
+    canvas.drawCircle(lastPoint, 3.5, Paint()..color = lineColorEnd);
   }
 
   void _drawDashedLine(Canvas canvas, Offset start, Offset end, Paint paint) {
