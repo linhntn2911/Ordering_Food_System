@@ -58,11 +58,13 @@ Fields: `name`, `imageUrl`, `sortOrder`, `isPublished`, `createdAt`, `updatedAt`
 
 Fields: `categoryId`, `name`, `description`, `imageUrl`, `basePrice`, `isAvailable`, `isPublished`, `sortOrder`, `ratingAverage`, `reviewCount`, `sizes`, `toppings`, `isCategoryPublished`, `categorySortOrder`, `createdAt`, `updatedAt`.
 
-- `sizes` and `toppings` are arrays of `{ id, name, priceDelta }` maps. `priceDelta` is a non-negative integer VND amount added to `basePrice`.
+- `sizes` and `toppings` are arrays of `{ id, name, priceDelta }` maps. `priceDelta` is a non-negative integer VND amount added to `basePrice`. The current Admin form supports optional sizes `{ id: "m", name: "M", priceDelta: 0 }` and `{ id: "l", name: "L", priceDelta: <surcharge> }`. Missing `sizes` is treated as an empty array for older records.
 - `isCategoryPublished` and `categorySortOrder` are denormalized copies of the owning category's `isPublished` and `sortOrder`. Firestore rules cannot read the owning category during list queries, so these copies let the rules hide items of unpublished categories and let one query order items by category.
 - **Denormalization invariant**: whoever changes a category's `isPublished` or `sortOrder` (Admin or trusted code) MUST update `isCategoryPublished` and `categorySortOrder` on every item of that category in the same batch or transaction. Items written without these fields are not publicly readable.
 
 Items where `isPublished == true` and `isCategoryPublished == true` are publicly readable regardless of `isAvailable`; unavailable items stay visible with a sold-out label (see `specs/002-browse-menu/spec.md`). Admin reads and manages all items.
+
+Menu images are stored under `menu_items/{menuItemId}/{timestamp}.{extension}` in Firebase Storage. The client writes image bytes only for an authenticated active Admin, while Firestore stores the resulting download URL.
 
 ### `orders/{orderId}`
 

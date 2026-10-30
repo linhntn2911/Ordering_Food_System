@@ -31,8 +31,8 @@ class MenuSectionList extends StatelessWidget {
         rows.add(
           Padding(
             padding: const EdgeInsets.only(
-              top: AppSpacing.xxl,
-              bottom: AppSpacing.md,
+              top: AppSpacing.p24,
+              bottom: AppSpacing.p12,
             ),
             child: Semantics(
               header: true,
@@ -49,7 +49,7 @@ class MenuSectionList extends StatelessWidget {
       for (final item in section.items) {
         rows.add(
           Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            padding: const EdgeInsets.only(bottom: AppSpacing.p12),
             child: FoodCard(
               key: ValueKey('food-card-${item.id}'),
               item: item,
@@ -63,7 +63,7 @@ class MenuSectionList extends StatelessWidget {
     if (isLoadingMore) {
       rows.add(
         const Padding(
-          padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+          padding: EdgeInsets.symmetric(vertical: AppSpacing.p16),
           child: Center(child: CircularProgressIndicator()),
         ),
       );

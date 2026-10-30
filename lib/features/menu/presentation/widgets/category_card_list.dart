@@ -32,9 +32,9 @@ class CategoryCardList extends StatelessWidget {
       scrollDirection: Axis.horizontal,
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
-        AppSpacing.xs,
+        AppSpacing.p4,
         horizontalPadding,
-        AppSpacing.lg,
+        AppSpacing.p16,
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -103,7 +103,7 @@ class CategoryCard extends StatelessWidget {
     final radius = BorderRadius.circular(AppRadii.card);
 
     return Padding(
-      padding: const EdgeInsets.only(right: AppSpacing.md),
+      padding: const EdgeInsets.only(right: AppSpacing.p12),
       child: Semantics(
         button: true,
         selected: selected,
@@ -119,8 +119,8 @@ class CategoryCard extends StatelessWidget {
             child: Ink(
               width: width,
               padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.md,
+                horizontal: AppSpacing.p8,
+                vertical: AppSpacing.p12,
               ),
               decoration: BoxDecoration(
                 borderRadius: radius,
@@ -143,7 +143,7 @@ class CategoryCard extends StatelessWidget {
                     ),
                     child: Icon(icon, size: 24, color: AppColors.primaryEnd),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.p8),
                   Text(
                     label,
                     style: AppTextStyles.labelLarge.copyWith(

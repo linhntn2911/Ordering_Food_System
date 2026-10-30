@@ -16,41 +16,52 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios.',
-        );
-      case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos.',
-        );
+        return ios;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows.',
-        );
-      case TargetPlatform.linux:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for linux.',
-        );
+        return windows;
       default:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions are not supported for this platform.',
-        );
+        return web;
     }
   }
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCV_4n_OcT9MKsg3LkXrViDpwiGhXFNEPo',
+    appId: '1:455542165389:web:90fc3d8da4149f754937c4',
+    messagingSenderId: '455542165389',
+    projectId: 'ordering-food-system-65c7f',
+    authDomain: 'ordering-food-system-65c7f.firebaseapp.com',
+    storageBucket: 'ordering-food-system-65c7f.firebasestorage.app',
+  );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCV_4n_OcT9MKsg3LkXrViDpwiGhXFNEPo',
     appId: '1:455542165389:android:90fc3d8da4149f754937c4',
     messagingSenderId: '455542165389',
     projectId: 'ordering-food-system-65c7f',
+    storageBucket: 'ordering-food-system-65c7f.firebasestorage.app',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyCV_4n_OcT9MKsg3LkXrViDpwiGhXFNEPo',
+    appId: '1:455542165389:ios:90fc3d8da4149f754937c4',
+    messagingSenderId: '455542165389',
+    projectId: 'ordering-food-system-65c7f',
+    storageBucket: 'ordering-food-system-65c7f.firebasestorage.app',
+    iosBundleId: 'com.example.orderingFoodSystem',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyCV_4n_OcT9MKsg3LkXrViDpwiGhXFNEPo',
+    appId: '1:455542165389:web:90fc3d8da4149f754937c4',
+    messagingSenderId: '455542165389',
+    projectId: 'ordering-food-system-65c7f',
+    authDomain: 'ordering-food-system-65c7f.firebaseapp.com',
     storageBucket: 'ordering-food-system-65c7f.firebasestorage.app',
   );
 }

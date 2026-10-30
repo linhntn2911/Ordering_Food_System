@@ -37,7 +37,7 @@ class ReviewSection extends StatelessWidget {
             style: AppTextStyles.titleLarge,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.p12),
         ..._content(),
       ],
     );
@@ -52,7 +52,7 @@ class ReviewSection extends StatelessWidget {
             child: const Column(
               children: [
                 _ReviewSkeleton(),
-                SizedBox(height: AppSpacing.md),
+                SizedBox(height: AppSpacing.p12),
                 _ReviewSkeleton(),
               ],
             ),
@@ -93,12 +93,12 @@ class ReviewSection extends StatelessWidget {
         return [
           for (final review in reviews.reviews) ...[
             ReviewCard(review: review),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.p12),
           ],
           if (reviews.isLoadingMore)
             const Center(
               child: Padding(
-                padding: EdgeInsets.all(AppSpacing.sm),
+                padding: EdgeInsets.all(AppSpacing.p8),
                 child: CircularProgressIndicator(
                   semanticsLabel: 'Đang tải thêm đánh giá',
                 ),

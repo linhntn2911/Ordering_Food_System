@@ -111,7 +111,9 @@ class _MenuSearchViewState extends ConsumerState<MenuSearchView> {
         bottom: false,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final padding = AppSpacing.screenHorizontal(constraints.maxWidth);
+            final padding = AppSpacing.screenHorizontalFor(
+              constraints.maxWidth,
+            );
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -119,9 +121,9 @@ class _MenuSearchViewState extends ConsumerState<MenuSearchView> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(
                     padding,
-                    AppSpacing.lg,
+                    AppSpacing.p16,
                     padding,
-                    AppSpacing.md,
+                    AppSpacing.p12,
                   ),
                   child: SearchInputBar(
                     controller: _keywordController,
@@ -136,7 +138,7 @@ class _MenuSearchViewState extends ConsumerState<MenuSearchView> {
                 ),
                 if (!state.filters.isDefault)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    padding: const EdgeInsets.only(bottom: AppSpacing.p8),
                     child: SearchFilterChips(
                       filters: state.filters,
                       categoryName: state.selectedCategory?.name,
@@ -153,7 +155,7 @@ class _MenuSearchViewState extends ConsumerState<MenuSearchView> {
                       padding,
                       0,
                       padding,
-                      AppSpacing.sm,
+                      AppSpacing.p8,
                     ),
                     child: const OfflineBanner(),
                   ),
@@ -206,12 +208,12 @@ class _MenuSearchViewState extends ConsumerState<MenuSearchView> {
           controller: _scrollController,
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: insets.copyWith(
-            top: AppSpacing.sm,
-            bottom: AppSpacing.xxl + MediaQuery.paddingOf(context).bottom,
+            top: AppSpacing.p8,
+            bottom: AppSpacing.p24 + MediaQuery.paddingOf(context).bottom,
           ),
           itemCount: results.length + 1,
           separatorBuilder: (_, index) =>
-              SizedBox(height: index == 0 ? AppSpacing.md : AppSpacing.lg),
+              SizedBox(height: index == 0 ? AppSpacing.p12 : AppSpacing.p16),
           itemBuilder: (context, index) {
             if (index == 0) {
               return Text(

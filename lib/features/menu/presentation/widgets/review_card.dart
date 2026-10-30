@@ -33,7 +33,7 @@ class _ReviewCardState extends State<ReviewCard> {
 
     return Container(
       key: ValueKey('review-${review.id}'),
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.p16),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppRadii.card),
@@ -43,8 +43,8 @@ class _ReviewCardState extends State<ReviewCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Wrap(
-            spacing: AppSpacing.sm,
-            runSpacing: AppSpacing.xs,
+            spacing: AppSpacing.p8,
+            runSpacing: AppSpacing.p4,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(review.authorLabel, style: AppTextStyles.titleMedium),
@@ -61,10 +61,10 @@ class _ReviewCardState extends State<ReviewCard> {
                 ),
             ],
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.p4),
           RatingStars(rating: review.rating.toDouble(), size: 14),
           if (review.comment.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.p8),
             _Comment(
               text: review.comment,
               expanded: _expanded,
@@ -72,10 +72,10 @@ class _ReviewCardState extends State<ReviewCard> {
             ),
           ],
           if (review.imageUrls.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.p12),
             Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.sm,
+              spacing: AppSpacing.p8,
+              runSpacing: AppSpacing.p8,
               children: [
                 for (var i = 0; i < review.imageUrls.length; i++)
                   _Thumbnail(

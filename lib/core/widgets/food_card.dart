@@ -50,11 +50,11 @@ class FoodCard extends StatelessWidget {
                 minHeight: AppSpacing.minTouchTarget,
               ),
               child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
+                padding: const EdgeInsets.all(AppSpacing.p12),
                 child: Row(
                   children: [
                     _FoodImage(url: item.imageUrl),
-                    const SizedBox(width: AppSpacing.md),
+                    const SizedBox(width: AppSpacing.p12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +65,7 @@ class FoodCard extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: AppSpacing.xs),
+                          const SizedBox(height: AppSpacing.p4),
                           Row(
                             children: [
                               if (item.hasRating) ...[
@@ -74,7 +74,7 @@ class FoodCard extends StatelessWidget {
                                   size: 20,
                                   color: AppColors.warning,
                                 ),
-                                const SizedBox(width: AppSpacing.xs),
+                                const SizedBox(width: AppSpacing.p4),
                               ],
                               Flexible(
                                 child: Text(
@@ -87,13 +87,13 @@ class FoodCard extends StatelessWidget {
                             ],
                           ),
                           if (!item.isAvailable) ...[
-                            const SizedBox(height: AppSpacing.sm),
+                            const SizedBox(height: AppSpacing.p8),
                             const SoldOutLabel(),
                           ],
                         ],
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
+                    const SizedBox(width: AppSpacing.p8),
                     // Right-aligned price that may wrap but is never clipped.
                     ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: priceWidth),
@@ -133,8 +133,8 @@ class SoldOutLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
+        horizontal: AppSpacing.p8,
+        vertical: AppSpacing.p4,
       ),
       decoration: BoxDecoration(
         color: AppColors.errorSoft,

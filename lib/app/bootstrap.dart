@@ -3,15 +3,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../core/services/preferences_service.dart';
 import '../firebase_options.dart';
 import 'app.dart';
 
 const _useFirestoreEmulator = bool.fromEnvironment('USE_FIRESTORE_EMULATOR');
 const _firestoreEmulatorPort = 8080;
 
-/// Emulator-only options for web, where `flutterfire configure` has not
-/// generated real options yet. A `demo-` project ID never reaches real
+/// Emulator-only options for web. A `demo-` project ID never reaches real
 /// Firebase services, so no real identifiers are needed.
 const _webEmulatorOptions = FirebaseOptions(
   apiKey: 'demo-api-key',
@@ -22,16 +23,29 @@ const _webEmulatorOptions = FirebaseOptions(
 
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: _firebaseOptions());
 
-  if (_useFirestoreEmulator) {
-    FirebaseFirestore.instance.useFirestoreEmulator(
-      _emulatorHost(),
-      _firestoreEmulatorPort,
-    );
+  try {
+    await Firebase.initializeApp(options: _firebaseOptions());
+    if (_useFirestoreEmulator) {
+      FirebaseFirestore.instance.useFirestoreEmulator(
+        _emulatorHost(),
+        _firestoreEmulatorPort,
+      );
+    }
+  } catch (e) {
+    debugPrint('Firebase initialization warning: $e');
   }
 
-  runApp(const ProviderScope(child: App()));
+  final sharedPreferences = await SharedPreferences.getInstance();
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(sharedPreferences),
+      ],
+      child: const FoodOrderingApp(),
+    ),
+  );
 }
 
 FirebaseOptions _firebaseOptions() {

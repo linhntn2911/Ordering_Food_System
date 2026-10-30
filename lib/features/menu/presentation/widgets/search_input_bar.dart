@@ -50,7 +50,7 @@ class SearchInputBar extends StatelessWidget {
           label: 'Quay lại',
           onTap: onBack,
         ),
-        const SizedBox(width: AppSpacing.sm),
+        const SizedBox(width: AppSpacing.p8),
         Expanded(
           child: Semantics(
             label: 'Tìm kiếm món',
@@ -73,7 +73,7 @@ class SearchInputBar extends StatelessWidget {
                   color: AppColors.textMuted,
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  vertical: AppSpacing.lg,
+                  vertical: AppSpacing.p16,
                 ),
                 constraints: const BoxConstraints(minHeight: height),
                 border: border,
@@ -105,7 +105,7 @@ class SearchInputBar extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: AppSpacing.sm),
+        const SizedBox(width: AppSpacing.p8),
         Stack(
           clipBehavior: Clip.none,
           children: [
@@ -129,8 +129,8 @@ class SearchInputBar extends StatelessWidget {
             ),
             if (hasActiveFilters)
               const Positioned(
-                top: AppSpacing.xs,
-                right: AppSpacing.xs,
+                top: AppSpacing.p4,
+                right: AppSpacing.p4,
                 child: _ActiveDot(),
               ),
           ],
@@ -147,8 +147,8 @@ class _ActiveDot extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const ValueKey('search-filter-active'),
-      width: AppSpacing.sm,
-      height: AppSpacing.sm,
+      width: AppSpacing.p8,
+      height: AppSpacing.p8,
       decoration: const BoxDecoration(
         color: AppColors.primaryEnd,
         shape: BoxShape.circle,

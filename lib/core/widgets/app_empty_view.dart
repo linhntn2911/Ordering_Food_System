@@ -39,19 +39,19 @@ class AppEmptyView extends StatelessWidget {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.huge),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.p40),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 28, color: AppColors.textMuted),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.p12),
           Text(
             title,
             style: AppTextStyles.titleMedium,
             textAlign: TextAlign.center,
           ),
           if (message != null) ...[
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.p8),
             Text(
               message,
               style: AppTextStyles.bodyMedium,
@@ -59,11 +59,11 @@ class AppEmptyView extends StatelessWidget {
             ),
           ],
           if (actions.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.p16),
             Wrap(
               alignment: WrapAlignment.center,
-              spacing: AppSpacing.md,
-              runSpacing: AppSpacing.sm,
+              spacing: AppSpacing.p12,
+              runSpacing: AppSpacing.p8,
               children: actions,
             ),
           ],

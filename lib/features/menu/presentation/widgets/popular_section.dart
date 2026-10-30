@@ -26,10 +26,10 @@ class PopularSection extends StatelessWidget {
           header: true,
           child: const Text('Phổ biến', style: AppTextStyles.titleLarge),
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.p12),
         for (final item in items)
           Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            padding: const EdgeInsets.only(bottom: AppSpacing.p12),
             child: FoodCard(
               key: ValueKey('popular-${item.id}'),
               item: item,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_category.dart';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_feed.dart';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_item.dart';
+import 'package:ordering_food_system/features/menu/domain/entities/menu_item_draft.dart';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_item_feed.dart';
 import 'package:ordering_food_system/features/menu/domain/repositories/menu_repository.dart';
 
@@ -61,6 +62,23 @@ class FakeMenuRepository implements MenuRepository {
     itemIdRequests.add(menuItemId);
     return _singleItems.putIfAbsent(menuItemId, _ReplayChannel.new).stream();
   }
+
+  @override
+  Stream<List<MenuItem>> watchAdminItems({
+    String? categoryId,
+    int limit = 100,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<void> setAvailability(String id, {required bool isAvailable}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> setPublished(String id, {required bool isPublished}) =>
+      throw UnimplementedError();
+
+  @override
+  Future<String> saveItem(MenuItemDraft draft) => throw UnimplementedError();
 
   void emitCategories(
     List<MenuCategory> categories, {

@@ -49,7 +49,7 @@ class ItemOptionSection extends StatelessWidget {
               enabled: enabled,
               onTap: () => onSizeSelected(size.id),
             ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.p16),
         ],
         if (item.toppings.isNotEmpty) ...[
           const _SectionTitle('Topping'),
@@ -62,7 +62,7 @@ class ItemOptionSection extends StatelessWidget {
               enabled: enabled,
               onTap: () => onToppingToggled(topping.id),
             ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.p16),
         ],
       ],
     );
@@ -77,7 +77,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      padding: const EdgeInsets.only(bottom: AppSpacing.p4),
       child: Semantics(
         header: true,
         child: Text(text, style: AppTextStyles.titleMedium),
@@ -135,7 +135,7 @@ class _OptionRow extends StatelessWidget {
           child: Row(
             children: [
               Icon(icon, size: 24, color: color),
-              const SizedBox(width: AppSpacing.md),
+              const SizedBox(width: AppSpacing.p12),
               Expanded(
                 child: Text(
                   option.name,
@@ -147,7 +147,7 @@ class _OptionRow extends StatelessWidget {
                 ),
               ),
               if (extra != null) ...[
-                const SizedBox(width: AppSpacing.sm),
+                const SizedBox(width: AppSpacing.p8),
                 Text(
                   extra,
                   style: AppTextStyles.labelLarge.copyWith(

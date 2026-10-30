@@ -31,7 +31,7 @@ class ItemOrderBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final padding = AppSpacing.screenHorizontal(
+    final padding = AppSpacing.screenHorizontalFor(
       MediaQuery.sizeOf(context).width,
     );
 
@@ -45,9 +45,9 @@ class ItemOrderBar extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.fromLTRB(
             padding,
-            AppSpacing.md,
+            AppSpacing.p12,
             padding,
-            AppSpacing.md,
+            AppSpacing.p12,
           ),
           child: Row(
             children: [
@@ -57,7 +57,7 @@ class ItemOrderBar extends StatelessWidget {
                   onDecrease: onDecrease,
                   onIncrease: onIncrease,
                 ),
-                const SizedBox(width: AppSpacing.md),
+                const SizedBox(width: AppSpacing.p12),
               ],
               Expanded(
                 child: canOrder
@@ -180,8 +180,8 @@ class _AddButton extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
+                  horizontal: AppSpacing.p12,
+                  vertical: AppSpacing.p8,
                 ),
                 // heightFactor keeps the bar as tall as its content.
                 child: Center(

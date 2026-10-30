@@ -81,7 +81,7 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: AppSpacing.sm),
+      padding: const EdgeInsets.only(right: AppSpacing.p8),
       child: InputChip(
         label: Text(label),
         labelStyle: AppTextStyles.labelLarge.copyWith(

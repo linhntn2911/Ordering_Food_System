@@ -17,7 +17,7 @@ class RestaurantBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.p20),
       decoration: BoxDecoration(
         gradient: AppGradients.primary,
         borderRadius: BorderRadius.circular(AppRadii.large),
@@ -32,7 +32,7 @@ class RestaurantBanner extends StatelessWidget {
               color: AppColors.surface,
             ),
           ),
-          const SizedBox(width: AppSpacing.lg),
+          const SizedBox(width: AppSpacing.p16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,14 +43,14 @@ class RestaurantBanner extends StatelessWidget {
                     color: AppColors.surface,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xs),
+                const SizedBox(height: AppSpacing.p4),
                 Text(
                   RestaurantInfo.tagline,
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.surface,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.p12),
                 FilledButton(
                   key: const ValueKey('home-view-menu'),
                   onPressed: onViewMenu,

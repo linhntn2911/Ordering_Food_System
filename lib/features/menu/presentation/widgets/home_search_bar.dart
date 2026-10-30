@@ -43,13 +43,13 @@ class HomeSearchBar extends StatelessWidget {
                   height: height,
                   child: Row(
                     children: [
-                      const SizedBox(width: AppSpacing.lg),
+                      const SizedBox(width: AppSpacing.p16),
                       const Icon(
                         Icons.search_rounded,
                         size: 24,
                         color: AppColors.foodAccentDark,
                       ),
-                      const SizedBox(width: AppSpacing.md),
+                      const SizedBox(width: AppSpacing.p12),
                       Expanded(
                         child: Text(
                           'Bạn muốn ăn gì?',
@@ -67,7 +67,7 @@ class HomeSearchBar extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: AppSpacing.md),
+        const SizedBox(width: AppSpacing.p12),
         Material(
           color: AppColors.warningSurface,
           borderRadius: radius,

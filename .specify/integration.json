@@ -1,20 +1,15 @@
 {
-  "version": "0.8.17",
+  "version": "1.2.2.dev0",
   "integration_state_schema": 1,
   "installed_integrations": [
-    "codex",
-    "claude"
+    "agy"
   ],
   "integration_settings": {
-    "codex": {
-      "script": "ps",
-      "invoke_separator": "-"
-    },
-    "claude": {
+    "agy": {
       "script": "ps",
       "invoke_separator": "-"
     }
   },
-  "integration": "codex",
-  "default_integration": "codex"
+  "integration": "agy",
+  "default_integration": "agy"
 }

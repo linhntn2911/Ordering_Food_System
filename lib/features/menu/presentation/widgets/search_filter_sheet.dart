@@ -71,10 +71,10 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
         Flexible(
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xxl,
+              AppSpacing.p24,
               0,
-              AppSpacing.xxl,
-              AppSpacing.lg,
+              AppSpacing.p24,
+              AppSpacing.p16,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -83,11 +83,11 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   header: true,
                   child: const Text('Bộ lọc', style: AppTextStyles.titleLarge),
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.p20),
                 const _SectionTitle('Danh mục'),
                 Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
+                  spacing: AppSpacing.p8,
+                  runSpacing: AppSpacing.p8,
                   children: [
                     _Choice(
                       key: const ValueKey('filter-category-all'),
@@ -106,7 +106,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                       ),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.p20),
                 const _SectionTitle('Tình trạng'),
                 SwitchListTile(
                   key: const ValueKey('filter-available'),
@@ -121,11 +121,11 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                   onChanged: (value) =>
                       _update(_draft.copyWith(availableOnly: value)),
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.p16),
                 const _SectionTitle('Sắp xếp'),
                 Wrap(
-                  spacing: AppSpacing.sm,
-                  runSpacing: AppSpacing.sm,
+                  spacing: AppSpacing.p8,
+                  runSpacing: AppSpacing.p8,
                   children: [
                     for (final order in MenuSortOrder.values)
                       _Choice(
@@ -145,10 +145,10 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
           top: false,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
-              AppSpacing.xxl,
-              AppSpacing.sm,
-              AppSpacing.xxl,
-              AppSpacing.lg,
+              AppSpacing.p24,
+              AppSpacing.p8,
+              AppSpacing.p24,
+              AppSpacing.p16,
             ),
             child: Row(
               children: [
@@ -168,7 +168,7 @@ class _SearchFilterSheetState extends State<SearchFilterSheet> {
                     child: const Text('Đặt lại'),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.md),
+                const SizedBox(width: AppSpacing.p12),
                 Expanded(
                   child: _GradientButton(
                     key: const ValueKey('filter-apply'),
@@ -193,7 +193,7 @@ class _SectionTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.only(bottom: AppSpacing.p8),
       child: Text(text, style: AppTextStyles.titleMedium),
     );
   }

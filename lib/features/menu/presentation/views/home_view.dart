@@ -123,7 +123,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final padding = AppSpacing.screenHorizontal(constraints.maxWidth);
+          final padding = AppSpacing.screenHorizontalFor(constraints.maxWidth);
           final insets = EdgeInsets.symmetric(horizontal: padding);
 
           return CustomScrollView(
@@ -135,7 +135,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 sliver: SliverPadding(
                   padding: EdgeInsets.fromLTRB(
                     padding,
-                    AppSpacing.xl,
+                    AppSpacing.p20,
                     padding,
                     0,
                   ),
@@ -144,18 +144,18 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         HomeHeader(onNotificationsTap: _showUnavailableFeature),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.p20),
                         HomeSearchBar(
                           onSearchTap: _openSearch,
                           onFilterTap: () => _openSearch(openFilters: true),
                         ),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.p20),
                         if (state.isOffline) ...[
                           const OfflineBanner(),
-                          const SizedBox(height: AppSpacing.lg),
+                          const SizedBox(height: AppSpacing.p16),
                         ],
                         RestaurantBanner(onViewMenu: _showCategories),
-                        const SizedBox(height: AppSpacing.xxl),
+                        const SizedBox(height: AppSpacing.p24),
                       ],
                     ),
                   ),
@@ -167,7 +167,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 sliver: const SliverToBoxAdapter(
                   child: SafeArea(
                     top: false,
-                    child: SizedBox(height: AppSpacing.xxl),
+                    child: SizedBox(height: AppSpacing.p24),
                   ),
                 ),
               ),
@@ -238,7 +238,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: AppSpacing.p8),
                 CategoryCardList(
                   categories: state.categories,
                   selectedCategoryId: state.selectedCategoryId,
@@ -251,7 +251,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           // A selected category shows only its own items (US2-5).
           if (state.isAllSelected && state.popular.isNotEmpty)
             SliverPadding(
-              padding: insets.copyWith(top: AppSpacing.sm),
+              padding: insets.copyWith(top: AppSpacing.p8),
               sliver: SliverToBoxAdapter(
                 child: PopularSection(
                   items: state.popular,
@@ -273,7 +273,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           else
             SliverPadding(
               padding: insets.copyWith(
-                top: state.isAllSelected ? 0 : AppSpacing.lg,
+                top: state.isAllSelected ? 0 : AppSpacing.p16,
               ),
               sliver: MenuSectionList(
                 sections: state.sections,

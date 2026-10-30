@@ -26,6 +26,14 @@ service cloud.firestore {
       return item.isPublished == true && item.isCategoryPublished == true;
     }
 
+    function validAdminOrderTransition(fromStatus, toStatus) {
+      return (fromStatus == 'Pending'
+          && (toStatus == 'Confirmed' || toStatus == 'Rejected'))
+        || (fromStatus == 'Confirmed' && toStatus == 'Preparing')
+        || (fromStatus == 'Preparing' && toStatus == 'OutForDelivery')
+        || (fromStatus == 'OutForDelivery' && toStatus == 'Completed');
+    }
+
     function validCustomerProfile(userId) {
       return owns(userId)
         && request.resource.data.keys().hasAll([
@@ -66,7 +74,14 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
             'isRead', 'readAt'
           ]);
-        allow create: if isAdmin();
+        allow create: if isAdmin()
+          && request.resource.data.keys().hasAll([
+            'type', 'title', 'body', 'orderId', 'isRead', 'createdAt'
+          ])
+          && request.resource.data.type == 'order_status'
+          && request.resource.data.orderId is string
+          && request.resource.data.isRead == false
+          && request.resource.data.createdAt == request.time;
       }
 
       match /devices/{deviceId} {
@@ -106,9 +121,25 @@ service cloud.firestore {
       allow read: if signedIn()
         && (resource.data.customerId == request.auth.uid || isAdmin());
 
-      // Order creation and state transitions require trusted validation of
-      // prices, distance, fees, totals, ownership, and allowed transitions.
-      allow create, update, delete: if false;
+      // Creation still requires trusted price/distance/total validation. Admin
+      // may only move an existing order through the approved state machine.
+      allow create, delete: if false;
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'orderStatus', 'updatedAt', 'rejectionReason', 'completedAt'
+        ])
+        && validAdminOrderTransition(
+          resource.data.orderStatus,
+          request.resource.data.orderStatus
+        )
+        && request.resource.data.updatedAt == request.time
+        && (
+          request.resource.data.orderStatus != 'Rejected'
+          || (
+            request.resource.data.rejectionReason is string
+            && request.resource.data.rejectionReason.size() > 0
+          )
+        );
 
       match /items/{orderItemId} {
         allow read: if signedIn()
@@ -117,7 +148,21 @@ service cloud.firestore {
               == request.auth.uid
             || isAdmin()
           );
-        allow write: if false;
+        allow create: if isAdmin()
+          && request.resource.data.keys().hasAll([
+            'fromStatus', 'toStatus', 'actorId', 'actorRole', 'createdAt'
+          ])
+          && request.resource.data.actorId == request.auth.uid
+          && request.resource.data.actorRole == 'admin'
+          && request.resource.data.createdAt == request.time
+          && validAdminOrderTransition(
+            request.resource.data.fromStatus,
+            request.resource.data.toStatus
+          )
+          && getAfter(
+            /databases/$(database)/documents/orders/$(orderId)
+          ).data.orderStatus == request.resource.data.toStatus;
+        allow update, delete: if false;
       }
 
       match /status_events/{eventId} {

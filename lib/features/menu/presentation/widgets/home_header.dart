@@ -25,7 +25,7 @@ class HomeHeader extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: AppSpacing.md),
+        const SizedBox(width: AppSpacing.p12),
         DecoratedBox(
           decoration: const BoxDecoration(
             color: AppColors.surface,

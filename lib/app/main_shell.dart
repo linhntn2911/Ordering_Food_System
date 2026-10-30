@@ -44,10 +44,10 @@ class _MainShellState extends State<MainShell> {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
+            AppSpacing.p16,
             0,
-            AppSpacing.lg,
-            AppSpacing.lg,
+            AppSpacing.p16,
+            AppSpacing.p16,
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -56,7 +56,7 @@ class _MainShellState extends State<MainShell> {
               boxShadow: const [AppShadows.card],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.sm),
+              padding: const EdgeInsets.all(AppSpacing.p8),
               child: Row(
                 children: [
                   for (var i = 0; i < MainShell.tabs.length; i++)
@@ -122,7 +122,7 @@ class _TabButton extends StatelessWidget {
               children: [
                 Icon(tab.icon, size: 24, color: color),
                 if (selected) ...[
-                  const SizedBox(width: AppSpacing.sm),
+                  const SizedBox(width: AppSpacing.p8),
                   Flexible(
                     child: Text(
                       tab.label,

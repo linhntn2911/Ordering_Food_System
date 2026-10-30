@@ -69,8 +69,8 @@ class _ReviewImageViewerState extends State<_ReviewImageViewer> {
               ),
             ),
             Positioned(
-              top: AppSpacing.sm,
-              left: AppSpacing.lg,
+              top: AppSpacing.p8,
+              left: AppSpacing.p16,
               child: Text(
                 '${_index + 1}/${widget.imageUrls.length}',
                 key: const ValueKey('review-image-index'),
@@ -81,7 +81,7 @@ class _ReviewImageViewerState extends State<_ReviewImageViewer> {
             ),
             Positioned(
               top: 0,
-              right: AppSpacing.sm,
+              right: AppSpacing.p8,
               child: IconButton(
                 key: const ValueKey('review-image-close'),
                 tooltip: 'Đóng',

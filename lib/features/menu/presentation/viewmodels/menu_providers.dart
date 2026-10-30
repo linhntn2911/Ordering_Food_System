@@ -15,7 +15,10 @@ typedef BrowsableItemsQuery = ({String? categoryId, int limit});
 Duration? _noAutomaticRetry(int retryCount, Object error) => null;
 
 final menuRepositoryProvider = Provider<MenuRepository>((ref) {
-  return FirestoreMenuRepository(ref.watch(firebaseFirestoreProvider));
+  return FirestoreMenuRepository(
+    ref.watch(firebaseFirestoreProvider),
+    ref.watch(firebaseStorageProvider),
+  );
 });
 
 final menuCategoriesProvider =

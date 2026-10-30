@@ -39,10 +39,10 @@ class AppLoadingView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const _SkeletonBlock(height: 36, width: 220),
-            const SizedBox(height: AppSpacing.xxl),
+            const SizedBox(height: AppSpacing.p24),
             for (var i = 0; i < _skeletonRows; i++) ...[
               const _SkeletonBlock(height: 88),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.p12),
             ],
           ],
         ),

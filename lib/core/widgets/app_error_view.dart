@@ -19,7 +19,7 @@ class AppErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.huge),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.p40),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -28,7 +28,7 @@ class AppErrorView extends StatelessWidget {
             size: 28,
             color: AppColors.error,
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.p12),
           Text(
             message,
             style: AppTextStyles.bodyMedium.copyWith(
@@ -36,7 +36,7 @@ class AppErrorView extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.p16),
           OutlinedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded, size: 20),

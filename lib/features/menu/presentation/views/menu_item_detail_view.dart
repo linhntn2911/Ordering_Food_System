@@ -77,7 +77,7 @@ class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
           : null,
       body: LayoutBuilder(
         builder: (context, constraints) {
-          final padding = AppSpacing.screenHorizontal(constraints.maxWidth);
+          final padding = AppSpacing.screenHorizontalFor(constraints.maxWidth);
           return switch (state.status) {
             MenuItemDetailStatus.ready when item != null && selection != null =>
               _Details(
@@ -149,15 +149,15 @@ class _Message extends StatelessWidget {
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
-          AppSpacing.lg,
+          AppSpacing.p16,
           horizontalPadding,
-          AppSpacing.xxl,
+          AppSpacing.p24,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Align(alignment: Alignment.centerLeft, child: _BackButton()),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.p16),
             child,
           ],
         ),
@@ -217,7 +217,7 @@ class _Details extends StatelessWidget {
               ),
               Positioned(
                 left: horizontalPadding,
-                top: AppSpacing.lg,
+                top: AppSpacing.p16,
                 child: const SafeArea(child: _BackButton()),
               ),
             ],
@@ -235,9 +235,9 @@ class _Details extends StatelessWidget {
               ),
               padding: EdgeInsets.fromLTRB(
                 horizontalPadding,
-                AppSpacing.xxl,
+                AppSpacing.p24,
                 horizontalPadding,
-                AppSpacing.xxl,
+                AppSpacing.p24,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -249,12 +249,12 @@ class _Details extends StatelessWidget {
                         text: 'Hết hàng – chưa thể thêm vào giỏ',
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: AppSpacing.p12),
                   ],
                   Text(item.name, style: AppTextStyles.headlineMedium),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacing.p8),
                   _RatingSummary(item: item),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacing.p12),
                   Text(
                     formatVndRange(range.min, range.max),
                     style: AppTextStyles.price.copyWith(
@@ -263,14 +263,14 @@ class _Details extends StatelessWidget {
                     ),
                   ),
                   if (state.isOffline) ...[
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.p16),
                     const OfflineBanner(),
                   ],
                   if (item.description.isNotEmpty) ...[
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.p16),
                     _Description(text: item.description),
                   ],
-                  const SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.p20),
                   ItemOptionSection(
                     item: item,
                     selection: selection,
@@ -283,7 +283,7 @@ class _Details extends StatelessWidget {
                     enabled: canOrder,
                     onChanged: viewModel.updateNote,
                   ),
-                  const SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.p24),
                   ReviewSection(
                     reviews: state.reviews,
                     reviewCount: item.reviewCount,
@@ -341,7 +341,7 @@ class _RatingSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Wrap(
       key: const ValueKey('detail-rating'),
-      spacing: AppSpacing.sm,
+      spacing: AppSpacing.p8,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         if (item.hasRating) RatingStars(rating: item.ratingAverage),
@@ -439,7 +439,7 @@ class _NoteField extends StatelessWidget {
           header: true,
           child: const Text('Ghi chú', style: AppTextStyles.titleMedium),
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.p8),
         TextField(
           key: const ValueKey('detail-note'),
           controller: controller,

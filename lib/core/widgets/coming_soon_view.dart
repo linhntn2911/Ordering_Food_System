@@ -18,7 +18,7 @@ class ComingSoonView extends StatelessWidget {
       appBar: AppBar(title: Text(title)),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
           child: AppEmptyView(title: title, message: message, icon: icon),
         ),
       ),

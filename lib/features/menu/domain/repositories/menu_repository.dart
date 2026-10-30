@@ -1,13 +1,15 @@
 import '../entities/menu_category.dart';
 import '../entities/menu_feed.dart';
 import '../entities/menu_item.dart';
+import '../entities/menu_item_draft.dart';
 import '../entities/menu_item_feed.dart';
 
-/// Read-only menu browsing contract
-/// (`specs/002-browse-menu/contracts/menu_repository.md`).
+/// Menu contract shared by customer browsing
+/// (`specs/002-browse-menu/contracts/menu_repository.md`) and Admin menu
+/// management.
 ///
-/// - Item queries always filter on `isPublished` and `isCategoryPublished` so
-///   Firestore rules accept them.
+/// - Browsing item queries always filter on `isPublished` and
+///   `isCategoryPublished` so Firestore rules accept them.
 /// - A `limit` outside 1–100 throws a [RangeError].
 /// - [MenuFeed.isFromCache] follows snapshot metadata, and streams re-emit
 ///   when only the metadata changes.
@@ -49,4 +51,15 @@ abstract interface class MenuRepository {
   /// malformed. When the item stops being publicly readable the stream emits
   /// a null item and closes.
   Stream<MenuItemFeed> watchItem(String menuItemId);
+
+  /// Every item, published or not, for Admin management.
+  Stream<List<MenuItem>> watchAdminItems({String? categoryId, int limit = 100});
+
+  Future<void> setAvailability(String id, {required bool isAvailable});
+
+  Future<void> setPublished(String id, {required bool isPublished});
+
+  /// Creates or updates an item and returns its ID. Copies the owning
+  /// category's `isPublished` and `sortOrder` onto the item.
+  Future<String> saveItem(MenuItemDraft draft);
 }

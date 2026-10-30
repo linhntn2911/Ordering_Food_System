@@ -19,8 +19,8 @@ class OfflineBanner extends StatelessWidget {
       liveRegion: true,
       child: Container(
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
+          horizontal: AppSpacing.p16,
+          vertical: AppSpacing.p12,
         ),
         decoration: BoxDecoration(
           color: AppColors.warningSurface,
@@ -33,7 +33,7 @@ class OfflineBanner extends StatelessWidget {
               size: 20,
               color: AppColors.textPrimary,
             ),
-            const SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacing.p8),
             Expanded(
               child: Text(
                 message,
