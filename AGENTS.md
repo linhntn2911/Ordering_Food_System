@@ -30,12 +30,12 @@ Use the installed Spec Kit skills in this order:
 Do not begin a substantial feature from a chat description alone. Update the feature spec, plan, and tasks first. Small repairs that preserve specified behavior may be implemented directly, but document any changed requirement.
 
 <!-- SPECKIT START -->
-For additional context about technologies, project structure, commands, and decisions, read the current feature plan under `specs/`.
+For additional context about technologies, project structure, commands, and decisions, read the current feature plan at `specs/004-food-details/plan.md`.
 <!-- SPECKIT END -->
 
 ## Product Boundaries
 
-- One restaurant.
+- One restaurant: **Ngõ Chicken** (fried chicken, rice, noodles, snacks, combos, drinks). Menu data comes from Firestore; `tools/seed_menu/menu_seed.json` holds the restaurant's menu for the emulator. Never hard-code menu items in widgets.
 - Human roles: Customer and pre-provisioned Admin. Guest is an unauthenticated state.
 - COD only.
 - No driver application, GPS tracking, online payment, refunds, chat, marketplace behavior, or complex promotions.
@@ -124,6 +124,8 @@ The reviewed `Example-PRM393` project is a learning reference for `ProviderScope
 - Feature widgets must not hard-code brand hex values or create local copies of global visual tokens.
 - Build reusable components for buttons, fields, food cards, quantity controls, status chips, order cards, loading states, empty states, error states, and navigation.
 - Match approved Food Ninja light frames, but implement controls and layouts as Flutter widgets rather than flattened images.
+- Home follows the Food Ninja Home frame (header with bell, search with filter, banner, category cards, Popular list, menu) with the single-restaurant substitutions recorded in `specs/002-browse-menu/spec.md`. Customer screens live inside `MainShell` (`lib/app/main_shell.dart`) with the bottom tabs Home, Cart, Orders, Profile; there is no Chat tab.
+- A control whose feature is not delivered yet must respond with a "feature in development" message or `ComingSoonView`, never silently do nothing.
 - Use the 4-point spacing grid, standard 24-pixel screen padding, and responsive constraints from `docs/design_system.md`.
 - Every data screen must handle loading, empty, error, retry, disabled, focused, and selected states where applicable.
 - Customer and Admin flows must use the same design tokens so they read as one application.

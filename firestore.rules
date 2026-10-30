@@ -20,6 +20,12 @@ service cloud.firestore {
         && currentUser().data.status == 'active';
     }
 
+    // Mirrors the public read rule of menu_items for nested documents.
+    function isPubliclyVisibleItem(menuItemId) {
+      let item = get(/databases/$(database)/documents/menu_items/$(menuItemId)).data;
+      return item.isPublished == true && item.isCategoryPublished == true;
+    }
+
     function validCustomerProfile(userId) {
       return owns(userId)
         && request.resource.data.keys().hasAll([
@@ -74,9 +80,21 @@ service cloud.firestore {
     }
 
     match /menu_items/{menuItemId} {
+      // Unavailable items stay readable so they can show a sold-out label.
+      // isCategoryPublished mirrors the owning category because list queries
+      // cannot read the category document.
       allow get, list: if isAdmin()
-        || (resource.data.isPublished == true && resource.data.isAvailable == true);
+        || (resource.data.isPublished == true
+          && resource.data.isCategoryPublished == true);
       allow create, update, delete: if isAdmin();
+
+      // Public display copy of a review without customer or order
+      // identifiers (specs/004-food-details/contracts/firestore_review_access.md).
+      // Trusted code writes it in the same batch as the private review.
+      match /reviews/{reviewId} {
+        allow get, list: if isAdmin() || isPubliclyVisibleItem(menuItemId);
+        allow create, update, delete: if false;
+      }
     }
 
     match /restaurant_configs/{configId} {
@@ -114,7 +132,9 @@ service cloud.firestore {
     }
 
     match /reviews/{reviewId} {
-      allow read: if true;
+      // Private review with customer and order identifiers: owner and Admin.
+      allow read: if signedIn()
+        && (resource.data.customerId == request.auth.uid || isAdmin());
       // Trusted code validates completed-order ownership, time windows,
       // duplicate prevention, and rating aggregate updates atomically.
       allow create, update, delete: if false;

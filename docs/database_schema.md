@@ -56,7 +56,13 @@ Fields: `name`, `imageUrl`, `sortOrder`, `isPublished`, `createdAt`, `updatedAt`
 
 ### `menu_items/{menuItemId}`
 
-Fields: `categoryId`, `name`, `description`, `imageUrl`, `basePrice`, `isAvailable`, `isPublished`, `sortOrder`, `ratingAverage`, `reviewCount`, `sizes`, `toppings`, `createdAt`, `updatedAt`. Published and available items are publicly readable; Admin manages them.
+Fields: `categoryId`, `name`, `description`, `imageUrl`, `basePrice`, `isAvailable`, `isPublished`, `sortOrder`, `ratingAverage`, `reviewCount`, `sizes`, `toppings`, `isCategoryPublished`, `categorySortOrder`, `createdAt`, `updatedAt`.
+
+- `sizes` and `toppings` are arrays of `{ id, name, priceDelta }` maps. `priceDelta` is a non-negative integer VND amount added to `basePrice`.
+- `isCategoryPublished` and `categorySortOrder` are denormalized copies of the owning category's `isPublished` and `sortOrder`. Firestore rules cannot read the owning category during list queries, so these copies let the rules hide items of unpublished categories and let one query order items by category.
+- **Denormalization invariant**: whoever changes a category's `isPublished` or `sortOrder` (Admin or trusted code) MUST update `isCategoryPublished` and `categorySortOrder` on every item of that category in the same batch or transaction. Items written without these fields are not publicly readable.
+
+Items where `isPublished == true` and `isCategoryPublished == true` are publicly readable regardless of `isAvailable`; unavailable items stay visible with a sold-out label (see `specs/002-browse-menu/spec.md`). Admin reads and manages all items.
 
 ### `orders/{orderId}`
 
@@ -74,7 +80,15 @@ Fields: `fromStatus`, `toStatus`, `actorId`, `actorRole`, optional `reason`, `cr
 
 ### `reviews/{reviewId}`
 
-Fields: `customerId`, `orderId`, `orderItemId`, `menuItemId`, `rating`, `comment`, `imageUrls`, `isAnonymous`, `isEdited`, `createdAt`, `updatedAt`. Trusted code validates order ownership, completion, review windows, duplicate prevention, and rating aggregation.
+Fields: `customerId`, `orderId`, `orderItemId`, `menuItemId`, `rating`, `comment`, `imageUrls`, `isAnonymous`, `isEdited`, `createdAt`, `updatedAt`. Trusted code validates order ownership, completion, review windows, duplicate prevention, and rating aggregation. Only the owner Customer and Admin can read it, because it contains customer and order identifiers.
+
+### `menu_items/{menuItemId}/reviews/{reviewId}`
+
+Public display copy of a review for the Food Details screen (`specs/004-food-details`). Fields: `rating` (1-5), `comment`, `imageUrls` (at most three), `isAnonymous`, `isEdited`, `createdAt`, `updatedAt`. The `reviewId` matches the private `reviews/{reviewId}` document.
+
+- It never contains `customerId`, `orderId`, `orderItemId`, or any customer name. The app shows the author as "Khách hàng" or "Khách hàng ẩn danh".
+- Readable when the parent menu item is publicly readable (`isPublished` and `isCategoryPublished`), or by Admin. No client may write it.
+- **Write invariant**: trusted code (the review submission feature) MUST create, update, and delete this copy in the same batch or transaction as the private review and the item's `ratingAverage` and `reviewCount`. A review without its public copy does not appear on Food Details.
 
 ### `restaurant_configs/main`
 

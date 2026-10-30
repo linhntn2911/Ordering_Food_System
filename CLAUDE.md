@@ -3,7 +3,7 @@
 Read `AGENTS.md` first. It is the shared engineering policy for every coding agent in this repository. Read `SPEC.md`, `.specify/memory/constitution.md`, and the active feature plan and tasks before making material changes.
 
 <!-- SPECKIT START -->
-For additional context about technologies, project structure, shell commands, and decisions, read the current feature plan under `specs/` and follow the installed `.claude/skills/speckit-*` workflow.
+For additional context about technologies, project structure, shell commands, and decisions, read the current feature plan at `specs/004-food-details/plan.md` and follow the installed `.claude/skills/speckit-*` workflow.
 <!-- SPECKIT END -->
 
 ## Required Working Method
@@ -26,6 +26,8 @@ For additional context about technologies, project structure, shell commands, an
 - Follow Dart naming and formatting conventions even when the sample project does not.
 - Read and enforce `docs/design_system.md`: Poppins, the Food Ninja green gradient, shared tokens, and light mode only.
 - Reject new dark-theme branches, theme toggles, screen-local brand colors, and flattened screenshots used as UI controls.
+- The restaurant is Ngõ Chicken. Home follows the Food Ninja Home frame with the single-restaurant substitutions in `specs/002-browse-menu/spec.md`; customer screens share `MainShell` with Home, Cart, Orders, and Profile tabs (no Chat).
+- Run the app locally against the Firestore emulator with `--dart-define=USE_FIRESTORE_EMULATOR=true`; on web this uses the `demo-ordering` project, so seed data with `GCLOUD_PROJECT=demo-ordering`.
 
 ## Verification
 

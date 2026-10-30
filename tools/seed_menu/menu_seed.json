@@ -1,0 +1,797 @@
+{
+  "restaurantName": "Ngõ Chicken",
+  "categories": [
+    {
+      "id": "ga-ran",
+      "name": "Gà rán",
+      "sortOrder": 1,
+      "isPublished": true,
+      "imageUrl": ""
+    },
+    {
+      "id": "com",
+      "name": "Cơm",
+      "sortOrder": 2,
+      "isPublished": true,
+      "imageUrl": ""
+    },
+    {
+      "id": "my",
+      "name": "Mỳ",
+      "sortOrder": 3,
+      "isPublished": true,
+      "imageUrl": ""
+    },
+    {
+      "id": "do-an-vat",
+      "name": "Đồ ăn vặt",
+      "sortOrder": 4,
+      "isPublished": true,
+      "imageUrl": ""
+    },
+    {
+      "id": "combo",
+      "name": "Combo",
+      "sortOrder": 5,
+      "isPublished": true,
+      "imageUrl": ""
+    },
+    {
+      "id": "do-uong",
+      "name": "Đồ uống",
+      "sortOrder": 6,
+      "isPublished": true,
+      "imageUrl": ""
+    }
+  ],
+  "items": [
+    {
+      "id": "ga-ran-ga-vien-truyen-thong",
+      "categoryId": "ga-ran",
+      "name": "Gà viên truyền thống",
+      "basePrice": 30000,
+      "sortOrder": 1,
+      "sizes": [],
+      "description": "Gà viên truyền thống. Gà chiên giòn rụm, áo sốt đậm vị, ăn nóng ngon nhất.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "ga-ran-ga-sot-kem-hanh",
+      "categoryId": "ga-ran",
+      "name": "Gà sốt kem hành",
+      "basePrice": 35000,
+      "sortOrder": 2,
+      "sizes": [],
+      "description": "Gà sốt kem hành. Gà chiên giòn rụm, áo sốt đậm vị, ăn nóng ngon nhất.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "ga-ran-ga-sot-pho-mai-cay",
+      "categoryId": "ga-ran",
+      "name": "Gà sốt phô mai cay",
+      "basePrice": 35000,
+      "sortOrder": 3,
+      "sizes": [],
+      "description": "Gà sốt phô mai cay. Gà chiên giòn rụm, áo sốt đậm vị, ăn nóng ngon nhất.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "categoryId": "ga-ran",
+      "name": "Gà sốt cay ngọt Hàn Quốc",
+      "basePrice": 35000,
+      "sortOrder": 4,
+      "sizes": [],
+      "description": "Gà sốt cay ngọt Hàn Quốc. Gà chiên giòn rụm, áo sốt đậm vị, ăn nóng ngon nhất.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 4.5,
+      "reviewCount": 12
+    },
+    {
+      "id": "ga-ran-canh-ga-nuong",
+      "categoryId": "ga-ran",
+      "name": "Cánh gà nướng",
+      "basePrice": 30000,
+      "sortOrder": 7,
+      "sizes": [],
+      "description": "Cánh gà nướng. Gà chiên giòn rụm, áo sốt đậm vị, ăn nóng ngon nhất.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "com-com-ga-chien-mam-toi",
+      "categoryId": "com",
+      "name": "Cơm gà chiên mắm tỏi",
+      "basePrice": 40000,
+      "sortOrder": 1,
+      "sizes": [],
+      "description": "Cơm gà chiên mắm tỏi. Cơm nóng ăn kèm rau dưa, phần vừa đủ cho một người.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 4.7,
+      "reviewCount": 3
+    },
+    {
+      "id": "com-com-rang-ga-chien-mam-toi",
+      "categoryId": "com",
+      "name": "Cơm rang gà chiên mắm tỏi",
+      "basePrice": 50000,
+      "sortOrder": 2,
+      "sizes": [],
+      "description": "Cơm rang gà chiên mắm tỏi. Cơm nóng ăn kèm rau dưa, phần vừa đủ cho một người.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "com-com-rang-ga-ran",
+      "categoryId": "com",
+      "name": "Cơm rang gà rán",
+      "basePrice": 50000,
+      "sortOrder": 4,
+      "sizes": [],
+      "description": "Cơm rang gà rán. Cơm nóng ăn kèm rau dưa, phần vừa đủ cho một người.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "com-com-rang-ga-sot-cay-ngot",
+      "categoryId": "com",
+      "name": "Cơm rang gà sốt cay ngọt",
+      "basePrice": 55000,
+      "sortOrder": 5,
+      "sizes": [],
+      "description": "Cơm rang gà sốt cay ngọt. Cơm nóng ăn kèm rau dưa, phần vừa đủ cho một người.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "my-my-y-bo-bam",
+      "categoryId": "my",
+      "name": "Mỳ ý bò bằm",
+      "basePrice": 35000,
+      "sortOrder": 1,
+      "sizes": [],
+      "description": "Mỳ ý bò bằm. Sợi mỳ dai, nước dùng đậm đà, chọn được cấp độ cay khi ghi chú.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "my-my-cay-bo",
+      "categoryId": "my",
+      "name": "Mỳ cay bò",
+      "basePrice": 35000,
+      "sortOrder": 4,
+      "sizes": [],
+      "description": "Mỳ cay bò. Sợi mỳ dai, nước dùng đậm đà, chọn được cấp độ cay khi ghi chú.",
+      "imageUrl": "",
+      "toppings": [
+        {
+          "id": "them-trung",
+          "name": "Thêm trứng",
+          "priceDelta": 5000
+        },
+        {
+          "id": "them-xuc-xich",
+          "name": "Thêm xúc xích",
+          "priceDelta": 7000
+        }
+      ],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "my-my-cay-hai-san",
+      "categoryId": "my",
+      "name": "Mỳ cay hải sản",
+      "basePrice": 45000,
+      "sortOrder": 5,
+      "sizes": [],
+      "description": "Mỳ cay hải sản. Sợi mỳ dai, nước dùng đậm đà, chọn được cấp độ cay khi ghi chú.",
+      "imageUrl": "",
+      "toppings": [
+        {
+          "id": "them-trung",
+          "name": "Thêm trứng",
+          "priceDelta": 5000
+        },
+        {
+          "id": "them-xuc-xich",
+          "name": "Thêm xúc xích",
+          "priceDelta": 7000
+        }
+      ],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "my-my-cay-thap-cam",
+      "categoryId": "my",
+      "name": "Mỳ cay thập cẩm",
+      "basePrice": 50000,
+      "sortOrder": 6,
+      "sizes": [],
+      "description": "Mỳ cay thập cẩm. Sợi mỳ dai, nước dùng đậm đà, chọn được cấp độ cay khi ghi chú.",
+      "imageUrl": "",
+      "toppings": [
+        {
+          "id": "them-trung",
+          "name": "Thêm trứng",
+          "priceDelta": 5000
+        },
+        {
+          "id": "them-xuc-xich",
+          "name": "Thêm xúc xích",
+          "priceDelta": 7000
+        }
+      ],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-an-vat-banh-ga",
+      "categoryId": "do-an-vat",
+      "name": "Bánh gà",
+      "basePrice": 30000,
+      "sortOrder": 1,
+      "sizes": [],
+      "description": "Bánh gà. Món ăn vặt chiên tươi, hợp dùng kèm trà sữa.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-an-vat-khoai-tay-tuoi-chien",
+      "categoryId": "do-an-vat",
+      "name": "Khoai tây tươi chiên",
+      "basePrice": 25000,
+      "sortOrder": 2,
+      "sizes": [],
+      "description": "Khoai tây tươi chiên. Món ăn vặt chiên tươi, hợp dùng kèm trà sữa.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-an-vat-khoai-tay-tuoi-chien-lac-pho-mai",
+      "categoryId": "do-an-vat",
+      "name": "Khoai tây tươi chiên lắc phô mai",
+      "basePrice": 30000,
+      "sortOrder": 3,
+      "sizes": [],
+      "description": "Khoai tây tươi chiên lắc phô mai. Món ăn vặt chiên tươi, hợp dùng kèm trà sữa.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-an-vat-nem-chua-ran",
+      "categoryId": "do-an-vat",
+      "name": "Nem chua rán",
+      "basePrice": 30000,
+      "sortOrder": 5,
+      "sizes": [],
+      "description": "Nem chua rán. Món ăn vặt chiên tươi, hợp dùng kèm trà sữa.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-an-vat-kimbap",
+      "categoryId": "do-an-vat",
+      "name": "Kimbap",
+      "basePrice": 25000,
+      "sortOrder": 6,
+      "sizes": [],
+      "description": "Kimbap. Món ăn vặt chiên tươi, hợp dùng kèm trà sữa.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-an-vat-ca-vien-chien",
+      "categoryId": "do-an-vat",
+      "name": "Cá viên chiên",
+      "basePrice": 25000,
+      "sortOrder": 7,
+      "sizes": [],
+      "description": "Cá viên chiên. Món ăn vặt chiên tươi, hợp dùng kèm trà sữa.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": false,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "combo-set-ga-vien-4-vi-sot-kimbap",
+      "categoryId": "combo",
+      "name": "Set gà viên 4 vị sốt + Kimbap",
+      "basePrice": 140000,
+      "sortOrder": 1,
+      "sizes": [],
+      "description": "Set gà viên 4 vị sốt + Kimbap. Combo tiết kiệm cho nhóm bạn, đủ no cho bữa xế.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "combo-my-cay-xuc-xich-tra-tac",
+      "categoryId": "combo",
+      "name": "Mỳ cay xúc xích + Trà tắc",
+      "basePrice": 35000,
+      "sortOrder": 3,
+      "sizes": [],
+      "description": "Mỳ cay xúc xích + Trà tắc. Combo tiết kiệm cho nhóm bạn, đủ no cho bữa xế.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "combo-my-y-ga-ran",
+      "categoryId": "combo",
+      "name": "Mỳ ý + Gà rán",
+      "basePrice": 60000,
+      "sortOrder": 5,
+      "sizes": [],
+      "description": "Mỳ ý + Gà rán. Combo tiết kiệm cho nhóm bạn, đủ no cho bữa xế.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-uong-tra-dao",
+      "categoryId": "do-uong",
+      "name": "Trà đào",
+      "basePrice": 20000,
+      "sortOrder": 2,
+      "sizes": [
+        {
+          "id": "m",
+          "name": "M",
+          "priceDelta": 0
+        },
+        {
+          "id": "l",
+          "name": "L",
+          "priceDelta": 5000
+        }
+      ],
+      "description": "Trà đào. Pha tươi trong ngày, chọn size M hoặc L.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-uong-tra-sua-tran-chau-duong-den",
+      "categoryId": "do-uong",
+      "name": "Trà sữa trân châu đường đen",
+      "basePrice": 25000,
+      "sortOrder": 3,
+      "sizes": [
+        {
+          "id": "m",
+          "name": "M",
+          "priceDelta": 0
+        },
+        {
+          "id": "l",
+          "name": "L",
+          "priceDelta": 5000
+        }
+      ],
+      "description": "Trà sữa trân châu đường đen. Pha tươi trong ngày, chọn size M hoặc L.",
+      "imageUrl": "",
+      "toppings": [
+        {
+          "id": "tran-chau-den",
+          "name": "Trân châu đen",
+          "priceDelta": 5000
+        },
+        {
+          "id": "thach-dua",
+          "name": "Thạch dừa",
+          "priceDelta": 5000
+        },
+        {
+          "id": "kem-cheese",
+          "name": "Kem cheese",
+          "priceDelta": 8000
+        }
+      ],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 4.7,
+      "reviewCount": 3
+    },
+    {
+      "id": "do-uong-sua-chua-lac-dau",
+      "categoryId": "do-uong",
+      "name": "Sữa chua lắc dâu",
+      "basePrice": 25000,
+      "sortOrder": 5,
+      "sizes": [
+        {
+          "id": "m",
+          "name": "M",
+          "priceDelta": 0
+        },
+        {
+          "id": "l",
+          "name": "L",
+          "priceDelta": 5000
+        }
+      ],
+      "description": "Sữa chua lắc dâu. Pha tươi trong ngày, chọn size M hoặc L.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-uong-matcha-latte",
+      "categoryId": "do-uong",
+      "name": "Matcha Latte",
+      "basePrice": 25000,
+      "sortOrder": 6,
+      "sizes": [
+        {
+          "id": "m",
+          "name": "M",
+          "priceDelta": 0
+        },
+        {
+          "id": "l",
+          "name": "L",
+          "priceDelta": 5000
+        }
+      ],
+      "description": "Matcha Latte. Pha tươi trong ngày, chọn size M hoặc L.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-uong-nuoc-ep-cam",
+      "categoryId": "do-uong",
+      "name": "Nước ép cam",
+      "basePrice": 25000,
+      "sortOrder": 7,
+      "sizes": [
+        {
+          "id": "m",
+          "name": "M",
+          "priceDelta": 0
+        },
+        {
+          "id": "l",
+          "name": "L",
+          "priceDelta": 5000
+        }
+      ],
+      "description": "Nước ép cam. Pha tươi trong ngày, chọn size M hoặc L.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": true,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    },
+    {
+      "id": "do-uong-sinh-to-bo",
+      "categoryId": "do-uong",
+      "name": "Sinh tố bơ",
+      "basePrice": 25000,
+      "sortOrder": 8,
+      "sizes": [
+        {
+          "id": "m",
+          "name": "M",
+          "priceDelta": 0
+        },
+        {
+          "id": "l",
+          "name": "L",
+          "priceDelta": 5000
+        }
+      ],
+      "description": "Sinh tố bơ. Pha tươi trong ngày, chọn size M hoặc L.",
+      "imageUrl": "",
+      "toppings": [],
+      "isPublished": true,
+      "isAvailable": false,
+      "ratingAverage": 0,
+      "reviewCount": 0
+    }
+  ],
+  "reviews": [
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r01",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 5,
+      "comment": "Sốt cay ngọt rất vừa, gà giòn lâu.",
+      "imageUrls": [
+        "https://picsum.photos/seed/ga1/600/600",
+        "https://picsum.photos/seed/ga2/600/600"
+      ],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1792411200000,
+      "updatedAt": 1792411200000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r02",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 4,
+      "comment": "Ngon nhưng hơi ngọt với mình.",
+      "imageUrls": [],
+      "isAnonymous": true,
+      "isEdited": false,
+      "createdAt": 1792324800000,
+      "updatedAt": 1792324800000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r03",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 5,
+      "comment": "Đặt lần thứ ba rồi, vẫn ngon như cũ.",
+      "imageUrls": [],
+      "isAnonymous": false,
+      "isEdited": true,
+      "createdAt": 1792238400000,
+      "updatedAt": 1792281600000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r04",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 5,
+      "comment": "",
+      "imageUrls": [],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1792152000000,
+      "updatedAt": 1792152000000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r05",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 4,
+      "comment": "Phần ăn vừa đủ, giao nhanh.",
+      "imageUrls": [
+        "https://picsum.photos/seed/ga3/600/600"
+      ],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1792065600000,
+      "updatedAt": 1792065600000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r06",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 5,
+      "comment": "Gà nóng hổi, sốt sánh, rất đáng tiền. Lần sau sẽ thử thêm vị phô mai cay và gọi thêm khoai tây chiên để ăn kèm cho đủ bữa.",
+      "imageUrls": [],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1791979200000,
+      "updatedAt": 1791979200000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r07",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 3,
+      "comment": "Hôm nay gà hơi nguội khi tới nơi.",
+      "imageUrls": [],
+      "isAnonymous": true,
+      "isEdited": false,
+      "createdAt": 1791892800000,
+      "updatedAt": 1791892800000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r08",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 5,
+      "comment": "Ngon!",
+      "imageUrls": [],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1791806400000,
+      "updatedAt": 1791806400000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r09",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 4,
+      "comment": "Ổn, sẽ quay lại.",
+      "imageUrls": [],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1791720000000,
+      "updatedAt": 1791720000000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r10",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 5,
+      "comment": "Sốt Hàn Quốc chuẩn vị.",
+      "imageUrls": [
+        "https://picsum.photos/seed/ga4/600/600",
+        "https://picsum.photos/seed/ga5/600/600",
+        "https://picsum.photos/seed/ga6/600/600"
+      ],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1791633600000,
+      "updatedAt": 1791633600000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r11",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 4,
+      "comment": "",
+      "imageUrls": [],
+      "isAnonymous": true,
+      "isEdited": false,
+      "createdAt": 1791547200000,
+      "updatedAt": 1791547200000
+    },
+    {
+      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r12",
+      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
+      "rating": 5,
+      "comment": "Bạn bè đều khen.",
+      "imageUrls": [],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1791460800000,
+      "updatedAt": 1791460800000
+    },
+    {
+      "id": "do-uong-tra-sua-tran-chau-duong-den-r01",
+      "menuItemId": "do-uong-tra-sua-tran-chau-duong-den",
+      "rating": 5,
+      "comment": "Trân châu dẻo, đường đen thơm.",
+      "imageUrls": [
+        "https://picsum.photos/seed/ts1/600/600"
+      ],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1792411200000,
+      "updatedAt": 1792411200000
+    },
+    {
+      "id": "do-uong-tra-sua-tran-chau-duong-den-r02",
+      "menuItemId": "do-uong-tra-sua-tran-chau-duong-den",
+      "rating": 4,
+      "comment": "Hơi ngọt, lần sau sẽ ghi chú ít đường.",
+      "imageUrls": [],
+      "isAnonymous": true,
+      "isEdited": false,
+      "createdAt": 1792324800000,
+      "updatedAt": 1792324800000
+    },
+    {
+      "id": "do-uong-tra-sua-tran-chau-duong-den-r03",
+      "menuItemId": "do-uong-tra-sua-tran-chau-duong-den",
+      "rating": 5,
+      "comment": "Size L uống đã.",
+      "imageUrls": [],
+      "isAnonymous": false,
+      "isEdited": true,
+      "createdAt": 1792238400000,
+      "updatedAt": 1792281600000
+    },
+    {
+      "id": "com-com-ga-chien-mam-toi-r01",
+      "menuItemId": "com-com-ga-chien-mam-toi",
+      "rating": 5,
+      "comment": "Mắm tỏi thơm, cơm dẻo.",
+      "imageUrls": [],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1792411200000,
+      "updatedAt": 1792411200000
+    },
+    {
+      "id": "com-com-ga-chien-mam-toi-r02",
+      "menuItemId": "com-com-ga-chien-mam-toi",
+      "rating": 4,
+      "comment": "Gà hơi nhỏ nhưng ngon.",
+      "imageUrls": [
+        "https://picsum.photos/seed/com1/600/600"
+      ],
+      "isAnonymous": false,
+      "isEdited": false,
+      "createdAt": 1792324800000,
+      "updatedAt": 1792324800000
+    },
+    {
+      "id": "com-com-ga-chien-mam-toi-r03",
+      "menuItemId": "com-com-ga-chien-mam-toi",
+      "rating": 5,
+      "comment": "",
+      "imageUrls": [],
+      "isAnonymous": true,
+      "isEdited": false,
+      "createdAt": 1792238400000,
+      "updatedAt": 1792238400000
+    }
+  ]
+}
