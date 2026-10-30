@@ -10,7 +10,7 @@ import 'package:ordering_food_system/features/menu/domain/services/menu_search.d
 
 import '../../../support/menu_fixtures.dart';
 
-/// A slice of the Ngõ Chicken menu, in menu order.
+/// A slice of the Ngô Chicken menu, in menu order.
 final _menu = [
   menuItem(
     'ga-vien',

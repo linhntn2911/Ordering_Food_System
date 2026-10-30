@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -11,6 +12,7 @@ import 'app.dart';
 
 const _useFirestoreEmulator = bool.fromEnvironment('USE_FIRESTORE_EMULATOR');
 const _firestoreEmulatorPort = 8080;
+const _authEmulatorPort = 9099;
 
 /// Emulator-only options for web. A `demo-` project ID never reaches real
 /// Firebase services, so no real identifiers are needed.
@@ -19,6 +21,7 @@ const _webEmulatorOptions = FirebaseOptions(
   appId: '1:000000000000:web:0000000000000000000000',
   messagingSenderId: '000000000000',
   projectId: 'demo-ordering',
+  storageBucket: 'demo-ordering.appspot.com',
 );
 
 Future<void> bootstrap() async {
@@ -30,6 +33,10 @@ Future<void> bootstrap() async {
       FirebaseFirestore.instance.useFirestoreEmulator(
         _emulatorHost(),
         _firestoreEmulatorPort,
+      );
+      await FirebaseAuth.instance.useAuthEmulator(
+        _emulatorHost(),
+        _authEmulatorPort,
       );
     }
   } catch (e) {

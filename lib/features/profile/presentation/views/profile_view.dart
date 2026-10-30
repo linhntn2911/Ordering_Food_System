@@ -164,7 +164,7 @@ class ProfileView extends ConsumerWidget {
                 if (context.mounted) {
                   Navigator.of(
                     context,
-                  ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+                  ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
                 }
               },
               child: const Text(
@@ -210,11 +210,8 @@ class ProfileView extends ConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.p16),
                       ElevatedButton(
-                        onPressed: () => Navigator.of(context)
-                            .pushNamedAndRemoveUntil(
-                              AppRoutes.login,
-                              (route) => false,
-                            ),
+                        onPressed: () =>
+                            Navigator.of(context).pushNamed(AppRoutes.login),
                         child: const Text('Go to Login'),
                       ),
                     ],
@@ -231,7 +228,11 @@ class ProfileView extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const AppBackButton(),
+                          // The "Tài khoản" tab has nothing to go back to.
+                          if (Navigator.of(context).canPop())
+                            const AppBackButton()
+                          else
+                            const SizedBox(width: 45),
                           const Text(
                             'Profile',
                             style: AppTextStyles.headlineMedium,

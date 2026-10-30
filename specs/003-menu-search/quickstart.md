@@ -6,7 +6,7 @@
 
 Giống [quickstart của tính năng 002](../002-browse-menu/quickstart.md):
 
-1. Chạy Firestore Emulator (project `demo-ordering`) và nạp dữ liệu mẫu Ngõ Chicken (6 danh mục, 28 món; "Cá viên chiên" và "Sinh tố bơ" đang hết hàng):
+1. Chạy Firestore Emulator (project `demo-ordering`) và nạp dữ liệu mẫu Ngô Chicken (6 danh mục, 28 món; "Cá viên chiên" và "Sinh tố bơ" đang hết hàng):
 
    ```powershell
    cd tools/seed_menu

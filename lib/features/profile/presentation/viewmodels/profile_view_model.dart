@@ -42,6 +42,9 @@ class ProfileState {
 class ProfileViewModel extends Notifier<ProfileState> {
   @override
   ProfileState build() {
+    // Reload when the user signs in or out, since the "Tài khoản" tab stays
+    // alive inside MainShell.
+    ref.watch(authStateProvider.select((user) => user.value?.id));
     Future.microtask(() => loadProfile());
     return const ProfileState(isLoading: true);
   }

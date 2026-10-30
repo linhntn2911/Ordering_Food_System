@@ -30,7 +30,7 @@ Guest hoặc Customer gõ một phần tên món (ví dụ "gà", "tra sua") và
 
 **Lý do ưu tiên**: Tìm theo tên là cách nhanh nhất để tới món đã biết tên; đây là phần cốt lõi của FR-008.
 
-**Kiểm thử độc lập**: Nạp thực đơn mẫu Ngõ Chicken, mở màn hình tìm kiếm từ ô tìm kiếm ở Trang chủ, gõ "ga" và xác nhận chỉ các món có "gà" trong tên xuất hiện, kể cả khi gõ không dấu.
+**Kiểm thử độc lập**: Nạp thực đơn mẫu Ngô Chicken, mở màn hình tìm kiếm từ ô tìm kiếm ở Trang chủ, gõ "ga" và xác nhận chỉ các món có "gà" trong tên xuất hiện, kể cả khi gõ không dấu.
 
 **Kịch bản chấp nhận**:
 

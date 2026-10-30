@@ -3,12 +3,12 @@
 **Feature ID**: `001-food-ordering-system`  
 **Created**: 2026-10-17  
 **Status**: Draft ready for clarification and planning  
-**Product**: Flutter mobile application for one restaurant (Ngõ Chicken)  
+**Product**: Flutter mobile application for one restaurant (Ngô Chicken)  
 **Input**: Course requirements, the revised `Project_PRM (3).docx` Food Ordering System SRS, and the architecture patterns reviewed in `Example-PRM393`
 
 ## Scope Decision
 
-The application supports food ordering from one restaurant, Ngõ Chicken, which sells fried chicken, rice, noodles, snacks, combos, and drinks. Guests can browse the menu. Registered customers can manage a cart, delivery addresses, COD orders, reviews, favorites, and notifications. Pre-provisioned administrators manage the menu and process orders from the same mobile application through role-based navigation.
+The application supports food ordering from one restaurant, Ngô Chicken, which sells fried chicken, rice, noodles, snacks, combos, and drinks. Guests can browse the menu. Registered customers can manage a cart, delivery addresses, COD orders, reviews, favorites, and notifications. Pre-provisioned administrators manage the menu and process orders from the same mobile application through role-based navigation.
 
 The first release uses Cash on Delivery only. It does not include an online payment gateway, a driver application, live GPS tracking, chat, multi-restaurant support, or complex voucher rules.
 
@@ -387,7 +387,7 @@ Each member owns at least three Medium-or-higher screens. Shared widgets, Fireba
 
 ## Assumptions
 
-- The initial menu is Ngõ Chicken's food and drink menu: 6 categories (Gà rán, Cơm, Mỳ, Đồ ăn vặt, Combo, Đồ uống) priced in VND. Each category keeps at most six representative items; drinks are grouped under Đồ uống and offer M and L sizes; the restaurant's "Combo đạt lớp" group is intentionally not offered in the app. Seed data lives in `tools/seed_menu/menu_seed.json`.
+- The initial menu is Ngô Chicken's food and drink menu: 6 categories (Gà rán, Cơm, Mỳ, Đồ ăn vặt, Combo, Đồ uống) priced in VND. Each category keeps at most six representative items; drinks are grouped under Đồ uống and offer M and L sizes; the restaurant's "Combo đạt lớp" group is intentionally not offered in the app. Seed data lives in `tools/seed_menu/menu_seed.json`.
 - Home follows the Food Ninja Home frame with single-restaurant substitutions: category cards replace "Nearest Restaurant", a restaurant banner replaces the promotional "Special Deal" banner, and the Chat tab is removed.
 - The application targets Android first; iOS-compatible Flutter code is retained where practical.
 - The restaurant has one delivery operation and Admin users manually set `OutForDelivery`; there is no driver role.

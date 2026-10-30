@@ -20,17 +20,17 @@
 - H: Thẻ món hiển thị giá như thế nào khi món có nhiều size? → Đ: Hiển thị khoảng giá theo size, ví dụ "45.000 – 65.000 ₫"; món chỉ có một mức giá thì hiển thị một giá; không tính topping.
 - H: Khi chọn "Tất cả", danh sách món sắp xếp thế nào? → Đ: Gom theo danh mục; mỗi danh mục là một nhóm có tiêu đề, các nhóm theo thứ tự danh mục, món trong nhóm theo thứ tự hiển thị rồi theo tên.
 
-### Phiên 2026-10-20 (giao diện theo mẫu Food Ninja và thực đơn Ngõ Chicken)
+### Phiên 2026-10-20 (giao diện theo mẫu Food Ninja và thực đơn Ngô Chicken)
 
 - H: Trang chủ bố trí theo mẫu nào? → Đ: Theo khung Home của Food Ninja: tiêu đề "Tìm món bạn yêu thích" kèm nút chuông, ô tìm kiếm kèm nút lọc, banner giới thiệu nhà hàng, hàng thẻ danh mục cuộn ngang, mục "Phổ biến" dạng danh sách dọc, rồi thực đơn gom theo danh mục; dưới cùng là thanh điều hướng.
 - H: Phần "Nearest Restaurant" của mẫu xử lý thế nào? → Đ: Thay bằng hàng thẻ danh mục, vì ứng dụng chỉ phục vụ một nhà hàng.
-- H: Banner "Special Deal" xử lý thế nào? → Đ: Thay bằng banner giới thiệu Ngõ Chicken (không phải khuyến mãi) với nút "Mua ngay" cuộn tới thực đơn; khuyến mãi vẫn nằm ngoài phạm vi.
+- H: Banner "Special Deal" xử lý thế nào? → Đ: Thay bằng banner giới thiệu Ngô Chicken (không phải khuyến mãi) với nút "Mua ngay" cuộn tới thực đơn; khuyến mãi vẫn nằm ngoài phạm vi.
 - H: Ô tìm kiếm, nút lọc và nút chuông làm gì khi các tính năng đó chưa có? → Đ: Hiển thị đúng mẫu; khi chạm thì báo ngắn rằng tính năng đang được phát triển. Tìm kiếm/lọc thuộc FR-008 gốc, thông báo thuộc User Story 6 gốc.
 - H: Thanh điều hướng dưới gồm những mục nào? → Đ: Trang chủ, Giỏ hàng, Đơn hàng, Tài khoản; bỏ mục Chat của mẫu vì chat nằm ngoài phạm vi. Các mục khác Trang chủ hiển thị màn chờ "đang phát triển" cho tới khi tính năng tương ứng được làm.
 - H: Mục "Phổ biến" hiển thị bao nhiêu món? → Đ: Tối đa 5 món, dạng danh sách dọc như "Popular Menu" của mẫu.
 - H: Khi chọn một danh mục (ví dụ "Gà rán"), mục "Phổ biến" có còn hiển thị không? → Đ: Không. Chỉ hiển thị món của danh mục đang chọn; "Phổ biến" chỉ xuất hiện khi chọn "Tất cả".
 - H: Nút trên banner ghi gì? → Đ: "Mua ngay" (theo yêu cầu, thay cho "Xem thực đơn"). Vì giỏ hàng chưa có, nút cuộn tới hàng thẻ danh mục để người dùng chọn món; khi tính năng giỏ hàng có, hành vi giữ nguyên.
-- H: Dữ liệu thực đơn mẫu lấy từ đâu? → Đ: Từ thực đơn đồ ăn và đồ uống của Ngõ Chicken, giá VND; đồ uống có size M/L nên hiển thị khoảng giá.
+- H: Dữ liệu thực đơn mẫu lấy từ đâu? → Đ: Từ thực đơn đồ ăn và đồ uống của Ngô Chicken, giá VND; đồ uống có size M/L nên hiển thị khoảng giá.
 - H: Có nên hiển thị đủ mọi nhóm món của thực đơn giấy không? → Đ: Không. Chỉ giữ các danh mục tiêu biểu: Gà rán, Cơm, Mỳ, Đồ ăn vặt, Combo, Đồ uống. Sáu nhóm đồ uống (Trà, Sữa chua, Sữa tươi, Latte, Nước ngọt, Nước ép + Sinh tố) gộp thành "Đồ uống"; nhóm "Combo đạt lớp" bỏ hẳn, không bán trong ứng dụng.
 - H: Danh mục nhiều món quá thì sao? → Đ: Mỗi danh mục giữ tối đa 6 món tiêu biểu (cắt hai lần: lần đầu tối đa 8, sau đó bỏ thêm 2 món mỗi danh mục), ưu tiên giữ món có đánh giá và món hết hàng dùng để trình diễn. Danh sách món bị bỏ nằm trong `tools/seed_menu/build_seed.cjs`. Đây là giới hạn của dữ liệu thực đơn, không phải giới hạn hiển thị: ứng dụng vẫn hiển thị mọi món đã đăng bán.
 
@@ -176,7 +176,7 @@ Từ bất kỳ món nào đang hiển thị khi duyệt, người dùng có th�
 - "Thứ tự hiển thị" là một con số do nhà hàng đặt cho danh mục và món; khi trùng thì sắp xếp theo tên theo bảng chữ cái.
 - Trải nghiệm duyệt là như nhau với Guest và Customer trong tính năng này; các thao tác chỉ dành cho Customer trên thẻ món (như yêu thích) sẽ do tính năng riêng bổ sung.
 - Giao diện tuân theo hệ thống thiết kế chỉ dùng chế độ sáng của dự án và khung Home của mẫu Food Ninja (xem Clarifications, phiên giao diện).
-- Nhà hàng là Ngõ Chicken. Dữ liệu mẫu (`tools/seed_menu/menu_seed.json`) chép từ thực đơn đồ ăn và đồ uống của nhà hàng và được sinh bằng `tools/seed_menu/build_seed.cjs`: 6 danh mục Gà rán, Cơm, Mỳ, Đồ ăn vặt, Combo, Đồ uống (28 món, tối đa 6 món mỗi danh mục; nhóm "Combo đạt lớp" không đưa vào). Dòng "Đùi, Cánh, Má đùi" không có giá nên chưa đưa vào. Điểm đánh giá và trạng thái hết hàng trong dữ liệu mẫu chỉ dùng để trình diễn trên Emulator.
+- Nhà hàng là Ngô Chicken. Dữ liệu mẫu (`tools/seed_menu/menu_seed.json`) chép từ thực đơn đồ ăn và đồ uống của nhà hàng và được sinh bằng `tools/seed_menu/build_seed.cjs`: 6 danh mục Gà rán, Cơm, Mỳ, Đồ ăn vặt, Combo, Đồ uống (28 món, tối đa 6 món mỗi danh mục; nhóm "Combo đạt lớp" không đưa vào). Dòng "Đùi, Cánh, Má đùi" không có giá nên chưa đưa vào. Điểm đánh giá và trạng thái hết hàng trong dữ liệu mẫu chỉ dùng để trình diễn trên Emulator.
 - Chưa có ảnh món; mọi món dùng ảnh thay thế cho tới khi Admin tải ảnh lên (User Story 7 gốc).
 - Kích thước trang đầu hợp lý là khoảng 20 món; con số chính xác được quyết định ở bước lập kế hoạch.
 - Câu về quyền đọc trong `docs/database_schema.md` ("Published and available items are publicly readable") cần được điều chỉnh ở bước lập kế hoạch để các món đã đăng bán thuộc danh mục đã đăng bán đọc được công khai bất kể tình trạng còn/hết hàng.

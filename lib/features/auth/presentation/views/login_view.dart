@@ -5,6 +5,7 @@ import 'package:ordering_food_system/core/services/preferences_service.dart';
 import 'package:ordering_food_system/core/theme/app_colors.dart';
 import 'package:ordering_food_system/core/theme/app_spacing.dart';
 import 'package:ordering_food_system/core/theme/app_text_styles.dart';
+import 'package:ordering_food_system/core/widgets/app_back_button.dart';
 import 'package:ordering_food_system/core/widgets/custom_text_field.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_logo.dart';
@@ -78,6 +79,14 @@ class _LoginViewState extends ConsumerState<LoginView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  if (Navigator.of(context).canPop())
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: AppSpacing.p16),
+                        child: AppBackButton(),
+                      ),
+                    ),
                   const SizedBox(height: AppSpacing.p32),
 
                   // Food Ninja Brand Header

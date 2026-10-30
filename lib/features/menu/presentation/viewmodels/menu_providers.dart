@@ -17,7 +17,7 @@ Duration? _noAutomaticRetry(int retryCount, Object error) => null;
 final menuRepositoryProvider = Provider<MenuRepository>((ref) {
   return FirestoreMenuRepository(
     ref.watch(firebaseFirestoreProvider),
-    ref.watch(firebaseStorageProvider),
+    () => ref.read(firebaseStorageProvider),
   );
 });
 

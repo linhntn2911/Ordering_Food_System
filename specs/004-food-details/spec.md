@@ -33,7 +33,7 @@ Guest hoặc Customer mở một món từ Trang chủ hoặc kết quả tìm k
 
 **Lý do ưu tiên**: Đây là phần cốt lõi của FR-009 và là bước tiếp theo bắt buộc trong hành trình đặt món sau khi duyệt hoặc tìm kiếm.
 
-**Kiểm thử độc lập**: Nạp thực đơn mẫu Ngõ Chicken, mở "Trà sữa trân châu đường đen" từ Trang chủ và xác nhận đủ ảnh (hoặc ảnh thay thế), tên, mô tả, giá, nhãn tình trạng và "4,9 (210 đánh giá)".
+**Kiểm thử độc lập**: Nạp thực đơn mẫu Ngô Chicken, mở "Trà sữa trân châu đường đen" từ Trang chủ và xác nhận đủ ảnh (hoặc ảnh thay thế), tên, mô tả, giá, nhãn tình trạng và "4,9 (210 đánh giá)".
 
 **Kịch bản chấp nhận**:
 

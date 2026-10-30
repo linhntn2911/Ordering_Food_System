@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/router.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_empty_view.dart';
@@ -8,6 +9,7 @@ import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_loading_view.dart';
 import '../../../../core/widgets/coming_soon_view.dart';
 import '../../../../core/widgets/offline_banner.dart';
+import '../../../auth/presentation/viewmodels/auth_providers.dart';
 import '../../domain/entities/menu_failure.dart';
 import '../../domain/entities/menu_item.dart';
 import '../viewmodels/home_menu_state.dart';
@@ -80,6 +82,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
     );
   }
 
+  void _openLogin() {
+    Navigator.of(context).pushNamed(AppRoutes.login);
+  }
+
   void _showUnavailableFeature() {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -119,6 +125,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
     final state = ref.watch(homeMenuViewModelProvider);
     final viewModel = ref.read(homeMenuViewModelProvider.notifier);
+    // Guests and an unresolved auth state both get the login button.
+    final isSignedIn = ref.watch(authStateProvider).value != null;
 
     return Scaffold(
       body: LayoutBuilder(
@@ -143,7 +151,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        HomeHeader(onNotificationsTap: _showUnavailableFeature),
+                        HomeHeader(
+                          onNotificationsTap: _showUnavailableFeature,
+                          onLoginTap: isSignedIn ? null : _openLogin,
+                        ),
                         const SizedBox(height: AppSpacing.p20),
                         HomeSearchBar(
                           onSearchTap: _openSearch,

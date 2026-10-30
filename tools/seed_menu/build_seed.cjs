@@ -1,4 +1,4 @@
-// Builds menu_seed.json from the Ngõ Chicken food and drink menus.
+// Builds menu_seed.json from the Ngô Chicken food and drink menus.
 // Usage: node tools/seed_menu/build_seed.cjs tools/seed_menu/menu_seed.json
 const fs = require('fs');
 const path = require('path');
@@ -154,5 +154,5 @@ for (const item of items) {
 }
 
 const out = path.resolve(process.argv[2]);
-fs.writeFileSync(out, JSON.stringify({ restaurantName: 'Ngõ Chicken', categories, items, reviews }, null, 2) + '\n');
+fs.writeFileSync(out, JSON.stringify({ restaurantName: 'Ngô Chicken', categories, items, reviews }, null, 2) + '\n');
 console.log(`${categories.length} categories, ${items.length} items, ${reviews.length} reviews -> ${out}`);

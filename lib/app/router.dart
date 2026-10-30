@@ -10,6 +10,7 @@ import '../features/order/presentation/views/admin_dashboard_screen.dart';
 import '../features/order/presentation/views/admin_order_list_screen.dart';
 import '../features/order/presentation/views/sales_report_screen.dart';
 import '../features/profile/presentation/views/profile_view.dart';
+import 'admin_gate.dart';
 import 'main_shell.dart';
 
 abstract final class AppRoutes {
@@ -37,22 +38,19 @@ abstract final class AppRoutes {
         return MaterialPageRoute(builder: (_) => const ForgotPasswordView());
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileView());
+      case Navigator.defaultRouteName:
       case home:
         return MaterialPageRoute(builder: (_) => const MainShell());
       case adminDashboard:
-        return MaterialPageRoute(builder: (_) => const AdminDashboardScreen());
+        return _adminRoute(const AdminDashboardScreen());
       case adminCategories:
-        return MaterialPageRoute(
-          builder: (_) => const CategoryManagementScreen(),
-        );
+        return _adminRoute(const CategoryManagementScreen());
       case adminMenuItems:
-        return MaterialPageRoute(
-          builder: (_) => const AdminMenuItemListScreen(),
-        );
+        return _adminRoute(const AdminMenuItemListScreen());
       case adminOrders:
-        return MaterialPageRoute(builder: (_) => const AdminOrderListScreen());
+        return _adminRoute(const AdminOrderListScreen());
       case adminSalesReport:
-        return MaterialPageRoute(builder: (_) => const SalesReportScreen());
+        return _adminRoute(const SalesReportScreen());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
@@ -60,5 +58,9 @@ abstract final class AppRoutes {
           ),
         );
     }
+  }
+
+  static Route<dynamic> _adminRoute(Widget screen) {
+    return MaterialPageRoute(builder: (_) => AdminGate(child: screen));
   }
 }

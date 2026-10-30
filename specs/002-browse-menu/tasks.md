@@ -176,14 +176,14 @@ description: "Danh sách task triển khai tính năng Duyệt thực đơn"
 
 ---
 
-## Phase 8: Giao diện theo mẫu Food Ninja và thực đơn Ngõ Chicken (FR-015 – FR-019)
+## Phase 8: Giao diện theo mẫu Food Ninja và thực đơn Ngô Chicken (FR-015 – FR-019)
 
-**Goal**: Trang chủ theo khung Home của mẫu, thanh điều hướng dưới, dữ liệu mẫu là thực đơn Ngõ Chicken.
+**Goal**: Trang chủ theo khung Home của mẫu, thanh điều hướng dưới, dữ liệu mẫu là thực đơn Ngô Chicken.
 
-**Independent Test**: Nạp `tools/seed_menu` (Ngõ Chicken), mở app trên Chrome hoặc Android: thấy tiêu đề + chuông, ô tìm kiếm + nút lọc, banner, thẻ danh mục, "Phổ biến" ≤ 5 món dạng dọc, thực đơn gom nhóm và thanh điều hướng 4 mục (US1 kịch bản 9–11).
+**Independent Test**: Nạp `tools/seed_menu` (Ngô Chicken), mở app trên Chrome hoặc Android: thấy tiêu đề + chuông, ô tìm kiếm + nút lọc, banner, thẻ danh mục, "Phổ biến" ≤ 5 món dạng dọc, thực đơn gom nhóm và thanh điều hướng 4 mục (US1 kịch bản 9–11).
 
-- [X] T059 [P] [US1] Sinh lại `tools/seed_menu/menu_seed.json` từ thực đơn Ngõ Chicken (6 danh mục, 28 món, đồ uống size M/L bằng `priceDelta`, 7 món có điểm đánh giá trình diễn, 2 món hết hàng, `restaurantName`) và cho `tools/seed_menu/seed.js` ghi `restaurant_configs/main`
-- [X] T060 [P] [US1] Tạo `lib/core/config/restaurant_info.dart` (`RestaurantInfo.name = 'Ngõ Chicken'`, dòng giới thiệu) và `lib/core/widgets/coming_soon_view.dart` (màn chờ "Tính năng đang được phát triển" dùng token)
+- [X] T059 [P] [US1] Sinh lại `tools/seed_menu/menu_seed.json` từ thực đơn Ngô Chicken (6 danh mục, 28 món, đồ uống size M/L bằng `priceDelta`, 7 món có điểm đánh giá trình diễn, 2 món hết hàng, `restaurantName`) và cho `tools/seed_menu/seed.js` ghi `restaurant_configs/main`
+- [X] T060 [P] [US1] Tạo `lib/core/config/restaurant_info.dart` (`RestaurantInfo.name = 'Ngô Chicken'`, dòng giới thiệu) và `lib/core/widgets/coming_soon_view.dart` (màn chờ "Tính năng đang được phát triển" dùng token)
 - [X] T061 [US1] Đổi giới hạn "Phổ biến" còn 5: mặc định `watchPopularItems({int limit = 5})` trong `lib/features/menu/domain/repositories/menu_repository.dart` và `lib/features/menu/data/repositories/firestore_menu_repository.dart`
 - [X] T062 [P] [US1] Tạo `lib/features/menu/presentation/widgets/home_header.dart` (tiêu đề hai dòng `headlineLarge` + nút chuông tròn) và `lib/features/menu/presentation/widgets/home_search_bar.dart` (ô tìm kiếm chỉ đọc nền `warningSurface` + nút lọc), cả hai nhận callback `onUnavailableFeature`
 - [X] T063 [P] [US1] Tạo `lib/features/menu/presentation/widgets/restaurant_banner.dart` (nền `AppGradients.primary`, tên và giới thiệu từ `RestaurantInfo`, nút "Mua ngay" gọi `onViewMenu`)
@@ -192,7 +192,7 @@ description: "Danh sách task triển khai tính năng Duyệt thực đơn"
 - [X] T066 [US1] Ghép lại `lib/features/menu/presentation/views/home_view.dart` theo thứ tự ở `contracts/home_screen_ui.md`: header, tìm kiếm, nhãn ngoại tuyến, banner, danh mục (có `GlobalKey` để "Mua ngay" cuộn tới), "Phổ biến", thực đơn; ô tìm kiếm/lọc/chuông hiện SnackBar "Tính năng đang được phát triển"
 - [X] T067 [US1] Tạo `lib/app/main_shell.dart` (`IndexedStack` + thanh điều hướng dưới 4 mục, mục khác Trang chủ dùng `ComingSoonView`) và đặt `home: const MainShell()` trong `lib/app/app.dart`
 - [X] T068 [US1] Cập nhật test: `test/features/menu/presentation/home_view_test.dart` (bố cục US1-9, banner cuộn US1-10, SnackBar US1-11, thẻ danh mục thay chip), `test/features/menu/presentation/food_card_test.dart` (bố cục mới), `test/widget_test.dart` (thanh điều hướng 4 mục, chuyển mục giữ trạng thái Trang chủ), `test/features/menu/presentation/home_layout_test.dart` (320 dp, 1,3×)
-- [ ] T069 Chạy `dart format lib test`, `flutter analyze`, `flutter test`; nạp dữ liệu Ngõ Chicken vào Emulator và chạy app trên Chrome để kiểm tra bằng mắt theo `quickstart.md`
+- [ ] T069 Chạy `dart format lib test`, `flutter analyze`, `flutter test`; nạp dữ liệu Ngô Chicken vào Emulator và chạy app trên Chrome để kiểm tra bằng mắt theo `quickstart.md`
 
 ---
 
@@ -291,5 +291,5 @@ Ghi chú: trên Windows, `firebase emulators:exec` để lại tiến trình Jav
 | `dart format lib test` | Đạt |
 | `flutter analyze` | Không có lỗi |
 | `flutter test` | Đạt 61/61 |
-| Nạp dữ liệu Ngõ Chicken vào Emulator (`demo-ordering`) | Đạt: 6 danh mục, 28 món |
+| Nạp dữ liệu Ngô Chicken vào Emulator (`demo-ordering`) | Đạt: 6 danh mục, 28 món |
 | `flutter run -d chrome --dart-define=USE_FIRESTORE_EMULATOR=true` | Khởi động không lỗi; chờ người dùng kiểm tra bằng mắt (T069) |

@@ -274,7 +274,7 @@ class AdminDrawer extends StatelessWidget {
                       } catch (_) {}
                       if (context.mounted) {
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.login,
+                          AppRoutes.home,
                           (route) => false,
                         );
                       }

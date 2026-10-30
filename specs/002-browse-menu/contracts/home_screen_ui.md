@@ -12,7 +12,7 @@
 1. **Tiêu đề**: "Tìm món / bạn yêu thích" (`headlineLarge`, hai dòng) và nút chuông tròn nền trắng có bóng nhẹ ở góc phải.
 2. **Ô tìm kiếm** (chỉ đọc, mở màn hình tìm kiếm của `specs/003-menu-search`; nền `warningSurface`, bo góc `AppRadii.input`, biểu tượng kính lúp `foodAccentDark`, gợi ý "Bạn muốn ăn gì?") và **nút lọc** vuông cùng nền.
 3. Nhãn ngoại tuyến "Đang ngoại tuyến – dữ liệu có thể chưa cập nhật" (chỉ khi `isOffline`).
-4. **Banner nhà hàng**: nền `AppGradients.primary`, bo góc `AppRadii.large`; tiêu đề "Ngõ Chicken", dòng phụ "Gà rán, cơm, mỳ & đồ uống – giao hàng tận nơi", nút trắng "Mua ngay"; minh họa bằng biểu tượng.
+4. **Banner nhà hàng**: nền `AppGradients.primary`, bo góc `AppRadii.large`; tiêu đề "Ngô Chicken", dòng phụ "Gà rán, cơm, mỳ & đồ uống – giao hàng tận nơi", nút trắng "Mua ngay"; minh họa bằng biểu tượng.
 5. **Danh mục**: tiêu đề "Danh mục"; hàng thẻ cuộn ngang, thẻ đầu "Tất cả", mỗi thẻ có biểu tượng và tên (tối đa 2 dòng); thẻ đang chọn có nền `primarySoft` và viền `primaryEnd`.
 6. **Phổ biến**: tiêu đề "Phổ biến"; danh sách dọc tối đa 5 thẻ món; chỉ hiện khi đang chọn "Tất cả"; ẩn khi rỗng.
 7. **Thực đơn**: "Tất cả" thì có tiêu đề nhóm theo danh mục; một danh mục thì không có tiêu đề nhóm.

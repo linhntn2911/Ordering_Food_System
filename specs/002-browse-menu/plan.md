@@ -58,7 +58,7 @@ Chi tiết và phương án đã cân nhắc ở [research.md](research.md).
 8. **Giao diện theo mẫu Food Ninja (FR-015 – FR-019)**:
    - `lib/app/main_shell.dart`: `MainShell` với `IndexedStack` + thanh điều hướng dưới 4 mục (Trang chủ, Giỏ hàng, Đơn hàng, Tài khoản); mục chưa có tính năng dùng `ComingSoonView` (`lib/core/widgets/coming_soon_view.dart`). Chỉ số mục đang chọn là trạng thái giao diện thuần, giữ trong `State` của shell.
    - Trang chủ chia thành widget nhỏ trong `lib/features/menu/presentation/widgets/`: `home_header.dart` (tiêu đề + chuông), `home_search_bar.dart` (ô tìm kiếm chỉ đọc + nút lọc), `restaurant_banner.dart`, `category_card_list.dart` (thay `category_chip_bar.dart`), `popular_section.dart` (chuyển sang danh sách dọc).
-   - Tên nhà hàng "Ngõ Chicken" đặt ở `lib/core/config/restaurant_info.dart` cho banner; dữ liệu thực đơn vẫn chỉ đến từ Firestore.
+   - Tên nhà hàng "Ngô Chicken" đặt ở `lib/core/config/restaurant_info.dart` cho banner; dữ liệu thực đơn vẫn chỉ đến từ Firestore.
    - Biểu tượng danh mục chọn theo từ khóa trong tên danh mục (gà, cơm, mỳ, trà…) trong một hàm thuần của tầng giao diện; danh mục lạ dùng biểu tượng mặc định.
    - `FoodCard` theo hàng "Popular Menu": ảnh trái, tên + đánh giá + nhãn hết hàng ở giữa, giá căn phải.
 

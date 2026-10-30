@@ -18,7 +18,10 @@ class FirestoreMenuRepository implements MenuRepository {
   FirestoreMenuRepository(this._firestore, this._storage);
 
   final FirebaseFirestore _firestore;
-  final FirebaseStorage _storage;
+
+  /// Read only when an Admin uploads an image, so browsing never depends
+  /// on Firebase Storage being configured.
+  final FirebaseStorage Function() _storage;
 
   CollectionReference<Map<String, dynamic>> get _categories =>
       _firestore.collection(FirestorePaths.categories);
@@ -190,7 +193,7 @@ class FirestoreMenuRepository implements MenuRepository {
 
     if (draft.imageBytes != null) {
       final extension = _extension(draft.imageName);
-      final imageReference = _storage.ref(
+      final imageReference = _storage().ref(
         'menu_items/${reference.id}/${DateTime.now().millisecondsSinceEpoch}.$extension',
       );
       final contentType = extension == 'png' ? 'image/png' : 'image/jpeg';

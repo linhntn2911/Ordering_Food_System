@@ -35,7 +35,7 @@ For additional context about technologies, project structure, commands, and deci
 
 ## Product Boundaries
 
-- One restaurant: **Ngõ Chicken** (fried chicken, rice, noodles, snacks, combos, drinks). Menu data comes from Firestore; `tools/seed_menu/menu_seed.json` holds the restaurant's menu for the emulator. Never hard-code menu items in widgets.
+- One restaurant: **Ngô Chicken** (fried chicken, rice, noodles, snacks, combos, drinks). Menu data comes from Firestore; `tools/seed_menu/menu_seed.json` holds the restaurant's menu for the emulator. Never hard-code menu items in widgets.
 - Human roles: Customer and pre-provisioned Admin. Guest is an unauthenticated state.
 - COD only.
 - No driver application, GPS tracking, online payment, refunds, chat, marketplace behavior, or complex promotions.

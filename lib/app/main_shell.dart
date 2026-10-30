@@ -7,6 +7,7 @@ import '../core/theme/app_spacing.dart';
 import '../core/theme/app_text_styles.dart';
 import '../core/widgets/coming_soon_view.dart';
 import '../features/menu/presentation/views/home_view.dart';
+import '../features/profile/presentation/views/profile_view.dart';
 
 /// Customer app shell with the bottom tabs Home, Cart, Orders and Profile.
 ///
@@ -36,8 +37,9 @@ class _MainShellState extends State<MainShell> {
         index: _index,
         children: [
           const HomeView(),
-          for (final tab in MainShell.tabs.skip(1))
+          for (final tab in MainShell.tabs.skip(1).take(2))
             ComingSoonView(title: tab.label, icon: tab.icon),
+          const ProfileView(),
         ],
       ),
       bottomNavigationBar: SafeArea(

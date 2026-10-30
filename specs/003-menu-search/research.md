@@ -71,7 +71,7 @@ Mỗi mục ghi theo dạng: Quyết định, Lý do, Phương án đã cân nh�
 ## R8. Kiểm thử
 
 - **Quyết định**:
-  - Unit test cho `normalizeSearchText` và `searchMenuItems` (bảng ví dụ từ thực đơn mẫu Ngõ Chicken, gồm SC-002: 4 ký tự đầu của mỗi từ đều tìm thấy món).
+  - Unit test cho `normalizeSearchText` và `searchMenuItems` (bảng ví dụ từ thực đơn mẫu Ngô Chicken, gồm SC-002: 4 ký tự đầu của mỗi từ đều tìm thấy món).
   - Unit test ViewModel với `FakeMenuRepository` (thêm `watchSearchableItems`).
   - Widget test cho `MenuSearchView`, bảng lọc, nhãn bộ lọc, trạng thái rỗng/lỗi/ngoại tuyến, ở 320 dp và cỡ chữ 1,3×.
   - Cập nhật widget test Trang chủ: chạm ô tìm kiếm hoặc nút lọc mở màn hình tìm kiếm.

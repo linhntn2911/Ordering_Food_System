@@ -58,3 +58,6 @@ tests/firestore_rules/node_modules/
 tools/seed_menu/node_modules/
 firebase-debug.log
 firestore-debug.log
+
+# Local Firebase emulator data
+.emulator-data/
