@@ -13,6 +13,9 @@ abstract class AuthRepository {
     required String password,
   });
 
+  /// Signs in with a Google account and returns the application user profile.
+  Future<AppUser> signInWithGoogle();
+
   /// Registers a new customer and creates their initial Firestore profile.
   Future<AppUser> registerCustomer({
     required String fullName,

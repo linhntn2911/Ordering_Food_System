@@ -51,7 +51,7 @@ class FoodNinjaLogo extends StatelessWidget {
           shaderCallback: (bounds) =>
               AppColors.primaryGradient.createShader(bounds),
           child: Text(
-            'FoodNinja',
+            'Ngô Chicken',
             style: AppTextStyles.headlineLarge.copyWith(
               fontSize: titleFontSize,
               fontWeight: FontWeight.w800,

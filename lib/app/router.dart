@@ -29,7 +29,7 @@ abstract final class AppRoutes {
       case home:
         return MaterialPageRoute(
           builder: (context) => Scaffold(
-            appBar: AppBar(title: const Text('Food Ninja Home')),
+            appBar: AppBar(title: const Text('Ngô Chicken')),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -48,7 +48,7 @@ abstract final class AppRoutes {
       case adminDashboard:
         return MaterialPageRoute(
           builder: (context) => Scaffold(
-            appBar: AppBar(title: const Text('Admin Dashboard')),
+            appBar: AppBar(title: const Text('Ngô Chicken - Admin')),
             body: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

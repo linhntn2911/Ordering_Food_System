@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/services/preferences_service.dart';
 import '../core/theme/app_theme.dart';
 import 'router.dart';
 
-class FoodOrderingApp extends ConsumerWidget {
+class FoodOrderingApp extends StatelessWidget {
   const FoodOrderingApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final prefs = ref.watch(preferencesServiceProvider);
-    final initialRoute = prefs.isOnboardingCompleted
-        ? AppRoutes.login
-        : AppRoutes.onboarding;
+  Widget build(BuildContext context) {
+    // Onboarding is currently skipped so users go straight to authentication.
+    const initialRoute = AppRoutes.login;
 
     return MaterialApp(
-      title: 'Food Ninja',
+      title: 'Ngô Chicken',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       themeMode: ThemeMode.light,

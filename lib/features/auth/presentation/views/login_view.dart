@@ -253,38 +253,25 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     children: [
                       Expanded(
                         child: SocialLoginButton(
-                          label: 'Facebook',
-                          icon: const Icon(
-                            Icons.facebook_rounded,
-                            color: Color(0xFF1877F2),
-                            size: 26,
-                          ),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Social login demo placeholder'),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.p16),
-                      Expanded(
-                        child: SocialLoginButton(
                           label: 'Google',
                           icon: const Icon(
                             Icons.g_mobiledata_rounded,
                             color: Color(0xFFEA4335),
                             size: 32,
                           ),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Social login demo placeholder'),
-                                duration: Duration(seconds: 1),
-                              ),
-                            );
+                          onPressed: () async {
+                            final user = await ref
+                                .read(loginViewModelProvider.notifier)
+                                .signInWithGoogle();
+                            if (!context.mounted) return;
+                            if (user != null) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                user.isAdmin
+                                    ? AppRoutes.adminDashboard
+                                    : AppRoutes.home,
+                                (route) => false,
+                              );
+                            }
                           },
                         ),
                       ),

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ordering_food_system/core/errors/app_exception.dart';
 import 'package:ordering_food_system/core/firebase/firestore_paths.dart';
 import 'package:ordering_food_system/features/auth/data/models/user_model.dart';
@@ -17,6 +19,63 @@ class FirebaseAuthRepository implements AuthRepository {
   DateTime? _lockoutUntil;
 
   FirebaseAuthRepository(this._firebaseAuth, this._firestore);
+
+  @override
+  Future<AppUser> signInWithGoogle() async {
+    try {
+      late final UserCredential result;
+      GoogleSignInAccount? googleUser;
+      if (kIsWeb) {
+        result = await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
+      } else {
+        await GoogleSignIn.instance.initialize(
+          clientId: '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
+        );
+        googleUser = await GoogleSignIn.instance.authenticate();
+        final googleAuth = googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          idToken: googleAuth.idToken,
+        );
+        result = await _firebaseAuth.signInWithCredential(credential);
+      }
+      final firebaseUser = result.user;
+      if (firebaseUser == null) {
+        throw const AuthException(
+          'Google sign-in failed.',
+          code: 'google-sign-in-failed',
+        );
+      }
+
+      final docRef = _firestore.doc(FirestorePaths.user(firebaseUser.uid));
+      final doc = await docRef.get();
+      if (!doc.exists) {
+        final now = DateTime.now();
+        final profile = UserModel(
+          id: firebaseUser.uid,
+          fullName: firebaseUser.displayName ?? googleUser?.displayName ?? '',
+          email: firebaseUser.email ?? '',
+          phone: firebaseUser.phoneNumber ?? '',
+          avatarUrl: firebaseUser.photoURL,
+          role: 'customer',
+          status: 'active',
+          createdAt: now,
+          updatedAt: now,
+        );
+        await docRef.set(profile.toFirestore());
+        return profile.toEntity();
+      }
+      return UserModel.fromFirestore(doc).toEntity();
+    } on FirebaseAuthException catch (e) {
+      throw AuthException.fromFirebaseCode(e.code, e.message);
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AuthException(
+        'Google sign-in failed: $e',
+        code: 'google-sign-in-failed',
+      );
+    }
+  }
 
   @override
   Stream<AppUser?> authStateChanges() {

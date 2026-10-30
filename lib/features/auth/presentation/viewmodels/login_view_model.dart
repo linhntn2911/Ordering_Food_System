@@ -88,6 +88,24 @@ class LoginViewModel extends Notifier<LoginState> {
       return null;
     }
   }
+
+  Future<AppUser?> signInWithGoogle() async {
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final user = await ref.read(authRepositoryProvider).signInWithGoogle();
+      state = state.copyWith(isLoading: false, user: user);
+      return user;
+    } on AppException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.message);
+      return null;
+    } catch (_) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Google sign-in failed.',
+      );
+      return null;
+    }
+  }
 }
 
 final loginViewModelProvider = NotifierProvider<LoginViewModel, LoginState>(

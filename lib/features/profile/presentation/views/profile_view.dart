@@ -379,7 +379,7 @@ class ProfileView extends ConsumerWidget {
                                   Text(
                                     user.isAdmin
                                         ? 'Full System Authority'
-                                        : 'Food Ninja Customer',
+                                        : 'Ngô Chicken Customer',
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.textMuted,
                                     ),
