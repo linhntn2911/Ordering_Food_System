@@ -2,60 +2,87 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
+/// Centralized Poppins typography tokens defined in docs/design_system.md.
 abstract final class AppTextStyles {
-  static const headlineLarge = TextStyle(
-    fontFamily: 'Poppins',
+  static const String fontFamily = 'Poppins';
+
+  static const TextStyle displayLarge = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 32,
+    fontWeight: FontWeight.w700,
+    height: 40 / 32,
+    color: AppColors.textPrimary,
+  );
+
+  static const TextStyle headlineLarge = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 25,
-    height: 1.32,
     fontWeight: FontWeight.w700,
+    height: 33 / 25,
     color: AppColors.textPrimary,
   );
-  static const headlineMedium = TextStyle(
-    fontFamily: 'Poppins',
+
+  static const TextStyle headlineMedium = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 22,
-    height: 1.36,
     fontWeight: FontWeight.w700,
+    height: 30 / 22,
     color: AppColors.textPrimary,
   );
-  static const titleLarge = TextStyle(
-    fontFamily: 'Poppins',
+
+  static const TextStyle titleLarge = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 18,
-    height: 1.44,
     fontWeight: FontWeight.w600,
+    height: 26 / 18,
     color: AppColors.textPrimary,
   );
-  static const titleMedium = TextStyle(
-    fontFamily: 'Poppins',
+
+  static const TextStyle titleMedium = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 16,
-    height: 1.5,
     fontWeight: FontWeight.w600,
+    height: 24 / 16,
     color: AppColors.textPrimary,
   );
-  static const bodyMedium = TextStyle(
-    fontFamily: 'Poppins',
-    fontSize: 14,
-    height: 1.5,
+
+  static const TextStyle bodyLarge = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
     fontWeight: FontWeight.w400,
+    height: 24 / 16,
     color: AppColors.textSecondary,
   );
-  static const bodySmall = TextStyle(
-    fontFamily: 'Poppins',
-    fontSize: 12,
-    height: 1.5,
+
+  static const TextStyle bodyMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
     fontWeight: FontWeight.w400,
+    height: 21 / 14,
+    color: AppColors.textSecondary,
+  );
+
+  static const TextStyle labelLarge = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    height: 20 / 14,
+    color: Colors.white,
+  );
+
+  static const TextStyle bodySmall = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    height: 18 / 12,
     color: AppColors.textMuted,
   );
-  static const labelLarge = TextStyle(
-    fontFamily: 'Poppins',
-    fontSize: 14,
-    height: 1.43,
-    fontWeight: FontWeight.w600,
-  );
-  static const labelSmall = TextStyle(
-    fontFamily: 'Poppins',
+
+  static const TextStyle labelSmall = TextStyle(
+    fontFamily: fontFamily,
     fontSize: 11,
-    height: 1.45,
     fontWeight: FontWeight.w500,
-    color: AppColors.textSecondary,
+    height: 16 / 11,
+    color: AppColors.textMuted,
   );
 }

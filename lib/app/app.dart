@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../core/theme/app_theme.dart';
-import '../features/order/presentation/views/admin_dashboard_screen.dart';
+import 'router.dart';
 
 class FoodOrderingApp extends StatelessWidget {
   const FoodOrderingApp({
     this.showPreviewBanner = false,
     this.initialHome,
+    this.initialRoute,
     super.key,
   });
 
   final bool showPreviewBanner;
   final Widget? initialHome;
+  final String? initialRoute;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,9 @@ class FoodOrderingApp extends StatelessWidget {
           child: child,
         );
       },
-      home: initialHome ?? const AdminDashboardScreen(),
+      home: initialHome,
+      initialRoute: initialHome == null ? (initialRoute ?? AppRoutes.login) : null,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }
 }
