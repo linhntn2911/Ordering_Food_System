@@ -3,6 +3,8 @@ import 'package:ordering_food_system/core/firebase/firebase_providers.dart';
 import 'package:ordering_food_system/features/auth/data/repositories/firebase_auth_repository.dart';
 import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
 import 'package:ordering_food_system/features/auth/domain/repositories/auth_repository.dart';
+import 'package:ordering_food_system/features/auth/data/repositories/firestore_otp_repository.dart';
+import 'package:ordering_food_system/features/auth/domain/repositories/otp_repository.dart';
 import 'package:ordering_food_system/features/profile/data/repositories/firestore_profile_repository.dart';
 import 'package:ordering_food_system/features/profile/domain/repositories/profile_repository.dart';
 
@@ -10,6 +12,13 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   final firebaseAuth = ref.watch(firebaseAuthProvider);
   final firestore = ref.watch(firebaseFirestoreProvider);
   return FirebaseAuthRepository(firebaseAuth, firestore);
+});
+
+final otpRepositoryProvider = Provider<OtpRepository>((ref) {
+  final firestore = ref.watch(firebaseFirestoreProvider);
+  final firebaseAuth = ref.watch(firebaseAuthProvider);
+  final authRepo = ref.watch(authRepositoryProvider);
+  return FirestoreOtpRepository(firestore, firebaseAuth, authRepo);
 });
 
 final authStateProvider = StreamProvider<AppUser?>((ref) {

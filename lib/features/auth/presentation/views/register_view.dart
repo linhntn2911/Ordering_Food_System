@@ -9,7 +9,9 @@ import 'package:ordering_food_system/core/widgets/custom_text_field.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_logo.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
+import 'package:ordering_food_system/features/auth/domain/repositories/otp_repository.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/register_view_model.dart';
+import 'package:ordering_food_system/features/auth/presentation/views/otp_verification_view.dart';
 
 class RegisterView extends ConsumerStatefulWidget {
   const RegisterView({super.key});
@@ -42,9 +44,9 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final user = await ref
+    final pending = await ref
         .read(registerViewModelProvider.notifier)
-        .register(
+        .prepareRegistrationWithOtp(
           fullName: _fullNameController.text,
           email: _emailController.text,
           phone: _phoneController.text,
@@ -52,17 +54,15 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
           confirmPassword: _confirmPasswordController.text,
         );
 
-    if (user != null && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Registration successful! Verification email has been sent.',
-          ),
-          backgroundColor: AppColors.success,
+    if (pending != null && mounted) {
+      Navigator.of(context).pushNamed(
+        AppRoutes.otpVerification,
+        arguments: OtpVerificationArgs(
+          email: _emailController.text.trim(),
+          type: OtpType.registration,
+          pendingRegistration: pending,
         ),
       );
-      Navigator.of(context)
-          .pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
     }
   }
 
@@ -143,7 +143,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                     const SizedBox(height: AppSpacing.p16),
                   ],
 
-                  // Full Name Field (Food Ninja Anamwp ..)
+                  // Full Name Field
                   CustomTextField(
                     controller: _fullNameController,
                     hintText: 'Full Name',

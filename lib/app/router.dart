@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../features/auth/domain/repositories/otp_repository.dart';
+import '../features/auth/presentation/views/auth_success_view.dart';
 import '../features/auth/presentation/views/forgot_password_view.dart';
 import '../features/auth/presentation/views/login_view.dart';
+import '../features/auth/presentation/views/otp_verification_view.dart';
 import '../features/auth/presentation/views/register_view.dart';
+import '../features/auth/presentation/views/reset_password_view.dart';
 import '../features/category/presentation/views/category_management_screen.dart';
 import '../features/menu/presentation/views/admin_menu_item_list_screen.dart';
 import '../features/onboarding/presentation/views/onboarding_view.dart';
@@ -16,6 +20,9 @@ abstract final class AppRoutes {
   static const String login = '/login';
   static const String register = '/register';
   static const String forgotPassword = '/forgot-password';
+  static const String otpVerification = '/otp-verification';
+  static const String resetPassword = '/reset-password';
+  static const String authSuccess = '/auth-success';
   static const String profile = '/profile';
   static const String home = '/home';
   static const String adminDashboard = '/admin-dashboard';
@@ -34,6 +41,23 @@ abstract final class AppRoutes {
         return MaterialPageRoute(builder: (_) => const RegisterView());
       case forgotPassword:
         return MaterialPageRoute(builder: (_) => const ForgotPasswordView());
+      case otpVerification:
+        final args =
+            settings.arguments as OtpVerificationArgs? ??
+            const OtpVerificationArgs(email: '', type: OtpType.forgotPassword);
+        return MaterialPageRoute(
+          builder: (_) => OtpVerificationView(args: args),
+        );
+      case resetPassword:
+        final args =
+            settings.arguments as ResetPasswordArgs? ??
+            const ResetPasswordArgs(email: '', otp: '');
+        return MaterialPageRoute(builder: (_) => ResetPasswordView(args: args));
+      case authSuccess:
+        final args =
+            settings.arguments as AuthSuccessArgs? ??
+            const AuthSuccessArgs(type: AuthSuccessType.passwordReset);
+        return MaterialPageRoute(builder: (_) => AuthSuccessView(args: args));
       case profile:
         return MaterialPageRoute(builder: (_) => const ProfileView());
       case home:

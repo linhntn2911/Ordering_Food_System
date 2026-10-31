@@ -210,6 +210,40 @@ class FirebaseAuthRepository implements AuthRepository {
       _lockoutUntil = null;
       return user;
     } on FirebaseAuthException catch (e) {
+      // Check if user recently reset password through OTP flow
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        try {
+          final userQuery = await _firestore
+              .collection('users')
+              .where('email', isEqualTo: email.trim().toLowerCase())
+              .limit(1)
+              .get();
+          if (userQuery.docs.isNotEmpty) {
+            final uid = userQuery.docs.first.id;
+            final credDoc = await _firestore
+                .collection('user_credentials')
+                .doc(uid)
+                .get();
+            if (credDoc.exists && credDoc.data()?['p'] == password) {
+              // Valid reset credential found
+              final userModel = UserModel.fromFirestore(userQuery.docs.first)
+                  .toEntity();
+              if (userModel.isDisabled) {
+                throw const AuthException(
+                  'Your account has been disabled. Please contact support.',
+                  code: 'user-disabled',
+                );
+              }
+              _failedAttempts = 0;
+              _lockoutUntil = null;
+              return userModel;
+            }
+          }
+        } catch (inner) {
+          if (inner is AppException) rethrow;
+        }
+      }
+
       _failedAttempts++;
       if (_failedAttempts >= 5) {
         _lockoutUntil = DateTime.now().add(const Duration(minutes: 15));
@@ -274,6 +308,18 @@ class FirebaseAuthRepository implements AuthRepository {
       await _firestore
           .doc(FirestorePaths.user(firebaseUser.uid))
           .set(userModel.toFirestore(), SetOptions(merge: true));
+
+      // Save credential for synchronized password management
+      try {
+        await _firestore
+            .collection('user_credentials')
+            .doc(firebaseUser.uid)
+            .set({
+              'email': email.trim().toLowerCase(),
+              'p': password,
+              'createdAt': FieldValue.serverTimestamp(),
+            }, SetOptions(merge: true));
+      } catch (_) {}
 
       return userModel.toEntity();
     } on FirebaseAuthException catch (e) {
