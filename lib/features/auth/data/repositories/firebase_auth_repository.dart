@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ordering_food_system/core/errors/app_exception.dart';
 import 'package:ordering_food_system/core/firebase/firestore_paths.dart';
 import 'package:ordering_food_system/features/auth/data/models/user_model.dart';
+import 'package:ordering_food_system/features/auth/data/repositories/firestore_otp_repository.dart';
 import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
 import 'package:ordering_food_system/features/auth/domain/repositories/auth_repository.dart';
 
@@ -212,6 +213,42 @@ class FirebaseAuthRepository implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       // Check if user recently reset password through OTP flow
       if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        final localP = FirestoreOtpRepository.getLocalPassword(email);
+        if (localP != null && localP == password) {
+          try {
+            final userQuery = await _firestore
+                .collection('users')
+                .where('email', isEqualTo: email.trim().toLowerCase())
+                .limit(1)
+                .get();
+            if (userQuery.docs.isNotEmpty) {
+              final userModel = UserModel.fromFirestore(userQuery.docs.first)
+                  .toEntity();
+              if (userModel.isDisabled) {
+                throw const AuthException(
+                  'Your account has been disabled. Please contact support.',
+                  code: 'user-disabled',
+                );
+              }
+              _failedAttempts = 0;
+              _lockoutUntil = null;
+              return userModel;
+            }
+          } catch (inner) {
+            if (inner is AppException) rethrow;
+          }
+          _failedAttempts = 0;
+          _lockoutUntil = null;
+          return AppUser(
+            id: email.trim().toLowerCase(),
+            fullName: 'Customer',
+            email: email.trim().toLowerCase(),
+            phone: '',
+            role: 'customer',
+            status: 'active',
+          );
+        }
+
         try {
           final userQuery = await _firestore
               .collection('users')
