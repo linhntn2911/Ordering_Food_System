@@ -469,6 +469,67 @@ class ProfileView extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.p24),
+                      const SizedBox(height: AppSpacing.p20),
+
+                      // Activity Card (Notifications & Reviews)
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.p20),
+                        decoration: const BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: AppSpacing.roundedCard,
+                          boxShadow: AppSpacing.cardShadow,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Activity & Updates',
+                              style: AppTextStyles.titleMedium,
+                            ),
+                            const SizedBox(height: AppSpacing.p12),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primarySoft,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.notifications_outlined,
+                                  color: AppColors.primarySolid,
+                                  size: 20,
+                                ),
+                              ),
+                              title: const Text('Notifications', style: AppTextStyles.bodyMedium),
+                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
+                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                            ),
+                            const Divider(height: 1, color: AppColors.borderLight),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.warningSurface,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.rate_review_outlined,
+                                  color: AppColors.foodAccentDark,
+                                  size: 20,
+                                ),
+                              ),
+                              title: const Text('My Reviews', style: AppTextStyles.bodyMedium),
+                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
+                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.myReviews),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.p24),
                       if (user.isAdmin) ...[
                         Container(
                           width: double.infinity,
