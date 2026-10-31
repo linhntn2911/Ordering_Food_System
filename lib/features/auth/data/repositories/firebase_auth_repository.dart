@@ -28,12 +28,17 @@ class FirebaseAuthRepository implements AuthRepository {
       if (kIsWeb) {
         result = await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
       } else {
-        await GoogleSignIn.instance.initialize(
-          clientId: '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
-        );
-        googleUser = await GoogleSignIn.instance.authenticate();
-        final googleAuth = googleUser.authentication;
+        final googleSignIn = GoogleSignIn();
+        googleUser = await googleSignIn.signIn();
+        if (googleUser == null) {
+          throw const AuthException(
+            'Google sign-in cancelled.',
+            code: 'google-sign-in-cancelled',
+          );
+        }
+        final googleAuth = await googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
         result = await _firebaseAuth.signInWithCredential(credential);
