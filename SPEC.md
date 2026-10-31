@@ -212,7 +212,7 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 
 #### Menu Discovery
 
-- **FR-007**: Guests and Customers MUST be able to browse published categories and available menu items.
+-**FR-007**: Guests and Customers MUST be able to browse published categories and available menu items.
 - **FR-008**: Users MUST be able to search menu items by name and filter by category and availability.
 - **FR-009**: Food Details MUST show image, name, description, base price, available options, rating summary, availability, and reviews.
 - **FR-010**: Customers MUST be able to add and remove favorite items.
