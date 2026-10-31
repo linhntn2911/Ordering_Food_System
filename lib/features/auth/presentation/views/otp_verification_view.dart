@@ -219,58 +219,6 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                 ),
                 const SizedBox(height: AppSpacing.p32),
 
-                // Developer / Testing helper banner showing OTP code
-                if (state.lastOtp != null) ...[
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.p16,
-                      vertical: AppSpacing.p12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primarySoft,
-                      borderRadius: AppSpacing.roundedSmall,
-                      border: Border.all(
-                        color: AppColors.primarySolid,
-                        width: 1,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.mark_email_read_rounded,
-                          color: AppColors.primarySolid,
-                          size: 20,
-                        ),
-                        const SizedBox(width: AppSpacing.p8),
-                        Expanded(
-                          child: Text(
-                            'Mã OTP của bạn: ${state.lastOtp}',
-                            style: AppTextStyles.bodyMedium.copyWith(
-                              color: AppColors.primaryEnd,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            for (
-                              int i = 0;
-                              i < _codeLength && i < state.lastOtp!.length;
-                              i++
-                            ) {
-                              _controllers[i].text = state.lastOtp![i];
-                            }
-                            _handleVerify();
-                          },
-                          child: const Text('Tự động điền'),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.p16),
-                ],
-
                 // Error Banner
                 if (state.errorMessage != null) ...[
                   Container(

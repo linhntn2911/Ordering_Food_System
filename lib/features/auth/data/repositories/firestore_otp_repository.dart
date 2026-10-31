@@ -66,7 +66,15 @@ class FirestoreOtpRepository implements OtpRepository {
       isUsed: false,
     );
 
-    // 2. Attempt to sync with Cloud Firestore `email_otps`
+    // 2. Trigger Firebase Auth's official email delivery to inbox
+    if (type == OtpType.forgotPassword) {
+      try {
+        await _firebaseAuth.setLanguageCode('vi');
+        await _firebaseAuth.sendPasswordResetEmail(email: normalizedEmail);
+      } catch (_) {}
+    }
+
+    // 3. Attempt to sync with Cloud Firestore `email_otps`
     try {
       await _firestore.collection('email_otps').doc(docId).set({
         'email': normalizedEmail,
