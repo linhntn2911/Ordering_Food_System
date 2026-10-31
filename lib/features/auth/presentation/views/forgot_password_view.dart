@@ -28,13 +28,13 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
     super.dispose();
   }
 
-  Future<void> _handleSendReset() async {
+  void _handleNext() {
     final email = _emailController.text.trim();
-    final otp = await ref
+    final isValid = ref
         .read(forgotPasswordViewModelProvider.notifier)
-        .sendResetOtp(email);
+        .validateEmail(email);
 
-    if (otp != null && mounted) {
+    if (isValid) {
       Navigator.of(context).pushNamed(
         AppRoutes.otpVerification,
         arguments: OtpVerificationArgs(
@@ -69,7 +69,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                 ),
                 const SizedBox(height: AppSpacing.p24),
 
-                // Frame 1.11 / 1.13 Forgot Password (Food Ninja)
+                // Frame 1.11 Forgot Password (Food Ninja)
                 Text(
                   'Forgot password?',
                   style: AppTextStyles.headlineLarge.copyWith(fontSize: 26),
@@ -180,7 +180,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.done,
                   onChanged: (_) => setState(() {}),
-                  onSubmitted: (_) => _handleSendReset(),
+                  onSubmitted: (_) => _handleNext(),
                   prefixIcon: const Icon(
                     Icons.email_outlined,
                     color: AppColors.primarySolid,
@@ -194,7 +194,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                     width: 160,
                     text: 'Next',
                     isLoading: state.isLoading,
-                    onPressed: _handleSendReset,
+                    onPressed: _handleNext,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p32),

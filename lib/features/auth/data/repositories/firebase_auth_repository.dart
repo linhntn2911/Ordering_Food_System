@@ -30,7 +30,8 @@ class FirebaseAuthRepository implements AuthRepository {
         result = await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
       } else {
         await GoogleSignIn.instance.initialize(
-          clientId: '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
+          clientId:
+              '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
         );
         googleUser = await GoogleSignIn.instance.authenticate();
         final googleAuth = googleUser.authentication;
@@ -149,13 +150,12 @@ class FirebaseAuthRepository implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    // Check lockout
+    // Check lockout status
     if (_lockoutUntil != null) {
       if (DateTime.now().isBefore(_lockoutUntil!)) {
-        final remainingMinutes =
-            _lockoutUntil!.difference(DateTime.now()).inMinutes + 1;
+        final remaining = _lockoutUntil!.difference(DateTime.now()).inMinutes;
         throw AuthException(
-          'Too many failed attempts. Please try again in $remainingMinutes minutes.',
+          'Account is temporarily locked. Please try again in $remaining minute(s).',
           code: 'too-many-requests',
         );
       } else {
@@ -165,39 +165,40 @@ class FirebaseAuthRepository implements AuthRepository {
     }
 
     try {
-      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+      final credential = await _firebaseAuth.signInWithEmailAndPassword(
         email: email.trim(),
         password: password,
       );
 
-      final firebaseUser = userCredential.user;
+      final firebaseUser = credential.user;
       if (firebaseUser == null) {
         throw const AuthException(
-          'Sign in failed: user not returned.',
-          code: 'invalid-credential',
+          'Sign in failed: user not found.',
+          code: 'user-not-found',
         );
       }
 
+      // Fetch user profile from Firestore to determine role
       final doc = await _firestore
           .doc(FirestorePaths.user(firebaseUser.uid))
           .get();
-      if (!doc.exists) {
-        // Fallback profile if missing
-        final fallback = AppUser(
+
+      final AppUser user;
+      if (doc.exists) {
+        user = UserModel.fromFirestore(doc).toEntity();
+      } else {
+        // Fallback profile if Firestore doc not yet created
+        user = AppUser(
           id: firebaseUser.uid,
           fullName: firebaseUser.displayName ?? '',
           email: firebaseUser.email ?? email.trim(),
-          phone: '',
+          phone: firebaseUser.phoneNumber ?? '',
           role: 'customer',
           status: 'active',
         );
-        _failedAttempts = 0;
-        return fallback;
       }
 
-      final user = UserModel.fromFirestore(doc).toEntity();
-
-      // Check account disablement
+      // Check if disabled
       if (user.isDisabled) {
         await _firebaseAuth.signOut();
         throw const AuthException(
