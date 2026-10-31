@@ -251,6 +251,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
       // Send verification/welcome email
       try {
+        await _firebaseAuth.setLanguageCode('vi');
         await firebaseUser.sendEmailVerification();
       } catch (_) {
         // Soft fail on verification send if blocked by provider quota
@@ -287,6 +288,7 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<void> sendPasswordResetEmail(String email) async {
     try {
+      await _firebaseAuth.setLanguageCode('vi');
       await _firebaseAuth.sendPasswordResetEmail(email: email.trim());
     } on FirebaseAuthException catch (e) {
       // Per FR-005, avoid exposing whether email exists or not when handling reset
