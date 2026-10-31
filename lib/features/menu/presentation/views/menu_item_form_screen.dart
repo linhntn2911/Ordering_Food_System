@@ -40,6 +40,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
   bool _hasSizes = false;
   Uint8List? _imageBytes;
   String? _imageName;
+  String? _customImageUrl;
   bool _isPickingImage = false;
 
   @override
@@ -362,7 +363,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
       categoryId: _categoryId!,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
-      existingImageUrl: widget.item?.imageUrl ?? '',
+      existingImageUrl: _customImageUrl ?? widget.item?.imageUrl ?? '',
       imageBytes: _imageBytes,
       imageName: _imageName,
       basePrice: _parseMoney(_priceController.text),
