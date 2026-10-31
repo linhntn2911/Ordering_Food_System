@@ -25,10 +25,12 @@ abstract class OtpRepository {
   Future<String> sendOtp({required String email, required OtpType type});
 
   /// Verifies that the provided [code] matches the active OTP for [email] and [type].
+  /// If [consume] is true, marks the OTP as used so it cannot be reused.
   Future<bool> verifyOtp({
     required String email,
     required String code,
     required OtpType type,
+    bool consume = true,
   });
 
   /// Resets the user's password after verifying the [otp].

@@ -127,10 +127,13 @@ class OtpViewModel extends Notifier<OtpState> {
         );
         return true;
       } else {
+        // For forgotPassword, verify validity without consuming OTP yet.
+        // It will be consumed when resetPasswordWithOtp is called.
         final verified = await otpRepo.verifyOtp(
           email: email,
           code: cleanCode,
           type: type,
+          consume: false,
         );
         state = state.copyWith(isLoading: false, isVerified: verified);
         return verified;

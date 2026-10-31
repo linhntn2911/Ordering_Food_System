@@ -97,7 +97,7 @@ class FirestoreOtpRepository implements OtpRepository {
       final response = await http.get(uri).timeout(const Duration(seconds: 20));
 
       if (response.statusCode != 200) {
-        throw AppException(
+        throw AuthException(
           'Không thể gửi email xác thực (lỗi ${response.statusCode}). '
           'Vui lòng thử lại.',
         );
@@ -105,7 +105,7 @@ class FirestoreOtpRepository implements OtpRepository {
     } on AppException {
       rethrow;
     } catch (_) {
-      throw const AppException(
+      throw const AuthException(
         'Không thể gửi mã xác thực đến email. '
         'Vui lòng kiểm tra kết nối mạng và thử lại.',
       );
@@ -117,6 +117,7 @@ class FirestoreOtpRepository implements OtpRepository {
     required String email,
     required String code,
     required OtpType type,
+    bool consume = true,
   }) async {
     final normalizedEmail = email.trim().toLowerCase();
     final cleanCode = code.trim();
@@ -143,14 +144,16 @@ class FirestoreOtpRepository implements OtpRepository {
         );
       }
       if (local.otp == cleanCode) {
-        local.isUsed = true;
-        // Best-effort remote update (ignore permission errors).
-        try {
-          await _firestore.collection('email_otps').doc(docId).update({
-            'isUsed': true,
-            'verifiedAt': FieldValue.serverTimestamp(),
-          });
-        } catch (_) {}
+        if (consume) {
+          local.isUsed = true;
+          // Best-effort remote update (ignore permission errors).
+          try {
+            await _firestore.collection('email_otps').doc(docId).update({
+              'isUsed': true,
+              'verifiedAt': FieldValue.serverTimestamp(),
+            });
+          } catch (_) {}
+        }
         return true;
       }
     }

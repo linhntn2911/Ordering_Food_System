@@ -26,6 +26,7 @@ class MockOtpRepository implements OtpRepository {
     required String email,
     required String code,
     required OtpType type,
+    bool consume = true,
   }) async {
     final key = '${email.trim().toLowerCase()}_${type.name}';
     final stored = _storage[key];
@@ -34,7 +35,9 @@ class MockOtpRepository implements OtpRepository {
     if (DateTime.now().isAfter(_expiry[key]!)) return false;
     if (stored != code) return false;
 
-    _used.add(key);
+    if (consume) {
+      _used.add(key);
+    }
     return true;
   }
 
