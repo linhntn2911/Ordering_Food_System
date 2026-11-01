@@ -7,7 +7,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:ordering_food_system/core/errors/app_exception.dart';
 import 'package:ordering_food_system/core/firebase/firestore_paths.dart';
 import 'package:ordering_food_system/features/auth/data/models/user_model.dart';
-import 'package:ordering_food_system/features/auth/data/repositories/firestore_otp_repository.dart';
 import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
 import 'package:ordering_food_system/features/auth/domain/repositories/auth_repository.dart';
 
@@ -31,8 +30,7 @@ class FirebaseAuthRepository implements AuthRepository {
         result = await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
       } else {
         await GoogleSignIn.instance.initialize(
-          clientId:
-              '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
+          clientId: '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
         );
         googleUser = await GoogleSignIn.instance.authenticate();
         final googleAuth = googleUser.authentication;
@@ -250,76 +248,6 @@ class FirebaseAuthRepository implements AuthRepository {
       _currentSessionUser = user;
       return user;
     } on FirebaseAuthException catch (e) {
-      // Check if user recently reset password through OTP flow
-      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
-        final localP = FirestoreOtpRepository.getLocalPassword(email);
-        if (localP != null && localP == password) {
-          try {
-            final userQuery = await _firestore
-                .collection('users')
-                .where('email', isEqualTo: email.trim().toLowerCase())
-                .limit(1)
-                .get();
-            if (userQuery.docs.isNotEmpty) {
-              final userModel = UserModel.fromFirestore(userQuery.docs.first)
-                  .toEntity();
-              if (userModel.isDisabled) {
-                throw const AuthException(
-                  'Your account has been disabled. Please contact support.',
-                  code: 'user-disabled',
-                );
-              }
-              _failedAttempts = 0;
-              _lockoutUntil = null;
-              return userModel;
-            }
-          } catch (inner) {
-            if (inner is AppException) rethrow;
-          }
-          _failedAttempts = 0;
-          _lockoutUntil = null;
-          return AppUser(
-            id: email.trim().toLowerCase(),
-            fullName: 'Customer',
-            email: email.trim().toLowerCase(),
-            phone: '',
-            role: 'customer',
-            status: 'active',
-          );
-        }
-
-        try {
-          final userQuery = await _firestore
-              .collection('users')
-              .where('email', isEqualTo: email.trim().toLowerCase())
-              .limit(1)
-              .get();
-          if (userQuery.docs.isNotEmpty) {
-            final uid = userQuery.docs.first.id;
-            final credDoc = await _firestore
-                .collection('user_credentials')
-                .doc(uid)
-                .get();
-            if (credDoc.exists && credDoc.data()?['p'] == password) {
-              // Valid reset credential found
-              final userModel = UserModel.fromFirestore(userQuery.docs.first)
-                  .toEntity();
-              if (userModel.isDisabled) {
-                throw const AuthException(
-                  'Your account has been disabled. Please contact support.',
-                  code: 'user-disabled',
-                );
-              }
-              _failedAttempts = 0;
-              _lockoutUntil = null;
-              return userModel;
-            }
-          }
-        } catch (inner) {
-          if (inner is AppException) rethrow;
-        }
-      }
-
       _failedAttempts++;
       if (_failedAttempts >= 5) {
         _lockoutUntil = DateTime.now().add(const Duration(minutes: 15));
@@ -384,18 +312,6 @@ class FirebaseAuthRepository implements AuthRepository {
       await _firestore
           .doc(FirestorePaths.user(firebaseUser.uid))
           .set(userModel.toFirestore(), SetOptions(merge: true));
-
-      // Save credential for synchronized password management
-      try {
-        await _firestore
-            .collection('user_credentials')
-            .doc(firebaseUser.uid)
-            .set({
-              'email': email.trim().toLowerCase(),
-              'p': password,
-              'createdAt': FieldValue.serverTimestamp(),
-            }, SetOptions(merge: true));
-      } catch (_) {}
 
       return userModel.toEntity();
     } on FirebaseAuthException catch (e) {

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'package:ordering_food_system/core/errors/app_exception.dart';
 import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
@@ -22,7 +21,6 @@ class _LocalOtpRecord {
 
 class FirestoreOtpRepository implements OtpRepository {
   final FirebaseFirestore _firestore;
-  final FirebaseAuth _firebaseAuth;
   final AuthRepository _authRepository;
 
   /// Google Apps Script web-app URL for sending OTP emails.
@@ -33,18 +31,9 @@ class FirestoreOtpRepository implements OtpRepository {
   // In-memory cache – ensures OTP verification works even when Firestore
   // security rules block unauthenticated writes.
   static final Map<String, _LocalOtpRecord> _localOtpCache = {};
-  static final Map<String, String> _localPasswordCache = {};
-
   String? _lastGeneratedOtp;
 
-  static String? getLocalPassword(String email) =>
-      _localPasswordCache[email.trim().toLowerCase()];
-
-  FirestoreOtpRepository(
-    this._firestore,
-    this._firebaseAuth,
-    this._authRepository,
-  );
+  FirestoreOtpRepository(this._firestore, this._authRepository);
 
   @override
   String? get lastGeneratedOtp => _lastGeneratedOtp;
@@ -87,11 +76,9 @@ class FirestoreOtpRepository implements OtpRepository {
     required String otp,
     required OtpType type,
   }) async {
-    final uri = Uri.parse(_gasEmailUrl).replace(queryParameters: {
-      'to': toEmail,
-      'otp': otp,
-      'type': type.name,
-    });
+    final uri = Uri.parse(
+      _gasEmailUrl,
+    ).replace(queryParameters: {'to': toEmail, 'otp': otp, 'type': type.name});
 
     try {
       final response = await http.get(uri).timeout(const Duration(seconds: 20));
@@ -182,58 +169,11 @@ class FirestoreOtpRepository implements OtpRepository {
     // Verify OTP first.
     await verifyOtp(email: email, code: otp, type: OtpType.forgotPassword);
 
-    final normalizedEmail = email.trim().toLowerCase();
-
-    // Keep in local password cache so login succeeds even if remote sync is pending.
-    _localPasswordCache[normalizedEmail] = newPassword;
-
-    try {
-      // Find the user document by email.
-      final userQuery = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: normalizedEmail)
-          .limit(1)
-          .get();
-
-      if (userQuery.docs.isNotEmpty) {
-        final userId = userQuery.docs.first.id;
-
-        // Attempt to re-authenticate and change the Firebase Auth password.
-        try {
-          final credDoc = await _firestore
-              .collection('user_credentials')
-              .doc(userId)
-              .get();
-
-          if (credDoc.exists && credDoc.data()?['p'] != null) {
-            final oldPassword = credDoc.data()!['p'] as String;
-            try {
-              await _firebaseAuth.signInWithEmailAndPassword(
-                email: normalizedEmail,
-                password: oldPassword,
-              );
-              await _firebaseAuth.currentUser?.updatePassword(newPassword);
-              await _firebaseAuth.signOut();
-            } catch (_) {}
-          }
-        } catch (_) {}
-
-        // Persist the new password in user_credentials.
-        try {
-          await _firestore.collection('user_credentials').doc(userId).set({
-            'email': normalizedEmail,
-            'p': newPassword,
-            'updatedAt': FieldValue.serverTimestamp(),
-          }, SetOptions(merge: true));
-
-          await _firestore.collection('users').doc(userId).update({
-            'updatedAt': FieldValue.serverTimestamp(),
-          });
-        } catch (_) {}
-      }
-    } catch (_) {
-      // Local password cache handles authentication if Firestore is blocked.
-    }
+    throw const AuthException(
+      'Đặt lại mật khẩu trong ứng dụng không còn được hỗ trợ. '
+      'Vui lòng dùng liên kết bảo mật Firebase gửi đến email của bạn.',
+      code: 'firebase-reset-link-required',
+    );
   }
 
   @override
@@ -255,15 +195,6 @@ class FirestoreOtpRepository implements OtpRepository {
       phone: pending.phone,
       password: pending.password,
     );
-
-    // 3. Persist credentials for password-reset re-authentication.
-    try {
-      await _firestore.collection('user_credentials').doc(user.id).set({
-        'email': pending.email.trim().toLowerCase(),
-        'p': pending.password,
-        'createdAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    } catch (_) {}
 
     return user;
   }

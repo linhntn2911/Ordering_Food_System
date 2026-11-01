@@ -186,11 +186,11 @@ service cloud.firestore {
     }
 
     match /email_otps/{otpId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     match /user_credentials/{userId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     match /mail/{mailId} {

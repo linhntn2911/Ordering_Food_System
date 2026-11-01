@@ -16,9 +16,8 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
 
 final otpRepositoryProvider = Provider<OtpRepository>((ref) {
   final firestore = ref.watch(firebaseFirestoreProvider);
-  final firebaseAuth = ref.watch(firebaseAuthProvider);
   final authRepo = ref.watch(authRepositoryProvider);
-  return FirestoreOtpRepository(firestore, firebaseAuth, authRepo);
+  return FirestoreOtpRepository(firestore, authRepo);
 });
 
 final authStateProvider = StreamProvider<AppUser?>((ref) {

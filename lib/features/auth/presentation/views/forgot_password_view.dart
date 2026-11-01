@@ -8,9 +8,8 @@ import 'package:ordering_food_system/core/widgets/app_back_button.dart';
 import 'package:ordering_food_system/core/widgets/custom_text_field.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
-import 'package:ordering_food_system/features/auth/domain/repositories/otp_repository.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/forgot_password_view_model.dart';
-import 'package:ordering_food_system/features/auth/presentation/views/otp_verification_view.dart';
+import 'package:ordering_food_system/features/auth/presentation/views/auth_success_view.dart';
 
 class ForgotPasswordView extends ConsumerStatefulWidget {
   const ForgotPasswordView({super.key});
@@ -28,18 +27,20 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
     super.dispose();
   }
 
-  void _handleNext() {
+  Future<void> _handleNext() async {
     final email = _emailController.text.trim();
-    final isValid = ref
+    final sent = await ref
         .read(forgotPasswordViewModelProvider.notifier)
-        .validateEmail(email);
+        .sendResetEmail(email);
 
-    if (isValid) {
-      Navigator.of(context).pushNamed(
-        AppRoutes.otpVerification,
-        arguments: OtpVerificationArgs(
-          email: email,
-          type: OtpType.forgotPassword,
+    if (sent && mounted) {
+      Navigator.of(context).pushReplacementNamed(
+        AppRoutes.authSuccess,
+        arguments: AuthSuccessArgs(
+          type: AuthSuccessType.passwordReset,
+          title: 'Check your email',
+          subtitle:
+              'We sent a Firebase password reset link to $email. Open the link to choose a new password.',
         ),
       );
     }
@@ -76,7 +77,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                 ),
                 const SizedBox(height: AppSpacing.p8),
                 Text(
-                  'Select which contact details should we use to reset your password',
+                  'Enter your registered email. Firebase will send you a secure password reset link.',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.5,
