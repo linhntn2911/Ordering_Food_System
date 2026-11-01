@@ -124,6 +124,7 @@ As a Customer or Admin, I want timely push and in-app notifications about releva
 1. **Given** notifications are permitted and a valid token exists, **When** an order event occurs, **Then** the trusted backend sends an FCM message and stores an in-app notification.
 2. **Given** the user taps an order notification, **When** the app opens from foreground, background, or terminated state, **Then** it routes to the authorized Order Details screen.
 3. **Given** push delivery is unavailable, **When** the user reconnects, **Then** Firestore still provides the current order state and notification history.
+4. **Given** an authenticated Admin, **When** the Admin broadcasts a promotional discount or system announcement with valid title and message, **Then** an in-app notification record is created with type `promo` or `system` and delivered to customer notification inboxes.
 
 ### User Story 7 - Manage Menu and Categories (Priority: P2)
 
@@ -269,6 +270,8 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **FR-038**: Each push event MUST also create an in-app notification record.
 - **FR-039**: A notification tap MUST deep-link to an authorized relevant screen.
 - **FR-040**: FCM sends MUST originate from trusted backend code and MUST NOT expose server credentials in the Flutter client.
+- **FR-051**: Admins MUST be able to broadcast promotional discount announcements and system notices (`promo` / `system`) to customers.
+- **FR-052**: Broadcast notifications MUST be stored as in-app notification records and appear in customer notification inboxes with timestamp, title, body, and type.
 
 #### Reporting and Local Configuration
 

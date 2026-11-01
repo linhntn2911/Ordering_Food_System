@@ -2,16 +2,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/features/notifications/models/notification_model.dart';
 import 'package:ordering_food_system/features/notifications/repositories/notification_repository.dart';
 
-final notificationRepositoryProvider = Provider<NotificationRepository>((ref) => MockNotificationRepository());
+final notificationRepositoryProvider =
+    Provider<NotificationRepository>((ref) => MockNotificationRepository());
 
-final notificationsListProvider = FutureProvider<List<NotificationModel>>((ref) async {
+final notificationsListProvider =
+    FutureProvider<List<NotificationModel>>((ref) async {
   final repo = ref.watch(notificationRepositoryProvider);
   return repo.getNotifications();
 });
 
 final unreadCountProvider = Provider<int>((ref) {
   final async = ref.watch(notificationsListProvider);
-  return async.maybeWhen(data: (list) => list.where((e) => !e.isRead).length, orElse: () => 0);
+  return async.maybeWhen(
+    data: (list) => list.where((e) => !e.isRead).length,
+    orElse: () => 0,
+  );
 });
 
 final notificationActionsProvider = Provider<NotificationActions>((ref) {
@@ -32,5 +37,19 @@ class NotificationActions {
   Future<void> markAllAsRead() async {
     await repo.markAllAsRead();
     ref.invalidate(notificationsListProvider);
+  }
+
+  Future<NotificationModel> broadcastNotification({
+    required String title,
+    required String body,
+    required NotificationType type,
+  }) async {
+    final result = await repo.broadcastNotification(
+      title: title,
+      body: body,
+      type: type,
+    );
+    ref.invalidate(notificationsListProvider);
+    return result;
   }
 }

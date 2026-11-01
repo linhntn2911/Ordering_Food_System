@@ -14,6 +14,7 @@ import '../features/cart/presentation/views/cart_screen.dart';
 import '../features/category/presentation/views/category_management_screen.dart';
 import '../features/checkout/presentation/views/checkout_screen.dart';
 import '../features/menu/presentation/views/admin_menu_item_list_screen.dart';
+import '../features/notifications/views/screens/admin_broadcast_screen.dart';
 import '../features/notifications/views/screens/notification_detail_screen.dart';
 import '../features/notifications/views/screens/notification_list_screen.dart';
 import '../features/onboarding/presentation/views/onboarding_view.dart';
@@ -44,6 +45,7 @@ abstract final class AppRoutes {
   static const String adminMenuItems = '/admin/menu-items';
   static const String adminOrders = '/admin/orders';
   static const String adminSalesReport = '/admin/sales-report';
+  static const String adminBroadcast = '/admin/broadcast';
 
   // Customer features from Member 3 (Hong Anh)
   static const String cart = '/cart';
@@ -109,6 +111,8 @@ abstract final class AppRoutes {
         return _adminRoute(const AdminOrderListScreen());
       case adminSalesReport:
         return _adminRoute(const SalesReportScreen());
+      case adminBroadcast:
+        return _adminRoute(const AdminBroadcastScreen());
       case cart:
         return MaterialPageRoute(builder: (_) => const CartScreen());
       case checkout:

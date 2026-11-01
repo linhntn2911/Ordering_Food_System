@@ -11,9 +11,10 @@ import '../../features/category/presentation/views/category_management_screen.da
 import '../../features/menu/presentation/views/admin_menu_item_list_screen.dart';
 import '../../features/order/presentation/views/admin_dashboard_screen.dart';
 import '../../features/order/presentation/views/admin_order_list_screen.dart';
+import '../../features/notifications/views/screens/admin_broadcast_screen.dart';
 import '../../features/order/presentation/views/sales_report_screen.dart';
 
-enum AdminDestination { dashboard, categories, menuItems, orders, salesReport }
+enum AdminDestination { dashboard, categories, menuItems, orders, salesReport, broadcasts }
 
 class AdminDrawer extends StatelessWidget {
   const AdminDrawer({required this.currentDestination, super.key});
@@ -47,6 +48,9 @@ class AdminDrawer extends StatelessWidget {
         break;
       case AdminDestination.salesReport:
         target = const SalesReportScreen();
+        break;
+      case AdminDestination.broadcasts:
+        target = const AdminBroadcastScreen();
         break;
     }
 
@@ -233,6 +237,17 @@ class AdminDrawer extends StatelessWidget {
                         currentDestination == AdminDestination.salesReport,
                     onTap: () =>
                         _navigate(context, AdminDestination.salesReport),
+                  ),
+                  const SizedBox(height: 4),
+                  _DrawerItem(
+                    key: const ValueKey('admin-drawer-broadcasts'),
+                    icon: Icons.campaign_rounded,
+                    title: 'Broadcasts',
+                    subtitle: 'Promo & system notices',
+                    isSelected:
+                        currentDestination == AdminDestination.broadcasts,
+                    onTap: () =>
+                        _navigate(context, AdminDestination.broadcasts),
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Padding(
