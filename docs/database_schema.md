@@ -94,7 +94,7 @@ Public display copy of a review for the Food Details screen (`specs/004-food-det
 
 ### `restaurant_configs/main`
 
-Fields: `restaurantName`, `latitude`, `longitude`, `paymentMethods`, `deliveryRules`, `maxDeliveryDistanceKm`, `updatedAt`. This document is publicly readable and Admin or trusted-code writable. The initial `paymentMethods` value is `["cod"]` and the maximum distance is `8`.
+Fields: `restaurantName`, `address`, `latitude`, `longitude`, `paymentMethods`, `deliveryRules`, `maxDeliveryDistanceKm`, `updatedAt`. This document is publicly readable and Admin or trusted-code writable. The initial `paymentMethods` value is `["cod"]` and the maximum distance is `8`.
 
 ## Derived Data
 

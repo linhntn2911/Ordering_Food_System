@@ -34,7 +34,16 @@ const now = FieldValue.serverTimestamp();
 if (seed.restaurantName) {
   batch.set(
     db.collection('restaurant_configs').doc('main'),
-    { restaurantName: seed.restaurantName, paymentMethods: ['cod'], updatedAt: now },
+    {
+      restaurantName: seed.restaurantName,
+      address: seed.restaurantAddress,
+      latitude: seed.restaurantLatitude,
+      longitude: seed.restaurantLongitude,
+      maxDeliveryDistanceKm: seed.maxDeliveryDistanceKm,
+      deliveryRules: seed.deliveryRules,
+      paymentMethods: ['cod'],
+      updatedAt: now,
+    },
     { merge: true },
   );
 }

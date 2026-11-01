@@ -1,5 +1,14 @@
 {
   "restaurantName": "Ngô Chicken",
+  "restaurantAddress": "123 Nguyễn Huệ, phường Bến Nghé, Quận 1, TP. Hồ Chí Minh",
+  "restaurantLatitude": 10.7769,
+  "restaurantLongitude": 106.7009,
+  "maxDeliveryDistanceKm": 8,
+  "deliveryRules": [
+    { "maxDistanceKm": 3, "fee": 15000 },
+    { "maxDistanceKm": 5, "fee": 20000 },
+    { "maxDistanceKm": 8, "fee": 30000 }
+  ],
   "categories": [
     {
       "id": "ga-ran",

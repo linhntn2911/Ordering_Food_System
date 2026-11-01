@@ -2,11 +2,12 @@ import 'dart:math' as math;
 
 /// Restaurant coordinates and delivery fee calculation rules according to SPEC.md (FR-046, FR-047, FR-048)
 class RestaurantConfig {
-  static const String name = 'Food Ninja Restaurant';
+  static const String name = 'Ngô Chicken';
   static const String address =
-      '123 Nguyen Hue, Ben Nghe, District 1, Ho Chi Minh City';
+      '123 Nguyễn Huệ, phường Bến Nghé, Quận 1, TP. Hồ Chí Minh';
 
-  // Restaurant reference location (District 1, HCMC)
+  // GPS origin of Ngô Chicken in central District 1, Ho Chi Minh City.
+  // The same values are seeded into Firestore restaurant_configs/main.
   static const double restaurantLat = 10.7769;
   static const double restaurantLng = 106.7009;
 

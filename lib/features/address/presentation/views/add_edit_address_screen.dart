@@ -374,7 +374,9 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                     ),
                     const SizedBox(height: AppSpacing.s8),
                     Text(
-                      'Tọa độ giúp xác định chính xác khoảng cách đến quán để tính phí giao hàng (Tối đa 8km).',
+                      'Khoảng cách được tính từ ${RestaurantConfig.name} – '
+                      '${RestaurantConfig.address} (tối đa '
+                      '${RestaurantConfig.maxDeliveryDistanceKm.toStringAsFixed(0)}km).',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                       ),
