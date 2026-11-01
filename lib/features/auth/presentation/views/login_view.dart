@@ -11,7 +11,9 @@ import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_logo.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
 import 'package:ordering_food_system/core/widgets/social_login_button.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/login_view_model.dart';
+import 'package:ordering_food_system/features/profile/presentation/viewmodels/profile_view_model.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -51,18 +53,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
         );
 
     if (user != null && mounted) {
-      if (user.isAdmin) {
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil(AppRoutes.adminDashboard, (route) => false);
-      } else {
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        } else {
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-        }
-      }
+      ref.invalidate(authStateProvider);
+      ref.invalidate(profileViewModelProvider);
+
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        user.isAdmin ? AppRoutes.adminDashboard : AppRoutes.home,
+        (route) => false,
+      );
     }
   }
 
@@ -278,6 +275,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                 .signInWithGoogle();
                             if (!context.mounted) return;
                             if (user != null) {
+                              ref.invalidate(authStateProvider);
+                              ref.invalidate(profileViewModelProvider);
+
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 user.isAdmin
                                     ? AppRoutes.adminDashboard

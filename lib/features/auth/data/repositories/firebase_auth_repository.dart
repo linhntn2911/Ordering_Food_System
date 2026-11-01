@@ -18,6 +18,7 @@ class FirebaseAuthRepository implements AuthRepository {
   // In-memory failed attempts tracker for lockout (FR-044 / BR-017)
   int _failedAttempts = 0;
   DateTime? _lockoutUntil;
+  AppUser? _currentSessionUser;
 
   FirebaseAuthRepository(this._firebaseAuth, this._firestore);
 
@@ -48,11 +49,34 @@ class FirebaseAuthRepository implements AuthRepository {
         );
       }
 
-      final docRef = _firestore.doc(FirestorePaths.user(firebaseUser.uid));
-      final doc = await docRef.get();
-      if (!doc.exists) {
-        final now = DateTime.now();
-        final profile = UserModel(
+      try {
+        final docRef = _firestore.doc(FirestorePaths.user(firebaseUser.uid));
+        final doc = await docRef.get();
+        if (!doc.exists) {
+          final now = DateTime.now();
+          final profile = UserModel(
+            id: firebaseUser.uid,
+            fullName: firebaseUser.displayName ?? googleUser?.displayName ?? '',
+            email: firebaseUser.email ?? '',
+            phone: firebaseUser.phoneNumber ?? '',
+            avatarUrl: firebaseUser.photoURL,
+            role: 'customer',
+            status: 'active',
+            createdAt: now,
+            updatedAt: now,
+          );
+          try {
+            await docRef.set(profile.toFirestore());
+          } catch (_) {}
+          final user = profile.toEntity();
+          _currentSessionUser = user;
+          return user;
+        }
+        final user = UserModel.fromFirestore(doc).toEntity();
+        _currentSessionUser = user;
+        return user;
+      } catch (_) {
+        final fallback = AppUser(
           id: firebaseUser.uid,
           fullName: firebaseUser.displayName ?? googleUser?.displayName ?? '',
           email: firebaseUser.email ?? '',
@@ -60,13 +84,10 @@ class FirebaseAuthRepository implements AuthRepository {
           avatarUrl: firebaseUser.photoURL,
           role: 'customer',
           status: 'active',
-          createdAt: now,
-          updatedAt: now,
         );
-        await docRef.set(profile.toFirestore());
-        return profile.toEntity();
+        _currentSessionUser = fallback;
+        return fallback;
       }
-      return UserModel.fromFirestore(doc).toEntity();
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromFirebaseCode(e.code, e.message);
     } on AppException {
@@ -82,7 +103,7 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Stream<AppUser?> authStateChanges() {
     return _firebaseAuth.authStateChanges().asyncMap((firebaseUser) async {
-      if (firebaseUser == null) return null;
+      if (firebaseUser == null) return _currentSessionUser;
       try {
         final doc = await _firestore
             .doc(FirestorePaths.user(firebaseUser.uid))
@@ -91,20 +112,35 @@ class FirebaseAuthRepository implements AuthRepository {
           final user = UserModel.fromFirestore(doc).toEntity();
           if (user.isDisabled) {
             await _firebaseAuth.signOut();
+            _currentSessionUser = null;
             return null;
           }
+          _currentSessionUser = user;
           return user;
         }
-        return AppUser(
+        final fallback = AppUser(
           id: firebaseUser.uid,
           fullName: firebaseUser.displayName ?? '',
           email: firebaseUser.email ?? '',
           phone: firebaseUser.phoneNumber ?? '',
+          avatarUrl: firebaseUser.photoURL,
           role: 'customer',
           status: 'active',
         );
+        _currentSessionUser = fallback;
+        return fallback;
       } catch (_) {
-        return null;
+        final fallback = AppUser(
+          id: firebaseUser.uid,
+          fullName: firebaseUser.displayName ?? '',
+          email: firebaseUser.email ?? '',
+          phone: firebaseUser.phoneNumber ?? '',
+          avatarUrl: firebaseUser.photoURL,
+          role: 'customer',
+          status: 'active',
+        );
+        _currentSessionUser = fallback;
+        return fallback;
       }
     });
   }
@@ -112,7 +148,7 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<AppUser?> getCurrentUser() async {
     final firebaseUser = _firebaseAuth.currentUser;
-    if (firebaseUser == null) return null;
+    if (firebaseUser == null) return _currentSessionUser;
 
     try {
       final doc = await _firestore
@@ -140,6 +176,7 @@ class FirebaseAuthRepository implements AuthRepository {
       fullName: firebaseUser.displayName ?? '',
       email: firebaseUser.email ?? '',
       phone: firebaseUser.phoneNumber ?? '',
+      avatarUrl: firebaseUser.photoURL,
       role: 'customer',
       status: 'active',
     );
@@ -210,6 +247,7 @@ class FirebaseAuthRepository implements AuthRepository {
       // Successful sign-in resets failed attempts
       _failedAttempts = 0;
       _lockoutUntil = null;
+      _currentSessionUser = user;
       return user;
     } on FirebaseAuthException catch (e) {
       // Check if user recently reset password through OTP flow
@@ -389,6 +427,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {
+    _currentSessionUser = null;
     await _firebaseAuth.signOut();
   }
 }

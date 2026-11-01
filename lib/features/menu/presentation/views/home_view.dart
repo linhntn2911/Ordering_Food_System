@@ -7,7 +7,6 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_empty_view.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_loading_view.dart';
-import '../../../../core/widgets/coming_soon_view.dart';
 import '../../../../core/widgets/offline_banner.dart';
 import '../../../auth/presentation/viewmodels/auth_providers.dart';
 import '../../domain/entities/menu_failure.dart';
@@ -88,12 +87,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
 
   void _openNotifications() {
     Navigator.of(context).pushNamed(AppRoutes.notifications);
-  }
-
-  void _showUnavailableFeature() {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text(ComingSoonView.message)));
   }
 
   /// Opens search over the whole screen, hiding the shell's tab bar.

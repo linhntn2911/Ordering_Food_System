@@ -10,7 +10,6 @@ import '../../../../core/utils/vnd_format.dart';
 import '../../../../core/widgets/app_empty_view.dart';
 import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_loading_view.dart';
-import '../../../../core/widgets/coming_soon_view.dart';
 import '../../../../core/widgets/food_card.dart';
 import '../../../../core/widgets/offline_banner.dart';
 import '../../../../core/widgets/rating_stars.dart';
@@ -22,9 +21,6 @@ import '../viewmodels/menu_item_detail_view_model.dart';
 import '../widgets/item_option_section.dart';
 import '../widgets/item_order_bar.dart';
 import '../widgets/review_section.dart';
-import '../../../cart/data/models/cart_item_model.dart';
-import '../../../cart/presentation/controllers/cart_controller.dart';
-import '../../domain/entities/menu_option.dart';
 
 /// Food Details following the Food Ninja Product Detail frame
 /// (`specs/004-food-details/contracts/food_details_ui.md`).
@@ -126,7 +122,7 @@ class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
       MenuItemDetailNotice.reviewsNeedConnection =>
         'Cần kết nối mạng để tải thêm đánh giá',
       MenuItemDetailNotice.addToCartUnavailable =>
-        'Đã thêm món vào giỏ hàng thành công!',
+        'Tính năng đang được phát triển',
     };
   }
 

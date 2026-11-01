@@ -9,6 +9,7 @@ import 'package:ordering_food_system/core/widgets/app_back_button.dart';
 import 'package:ordering_food_system/core/widgets/custom_text_field.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/profile/presentation/viewmodels/profile_view_model.dart';
 
 class ProfileView extends ConsumerWidget {
@@ -293,8 +294,11 @@ class ProfileView extends ConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.p16),
                       ElevatedButton(
-                        onPressed: () =>
-                            Navigator.of(context).pushNamed(AppRoutes.login),
+                        onPressed: () async {
+                          await Navigator.of(context).pushNamed(AppRoutes.login);
+                          ref.invalidate(profileViewModelProvider);
+                          ref.invalidate(authStateProvider);
+                        },
                         child: const Text('Go to Login'),
                       ),
                     ],
