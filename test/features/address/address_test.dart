@@ -76,6 +76,12 @@ void main() {
       container.dispose();
     });
 
+    test('Initial address state has empty addresses list', () {
+      final state = container.read(addressControllerProvider);
+      expect(state.addresses.isEmpty, isTrue);
+      expect(state.defaultAddress, isNull);
+    });
+
     test(
       'BR-008: Auth check throws AuthFailure if customer not logged in',
       () async {

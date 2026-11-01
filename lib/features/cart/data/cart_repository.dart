@@ -122,9 +122,7 @@ class CartRepositoryImpl implements CartRepository {
   ];
 
   // In-memory backing store keyed by customerId for rapid response & local offline support
-  final Map<String, List<CartItemModel>> _storage = {
-    'customer_demo_uid': createDemoCartItems(),
-  };
+  final Map<String, List<CartItemModel>> _storage = {};
   final Map<String, StreamController<List<CartItemModel>>> _controllers = {};
 
   StreamController<List<CartItemModel>> _getController(String customerId) {

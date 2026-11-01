@@ -133,6 +133,12 @@ void main() {
       additionalPrice: 5000,
     );
 
+    test('Initial cart state has empty items list', () {
+      final state = container.read(cartControllerProvider);
+      expect(state.items.isEmpty, isTrue);
+      expect(state.subtotal, 0.0);
+    });
+
     test(
       'BR-011: Throws AuthFailure when customer is not authenticated',
       () async {

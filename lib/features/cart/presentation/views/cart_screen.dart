@@ -146,7 +146,7 @@ class CartScreen extends ConsumerWidget {
                                 color: AppColors.primarySolid,
                               ),
                               label: const Text(
-                                '+ Thêm món khác',
+                                'Thêm món khác',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 15,
@@ -477,7 +477,10 @@ class CartScreen extends ConsumerWidget {
     VoidCallback onProceed,
   ) {
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.s24),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.s20,
+        vertical: 10,
+      ),
       decoration: const BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.only(
@@ -503,67 +506,52 @@ class CartScreen extends ConsumerWidget {
                 'Tạm tính (${cartState.selectedItemCount} món đã chọn)',
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
+                  fontSize: 13,
                 ),
               ),
               Text(
                 CurrencyFormatter.formatVND(cartState.subtotal),
                 style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.s8),
-
-          // Gợi ý phí giao hàng
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Phí giao hàng',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textMuted,
-                ),
-              ),
-              Text(
-                'Tính khi chọn địa chỉ (tối đa 8km)',
-                style: AppTextStyles.bodySmall.copyWith(
-                  color: AppColors.textMuted,
-                  fontStyle: FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: AppSpacing.s12),
+          const SizedBox(height: 6),
           const Divider(color: AppColors.border, height: 1),
-          const SizedBox(height: AppSpacing.s12),
+          const SizedBox(height: 6),
 
           // Tổng tiền món ăn (Chỉ tính tiền các món có isSelected == true)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Tổng tiền món ăn',
-                style: AppTextStyles.headlineMedium,
+                style: AppTextStyles.bodyLarge.copyWith(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
               ),
               Text(
                 CurrencyFormatter.formatVND(cartState.subtotal),
-                style: AppTextStyles.headlineMedium.copyWith(
+                style: AppTextStyles.titleMedium.copyWith(
                   color: AppColors.primaryEnd,
                   fontWeight: FontWeight.w700,
+                  fontSize: 16,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: AppSpacing.s20),
+          const SizedBox(height: 10),
 
-          // Nút tiến hành đặt hàng
+          // Nút tiến hành đặt hàng (padding dọc 10-12dp)
           GestureDetector(
             onTap: cartState.canProceedToCheckout ? onProceed : null,
             child: Container(
-              height: 56,
+              padding: const EdgeInsets.symmetric(vertical: 11),
               decoration: BoxDecoration(
                 gradient: cartState.canProceedToCheckout
                     ? AppGradients.primary
@@ -589,7 +577,7 @@ class CartScreen extends ConsumerWidget {
                           ? Colors.white
                           : AppColors.textMuted,
                       fontWeight: FontWeight.w600,
-                      fontSize: 16,
+                      fontSize: 15,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.s8),
@@ -598,7 +586,7 @@ class CartScreen extends ConsumerWidget {
                     color: cartState.canProceedToCheckout
                         ? Colors.white
                         : AppColors.textMuted,
-                    size: 20,
+                    size: 18,
                   ),
                 ],
               ),
@@ -638,7 +626,7 @@ class CartScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.s8),
             Text(
-              'Hãy khám phá thực đơn hoặc nạp danh sách món mẫu để trải nghiệm thử!',
+              'Hãy khám phá thực đơn để chọn món ngon nhé!',
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -646,33 +634,14 @@ class CartScreen extends ConsumerWidget {
             ),
             const SizedBox(height: AppSpacing.s24),
 
-            // Nút "Nạp lại danh sách món mẫu để kiểm thử"
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primarySolid,
-                foregroundColor: Colors.white,
-                minimumSize: const Size.fromHeight(48),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: AppRadii.radiusInput,
-                ),
-                elevation: 0,
-              ),
-              icon: const Icon(Icons.refresh_rounded, size: 20),
-              label: const Text(
-                'Nạp lại danh sách món mẫu để kiểm thử',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-              ),
-              onPressed: () {
-                ref.read(cartControllerProvider.notifier).reloadDemoItems();
-              },
-            ),
-            const SizedBox(height: AppSpacing.s12),
-
             // Nút "Khám phá thực đơn ngay"
             OutlinedButton(
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.textPrimary,
-                side: const BorderSide(color: AppColors.border),
+                foregroundColor: AppColors.primarySolid,
+                side: const BorderSide(
+                  color: AppColors.primarySolid,
+                  width: 1.5,
+                ),
                 minimumSize: const Size.fromHeight(48),
                 shape: const RoundedRectangleBorder(
                   borderRadius: AppRadii.radiusInput,
@@ -687,7 +656,7 @@ class CartScreen extends ConsumerWidget {
               },
               child: const Text(
                 'Khám phá thực đơn ngay',
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
               ),
             ),
           ],

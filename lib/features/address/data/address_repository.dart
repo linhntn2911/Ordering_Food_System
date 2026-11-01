@@ -34,43 +34,9 @@ abstract class AddressRepository {
 
 /// Implementation of AddressRepository with user-isolated data store (BR-008)
 class AddressRepositoryImpl implements AddressRepository {
-  static final List<AddressModel> _demoAddresses = [
-    AddressModel(
-      id: 'mock_addr_home',
-      userId: 'customer_demo_uid',
-      label: 'Nhà riêng',
-      recipientName: 'Hồng Anh',
-      phoneNumber: '0901234567',
-      streetAddress: '123 Lê Lợi',
-      ward: 'Bến Nghé',
-      district: 'Quận 1',
-      city: 'TP. Hồ Chí Minh',
-      latitude: 10.7720,
-      longitude: 106.6980, // ~0.6 km from restaurant
-      isDefault: true, // FR-018: Exactly one default
-      createdAt: DateTime.now(),
-    ),
-    AddressModel(
-      id: 'mock_addr_office',
-      userId: 'customer_demo_uid',
-      label: 'Văn phòng',
-      recipientName: 'Hồng Anh',
-      phoneNumber: '0987654321',
-      streetAddress: 'Tòa nhà Bitexco, 2 Hải Triều',
-      ward: 'Bến Nghé',
-      district: 'Quận 1',
-      city: 'TP. Hồ Chí Minh',
-      latitude: 10.7715,
-      longitude: 106.7040, // ~0.7 km from restaurant
-      isDefault: false,
-      createdAt: DateTime.now(),
-    ),
-  ];
 
   // Backing store isolated by customer UID (BR-008)
-  final Map<String, List<AddressModel>> _userAddresses = {
-    'customer_demo_uid': List.from(_demoAddresses),
-  };
+  final Map<String, List<AddressModel>> _userAddresses = {};
   final Map<String, StreamController<List<AddressModel>>> _controllers = {};
 
   StreamController<List<AddressModel>> _getController(String userId) {

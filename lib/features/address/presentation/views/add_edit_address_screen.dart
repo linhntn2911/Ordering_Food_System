@@ -37,6 +37,15 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
   late TextEditingController _latController;
   late TextEditingController _lngController;
 
+  late FocusNode _nameFocus;
+  late FocusNode _phoneFocus;
+  late FocusNode _streetFocus;
+  late FocusNode _wardFocus;
+  late FocusNode _districtFocus;
+  late FocusNode _cityFocus;
+  late FocusNode _latFocus;
+  late FocusNode _lngFocus;
+
   String _selectedLabel = 'Nhà riêng';
   bool _isDefault = false;
   bool _isSubmitting = false;
@@ -63,11 +72,17 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
       text: item?.longitude != null ? item!.longitude.toString() : '106.6980',
     );
 
+    _nameFocus = FocusNode();
+    _phoneFocus = FocusNode();
+    _streetFocus = FocusNode();
+    _wardFocus = FocusNode();
+    _districtFocus = FocusNode();
+    _cityFocus = FocusNode();
+    _latFocus = FocusNode();
+    _lngFocus = FocusNode();
+
     _selectedLabel = item?.label ?? 'Nhà riêng';
     _isDefault = item?.isDefault ?? false;
-
-    _latController.addListener(() => setState(() {}));
-    _lngController.addListener(() => setState(() {}));
   }
 
   @override
@@ -80,6 +95,15 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     _cityController.dispose();
     _latController.dispose();
     _lngController.dispose();
+
+    _nameFocus.dispose();
+    _phoneFocus.dispose();
+    _streetFocus.dispose();
+    _wardFocus.dispose();
+    _districtFocus.dispose();
+    _cityFocus.dispose();
+    _latFocus.dispose();
+    _lngFocus.dispose();
     super.dispose();
   }
 
@@ -239,6 +263,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
               _buildFieldLabel('Tên người nhận *'),
               TextFormField(
                 controller: _nameController,
+                focusNode: _nameFocus,
                 textCapitalization: TextCapitalization.words,
                 decoration: _inputDecoration(
                   hint: 'Nguyễn Văn A',
@@ -261,6 +286,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
               _buildFieldLabel('Số điện thoại *'),
               TextFormField(
                 controller: _phoneController,
+                focusNode: _phoneFocus,
                 keyboardType: TextInputType.phone,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
@@ -287,6 +313,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
               _buildFieldLabel('Số nhà, tên đường *'),
               TextFormField(
                 controller: _streetController,
+                focusNode: _streetFocus,
                 decoration: _inputDecoration(
                   hint: 'Số 45 Lê Duẩn, Tòa nhà Diamond',
                   prefixIcon: Icons.location_on_outlined,
@@ -314,6 +341,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                         _buildFieldLabel('Phường / Xã'),
                         TextFormField(
                           controller: _wardController,
+                          focusNode: _wardFocus,
                           decoration: _inputDecoration(hint: 'Bến Nghé'),
                         ),
                       ],
@@ -327,6 +355,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                         _buildFieldLabel('Quận / Huyện'),
                         TextFormField(
                           controller: _districtController,
+                          focusNode: _districtFocus,
                           decoration: _inputDecoration(hint: 'Quận 1'),
                         ),
                       ],
@@ -340,6 +369,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
               _buildFieldLabel('Tỉnh / Thành phố'),
               TextFormField(
                 controller: _cityController,
+                focusNode: _cityFocus,
                 decoration: _inputDecoration(hint: 'TP. Hồ Chí Minh'),
               ),
 
@@ -402,20 +432,24 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _latController,
+                            focusNode: _latFocus,
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
                             decoration: _inputDecoration(hint: 'Vĩ độ (Lat)'),
+                            onChanged: (_) => setState(() {}),
                           ),
                         ),
                         const SizedBox(width: AppSpacing.s12),
                         Expanded(
                           child: TextFormField(
                             controller: _lngController,
+                            focusNode: _lngFocus,
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
                             decoration: _inputDecoration(hint: 'Kinh độ (Lng)'),
+                            onChanged: (_) => setState(() {}),
                           ),
                         ),
                       ],
