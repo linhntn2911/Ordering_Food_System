@@ -9,6 +9,8 @@ import 'package:ordering_food_system/features/menu/domain/entities/menu_failure.
 import 'package:ordering_food_system/features/menu/domain/entities/menu_item.dart';
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/menu_providers.dart';
 import 'package:ordering_food_system/features/reviews/presentation/review_providers.dart';
+import 'package:ordering_food_system/app/router.dart';
+import 'package:ordering_food_system/features/notifications/views/screens/notification_list_screen.dart';
 import 'package:ordering_food_system/features/menu/presentation/views/home_view.dart';
 import 'package:ordering_food_system/features/menu/presentation/views/menu_item_detail_view.dart';
 import 'package:ordering_food_system/features/menu/presentation/views/menu_search_view.dart';
@@ -38,7 +40,11 @@ void main() {
           reviewRepositoryProvider.overrideWithValue(FakeReviewRepository()),
           menuOfflineGraceProvider.overrideWithValue(_grace),
         ],
-        child: MaterialApp(theme: AppTheme.light, home: const HomeView()),
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: const HomeView(),
+          onGenerateRoute: AppRoutes.onGenerateRoute,
+        ),
       ),
     );
   }
@@ -161,7 +167,7 @@ void main() {
       expect(after, lessThan(100));
     });
 
-    testWidgets('notifications report a feature in development (US1-11)', (
+    testWidgets('notifications button opens notification list', (
       tester,
     ) async {
       await pumpHome(tester);
@@ -170,10 +176,9 @@ void main() {
       await tester.pump();
 
       await tester.tap(find.byKey(const ValueKey('home-notifications')));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(find.text('Tính năng đang được phát triển'), findsOneWidget);
-      expect(find.byType(HomeView), findsOneWidget);
+      expect(find.byType(NotificationListScreen), findsOneWidget);
     });
 
     testWidgets('hides popular when it is empty', (tester) async {

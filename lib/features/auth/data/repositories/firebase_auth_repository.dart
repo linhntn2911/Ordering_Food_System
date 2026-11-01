@@ -359,6 +359,9 @@ class FirebaseAuthRepository implements AuthRepository {
             }, SetOptions(merge: true));
       } catch (_) {}
 
+      // Sign out immediately so registration does not auto-login
+      await _firebaseAuth.signOut();
+
       return userModel.toEntity();
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromFirebaseCode(e.code, e.message);

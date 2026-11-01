@@ -56,8 +56,12 @@ class _LoginViewState extends ConsumerState<LoginView> {
           context,
         ).pushNamedAndRemoveUntil(AppRoutes.adminDashboard, (route) => false);
       } else {
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        } else {
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+        }
       }
     }
   }

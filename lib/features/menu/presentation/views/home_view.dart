@@ -86,6 +86,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
     Navigator.of(context).pushNamed(AppRoutes.login);
   }
 
+  void _openNotifications() {
+    Navigator.of(context).pushNamed(AppRoutes.notifications);
+  }
+
   void _showUnavailableFeature() {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -152,7 +156,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         HomeHeader(
-                          onNotificationsTap: _showUnavailableFeature,
+                          onNotificationsTap: _openNotifications,
                           onLoginTap: isSignedIn ? null : _openLogin,
                         ),
                         const SizedBox(height: AppSpacing.p20),
