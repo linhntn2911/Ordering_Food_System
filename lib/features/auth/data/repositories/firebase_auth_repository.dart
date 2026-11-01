@@ -18,6 +18,7 @@ class FirebaseAuthRepository implements AuthRepository {
   // In-memory failed attempts tracker for lockout (FR-044 / BR-017)
   int _failedAttempts = 0;
   DateTime? _lockoutUntil;
+  AppUser? _cachedUser;
 
   FirebaseAuthRepository(this._firebaseAuth, this._firestore);
 
@@ -30,8 +31,7 @@ class FirebaseAuthRepository implements AuthRepository {
         result = await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
       } else {
         await GoogleSignIn.instance.initialize(
-          clientId:
-              '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
+          clientId: '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
         );
         googleUser = await GoogleSignIn.instance.authenticate();
         final googleAuth = googleUser.authentication;
@@ -50,6 +50,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
       final docRef = _firestore.doc(FirestorePaths.user(firebaseUser.uid));
       final doc = await docRef.get();
+      final AppUser user;
       if (!doc.exists) {
         final now = DateTime.now();
         final profile = UserModel(
@@ -64,14 +65,24 @@ class FirebaseAuthRepository implements AuthRepository {
           updatedAt: now,
         );
         await docRef.set(profile.toFirestore());
-        return profile.toEntity();
+        user = profile.toEntity();
+      } else {
+        user = UserModel.fromFirestore(doc).toEntity();
       }
-      return UserModel.fromFirestore(doc).toEntity();
+      _cachedUser = user;
+      return user;
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromFirebaseCode(e.code, e.message);
     } on AppException {
       rethrow;
     } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('cancel') || msg.contains('abort')) {
+        throw const AuthException(
+          'Google sign-in was canceled.',
+          code: 'canceled',
+        );
+      }
       throw AuthException(
         'Google sign-in failed: $e',
         code: 'google-sign-in-failed',
@@ -82,7 +93,7 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Stream<AppUser?> authStateChanges() {
     return _firebaseAuth.authStateChanges().asyncMap((firebaseUser) async {
-      if (firebaseUser == null) return null;
+      if (firebaseUser == null) return _cachedUser;
       try {
         final doc = await _firestore
             .doc(FirestorePaths.user(firebaseUser.uid))
@@ -91,11 +102,13 @@ class FirebaseAuthRepository implements AuthRepository {
           final user = UserModel.fromFirestore(doc).toEntity();
           if (user.isDisabled) {
             await _firebaseAuth.signOut();
+            _cachedUser = null;
             return null;
           }
+          _cachedUser = user;
           return user;
         }
-        return AppUser(
+        final fallback = AppUser(
           id: firebaseUser.uid,
           fullName: firebaseUser.displayName ?? '',
           email: firebaseUser.email ?? '',
@@ -103,8 +116,10 @@ class FirebaseAuthRepository implements AuthRepository {
           role: 'customer',
           status: 'active',
         );
+        _cachedUser = fallback;
+        return fallback;
       } catch (_) {
-        return null;
+        return _cachedUser;
       }
     });
   }
@@ -112,7 +127,7 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<AppUser?> getCurrentUser() async {
     final firebaseUser = _firebaseAuth.currentUser;
-    if (firebaseUser == null) return null;
+    if (firebaseUser == null) return _cachedUser;
 
     try {
       final doc = await _firestore
@@ -122,11 +137,13 @@ class FirebaseAuthRepository implements AuthRepository {
         final user = UserModel.fromFirestore(doc).toEntity();
         if (user.isDisabled) {
           await _firebaseAuth.signOut();
+          _cachedUser = null;
           throw const AuthException(
             'Your account has been disabled. Please contact support.',
             code: 'user-disabled',
           );
         }
+        _cachedUser = user;
         return user;
       }
     } on AppException {
@@ -135,7 +152,7 @@ class FirebaseAuthRepository implements AuthRepository {
       // Fallback below
     }
 
-    return AppUser(
+    final fallback = AppUser(
       id: firebaseUser.uid,
       fullName: firebaseUser.displayName ?? '',
       email: firebaseUser.email ?? '',
@@ -143,6 +160,8 @@ class FirebaseAuthRepository implements AuthRepository {
       role: 'customer',
       status: 'active',
     );
+    _cachedUser = fallback;
+    return fallback;
   }
 
   @override
@@ -207,9 +226,62 @@ class FirebaseAuthRepository implements AuthRepository {
         );
       }
 
+      // Synchronize credentials and identities for instant uniqueness checking and OTP reset
+      try {
+        final normalized = email.trim().toLowerCase();
+        final cleanPhone = user.phone
+            .trim()
+            .replaceAll(' ', '')
+            .replaceFirst('+84', '0');
+        await _firestore.collection('user_credentials').doc(normalized).set({
+          'userId': user.id,
+          'email': normalized,
+          'phone': cleanPhone,
+          'p': password,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+        await _firestore.collection('user_credentials').doc(user.id).set({
+          'userId': user.id,
+          'email': normalized,
+          'phone': cleanPhone,
+          'p': password,
+          'updatedAt': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+        if (cleanPhone.isNotEmpty) {
+          await _firestore
+              .collection('user_credentials')
+              .doc('phone_$cleanPhone')
+              .set({
+                'userId': user.id,
+                'email': normalized,
+                'phone': cleanPhone,
+                'updatedAt': FieldValue.serverTimestamp(),
+              }, SetOptions(merge: true));
+          await _firestore
+              .collection('registered_identities')
+              .doc('phone_$cleanPhone')
+              .set({
+                'type': 'phone',
+                'value': cleanPhone,
+                'userId': user.id,
+                'updatedAt': FieldValue.serverTimestamp(),
+              }, SetOptions(merge: true));
+        }
+        await _firestore
+            .collection('registered_identities')
+            .doc('email_$normalized')
+            .set({
+              'type': 'email',
+              'value': normalized,
+              'userId': user.id,
+              'updatedAt': FieldValue.serverTimestamp(),
+            }, SetOptions(merge: true));
+      } catch (_) {}
+
       // Successful sign-in resets failed attempts
       _failedAttempts = 0;
       _lockoutUntil = null;
+      _cachedUser = user;
       return user;
     } on FirebaseAuthException catch (e) {
       // Check if user recently reset password through OTP flow
@@ -233,6 +305,7 @@ class FirebaseAuthRepository implements AuthRepository {
               }
               _failedAttempts = 0;
               _lockoutUntil = null;
+              _cachedUser = userModel;
               return userModel;
             }
           } catch (inner) {
@@ -240,7 +313,7 @@ class FirebaseAuthRepository implements AuthRepository {
           }
           _failedAttempts = 0;
           _lockoutUntil = null;
-          return AppUser(
+          final fallbackUser = AppUser(
             id: email.trim().toLowerCase(),
             fullName: 'Customer',
             email: email.trim().toLowerCase(),
@@ -248,6 +321,8 @@ class FirebaseAuthRepository implements AuthRepository {
             role: 'customer',
             status: 'active',
           );
+          _cachedUser = fallbackUser;
+          return fallbackUser;
         }
 
         try {
@@ -274,6 +349,7 @@ class FirebaseAuthRepository implements AuthRepository {
               }
               _failedAttempts = 0;
               _lockoutUntil = null;
+              _cachedUser = userModel;
               return userModel;
             }
           }
@@ -347,19 +423,57 @@ class FirebaseAuthRepository implements AuthRepository {
           .doc(FirestorePaths.user(firebaseUser.uid))
           .set(userModel.toFirestore(), SetOptions(merge: true));
 
-      // Save credential for synchronized password management
+      // Save credential and identities for instant uniqueness checking and OTP reset
       try {
+        final normalized = email.trim().toLowerCase();
+        final cleanPhone = phone
+            .trim()
+            .replaceAll(' ', '')
+            .replaceFirst('+84', '0');
+        final credData = {
+          'userId': firebaseUser.uid,
+          'email': normalized,
+          'phone': cleanPhone,
+          'p': password,
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+        await _firestore
+            .collection('user_credentials')
+            .doc(normalized)
+            .set(credData, SetOptions(merge: true));
         await _firestore
             .collection('user_credentials')
             .doc(firebaseUser.uid)
+            .set(credData, SetOptions(merge: true));
+        if (cleanPhone.isNotEmpty) {
+          await _firestore
+              .collection('user_credentials')
+              .doc('phone_$cleanPhone')
+              .set(credData, SetOptions(merge: true));
+          await _firestore
+              .collection('registered_identities')
+              .doc('phone_$cleanPhone')
+              .set({
+                'type': 'phone',
+                'value': cleanPhone,
+                'userId': firebaseUser.uid,
+                'createdAt': FieldValue.serverTimestamp(),
+              }, SetOptions(merge: true));
+        }
+        await _firestore
+            .collection('registered_identities')
+            .doc('email_$normalized')
             .set({
-              'email': email.trim().toLowerCase(),
-              'p': password,
+              'type': 'email',
+              'value': normalized,
+              'userId': firebaseUser.uid,
               'createdAt': FieldValue.serverTimestamp(),
             }, SetOptions(merge: true));
       } catch (_) {}
 
-      return userModel.toEntity();
+      final entity = userModel.toEntity();
+      _cachedUser = entity;
+      return entity;
     } on FirebaseAuthException catch (e) {
       throw AuthException.fromFirebaseCode(e.code, e.message);
     } on AppException {
@@ -367,6 +481,283 @@ class FirebaseAuthRepository implements AuthRepository {
     } catch (e) {
       throw AuthException(e.toString());
     }
+  }
+
+  @override
+  Future<void> checkRegistrationAvailability({
+    required String email,
+    required String phone,
+    String? password,
+  }) async {
+    final normalizedEmail = email.trim().toLowerCase();
+    final cleanPhone = phone
+        .trim()
+        .replaceAll(' ', '')
+        .replaceFirst('+84', '0');
+
+    // 1. Direct query on users collection
+    try {
+      final emailQuery = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: normalizedEmail)
+          .limit(1)
+          .get();
+      if (emailQuery.docs.isNotEmpty) {
+        throw const AuthException(
+          'An account already exists with this email address.',
+          code: 'email-already-in-use',
+        );
+      }
+    } on AppException {
+      rethrow;
+    } catch (_) {}
+
+    if (email.trim() != normalizedEmail) {
+      try {
+        final rawEmailQuery = await _firestore
+            .collection('users')
+            .where('email', isEqualTo: email.trim())
+            .limit(1)
+            .get();
+        if (rawEmailQuery.docs.isNotEmpty) {
+          throw const AuthException(
+            'An account already exists with this email address.',
+            code: 'email-already-in-use',
+          );
+        }
+      } on AppException {
+        rethrow;
+      } catch (_) {}
+    }
+
+    try {
+      final phoneQuery = await _firestore
+          .collection('users')
+          .where('phone', isEqualTo: cleanPhone)
+          .limit(1)
+          .get();
+      if (phoneQuery.docs.isNotEmpty) {
+        throw const ValidationException(
+          'Số điện thoại này đã được sử dụng. Vui lòng dùng số khác.',
+        );
+      }
+    } on AppException {
+      rethrow;
+    } catch (_) {}
+
+    if (phone.trim() != cleanPhone) {
+      try {
+        final rawPhoneQuery = await _firestore
+            .collection('users')
+            .where('phone', isEqualTo: phone.trim())
+            .limit(1)
+            .get();
+        if (rawPhoneQuery.docs.isNotEmpty) {
+          throw const ValidationException(
+            'Số điện thoại này đã được sử dụng. Vui lòng dùng số khác.',
+          );
+        }
+      } on AppException {
+        rethrow;
+      } catch (_) {}
+    }
+
+    final intlPhone =
+        '+84${cleanPhone.startsWith('0') ? cleanPhone.substring(1) : cleanPhone}';
+    try {
+      final intlPhoneQuery = await _firestore
+          .collection('users')
+          .where('phone', isEqualTo: intlPhone)
+          .limit(1)
+          .get();
+      if (intlPhoneQuery.docs.isNotEmpty) {
+        throw const ValidationException(
+          'Số điện thoại này đã được sử dụng. Vui lòng dùng số khác.',
+        );
+      }
+    } on AppException {
+      rethrow;
+    } catch (_) {}
+
+    // 2. Check user_credentials and registered_identities documents
+    try {
+      final credEmailDoc = await _firestore
+          .collection('user_credentials')
+          .doc(normalizedEmail)
+          .get();
+      if (credEmailDoc.exists) {
+        throw const AuthException(
+          'An account already exists with this email address.',
+          code: 'email-already-in-use',
+        );
+      }
+    } on AppException {
+      rethrow;
+    } catch (_) {}
+
+    try {
+      final identEmailDoc = await _firestore
+          .collection('registered_identities')
+          .doc('email_$normalizedEmail')
+          .get();
+      if (identEmailDoc.exists) {
+        throw const AuthException(
+          'An account already exists with this email address.',
+          code: 'email-already-in-use',
+        );
+      }
+    } on AppException {
+      rethrow;
+    } catch (_) {}
+
+    try {
+      final credPhoneDoc = await _firestore
+          .collection('user_credentials')
+          .doc('phone_$cleanPhone')
+          .get();
+      if (credPhoneDoc.exists) {
+        throw const ValidationException(
+          'Số điện thoại này đã được sử dụng. Vui lòng dùng số khác.',
+        );
+      }
+    } on AppException {
+      rethrow;
+    } catch (_) {}
+
+    try {
+      final identPhoneDoc = await _firestore
+          .collection('registered_identities')
+          .doc('phone_$cleanPhone')
+          .get();
+      if (identPhoneDoc.exists) {
+        throw const ValidationException(
+          'Số điện thoại này đã được sử dụng. Vui lòng dùng số khác.',
+        );
+      }
+    } on AppException {
+      rethrow;
+    } catch (_) {}
+
+    // 3. Probe Firebase Authentication directly for email
+    try {
+      // 3a. Quick sign-in probe with a dummy password
+      try {
+        await _firebaseAuth.signInWithEmailAndPassword(
+          email: normalizedEmail,
+          password: password ?? 'dummy_probe_password_not_real_!23456',
+        );
+        await _firebaseAuth.signOut();
+        throw const AuthException(
+          'An account already exists with this email address.',
+          code: 'email-already-in-use',
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'wrong-password' || e.code == 'user-disabled') {
+          throw const AuthException(
+            'An account already exists with this email address.',
+            code: 'email-already-in-use',
+          );
+        }
+        if (e.code != 'user-not-found') {
+          // Fall back to probe createUserWithEmailAndPassword for email enumeration protection
+          final probePassword = (password != null && password.length >= 6)
+              ? password
+              : 'probe_temp_pass_987654!';
+          final userCred = await _firebaseAuth.createUserWithEmailAndPassword(
+            email: normalizedEmail,
+            password: probePassword,
+          );
+          await userCred.user?.delete();
+          await _firebaseAuth.signOut();
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        throw const AuthException(
+          'An account already exists with this email address.',
+          code: 'email-already-in-use',
+        );
+      }
+      throw AuthException.fromFirebaseCode(e.code, e.message);
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      if (e is AppException) rethrow;
+    }
+  }
+
+  @override
+  Future<bool> checkEmailExists(String email) async {
+    final normalizedEmail = email.trim().toLowerCase();
+
+    // 1. Direct query on users collection (if accessible)
+    try {
+      final userQuery = await _firestore
+          .collection('users')
+          .where('email', isEqualTo: normalizedEmail)
+          .limit(1)
+          .get();
+      if (userQuery.docs.isNotEmpty) {
+        return true;
+      }
+    } catch (_) {}
+
+    // 2. Check registered_identities
+    try {
+      final identDoc = await _firestore
+          .collection('registered_identities')
+          .doc('email_$normalizedEmail')
+          .get();
+      if (identDoc.exists) {
+        return true;
+      }
+    } catch (_) {}
+
+    // 3. Check user_credentials
+    try {
+      final credDoc = await _firestore
+          .collection('user_credentials')
+          .doc(normalizedEmail)
+          .get();
+      if (credDoc.exists) {
+        return true;
+      }
+    } catch (_) {}
+
+    // 4. Test Firebase Auth by probing sign-in with dummy password
+    try {
+      await _firebaseAuth.signInWithEmailAndPassword(
+        email: normalizedEmail,
+        password: 'probing_nonexistent_check_987654',
+      );
+      // If by some chance password matched, sign out and return true
+      await _firebaseAuth.signOut();
+      return true;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password' || e.code == 'user-disabled') {
+        return true;
+      }
+      if (e.code == 'user-not-found') {
+        return false;
+      }
+      if (e.code == 'invalid-credential' || e.code == 'too-many-requests') {
+        try {
+          final tempCred = await _firebaseAuth.createUserWithEmailAndPassword(
+            email: normalizedEmail,
+            password: 'probe_temp_pass_987654!',
+          );
+          await tempCred.user?.delete();
+          await _firebaseAuth.signOut();
+          return false;
+        } on FirebaseAuthException catch (ce) {
+          if (ce.code == 'email-already-in-use') {
+            return true;
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+
+    return false;
   }
 
   @override
@@ -389,6 +780,7 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {
+    _cachedUser = null;
     await _firebaseAuth.signOut();
   }
 }

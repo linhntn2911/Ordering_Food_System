@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ordering_food_system/app/router.dart';
 import 'package:ordering_food_system/core/theme/app_colors.dart';
 import 'package:ordering_food_system/core/theme/app_spacing.dart';
@@ -86,7 +89,38 @@ class ProfileView extends ConsumerWidget {
                     if (val == null || val.trim().isEmpty) {
                       return 'Phone number cannot be empty.';
                     }
+                    final phoneRegex = RegExp(r'^(0|\+84)[0-9]{9,10}$');
+                    if (!phoneRegex.hasMatch(val.trim())) {
+                      return 'Please enter a valid 10-digit phone number.';
+                    }
                     return null;
+                  },
+                ),
+                Consumer(
+                  builder: (context, ref, _) {
+                    final state = ref.watch(profileViewModelProvider);
+                    if (state.errorMessage == null) {
+                      return const SizedBox.shrink();
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(top: AppSpacing.p12),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppSpacing.p8),
+                        decoration: BoxDecoration(
+                          color: AppColors.errorSoft,
+                          borderRadius: AppSpacing.roundedSmall,
+                          border: Border.all(color: AppColors.error, width: 1),
+                        ),
+                        child: Text(
+                          state.errorMessage!,
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: AppColors.error,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    );
                   },
                 ),
                 const SizedBox(height: AppSpacing.p24),
@@ -178,6 +212,142 @@ class ProfileView extends ConsumerWidget {
     );
   }
 
+  Widget _buildAvatarImage(String? avatarUrl, String fullName) {
+    final initial = fullName.trim().isNotEmpty
+        ? fullName.trim()[0].toUpperCase()
+        : 'U';
+
+    final fallback = Center(
+      child: Text(
+        initial,
+        style: AppTextStyles.displayLarge.copyWith(
+          color: Colors.white,
+          fontSize: 44,
+        ),
+      ),
+    );
+
+    if (avatarUrl == null || avatarUrl.trim().isEmpty) {
+      return fallback;
+    }
+
+    final trimmedUrl = avatarUrl.trim();
+
+    if (trimmedUrl.startsWith('data:image')) {
+      try {
+        final commaIndex = trimmedUrl.indexOf(',');
+        final base64Data = commaIndex != -1
+            ? trimmedUrl.substring(commaIndex + 1)
+            : trimmedUrl;
+        final bytes = base64Decode(base64Data);
+        return Image.memory(
+          bytes,
+          width: 110,
+          height: 110,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) => fallback,
+        );
+      } catch (_) {
+        return fallback;
+      }
+    }
+
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+      return Image.network(
+        trimmedUrl,
+        width: 110,
+        height: 110,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => fallback,
+      );
+    }
+
+    return fallback;
+  }
+
+  Future<void> _pickAndUploadAvatar(BuildContext context, WidgetRef ref) async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (modalCtx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.p16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Change Profile Photo',
+                style: AppTextStyles.titleMedium.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.p16),
+              ListTile(
+                leading: const Icon(
+                  Icons.photo_library_outlined,
+                  color: AppColors.primarySolid,
+                ),
+                title: const Text(
+                  'Choose from Gallery',
+                  style: AppTextStyles.bodyMedium,
+                ),
+                onTap: () => Navigator.of(modalCtx).pop(ImageSource.gallery),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.camera_alt_outlined,
+                  color: AppColors.primarySolid,
+                ),
+                title: const Text(
+                  'Take a Photo',
+                  style: AppTextStyles.bodyMedium,
+                ),
+                onTap: () => Navigator.of(modalCtx).pop(ImageSource.camera),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    final picker = ImagePicker();
+    final image = await picker.pickImage(
+      source: source,
+      maxWidth: 300,
+      maxHeight: 300,
+      imageQuality: 80,
+    );
+    if (image == null) return;
+
+    final bytes = await image.readAsBytes();
+    final success = await ref
+        .read(profileViewModelProvider.notifier)
+        .uploadAvatar(imageBytes: bytes, imageName: image.name);
+
+    if (context.mounted) {
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile picture updated successfully!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to upload profile picture.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(profileViewModelProvider);
@@ -257,59 +427,69 @@ class ProfileView extends ConsumerWidget {
                       Center(
                         child: Column(
                           children: [
-                            Stack(
-                              children: [
-                                Container(
-                                  width: 110,
-                                  height: 110,
-                                  decoration: BoxDecoration(
-                                    gradient: AppColors.primaryGradient,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.primaryEnd.withValues(
-                                          alpha: 0.25,
-                                        ),
-                                        blurRadius: 25,
-                                        offset: const Offset(0, 10),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      user.fullName.isNotEmpty
-                                          ? user.fullName[0].toUpperCase()
-                                          : 'U',
-                                      style: AppTextStyles.displayLarge
-                                          .copyWith(
-                                            color: Colors.white,
-                                            fontSize: 44,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.primarySolid,
+                            GestureDetector(
+                              onTap: () => _pickAndUploadAvatar(context, ref),
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: 110,
+                                    height: 110,
+                                    decoration: BoxDecoration(
+                                      gradient: AppColors.primaryGradient,
                                       shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: AppColors.primaryEnd
+                                              .withValues(alpha: 0.25),
+                                          blurRadius: 25,
+                                          offset: const Offset(0, 10),
+                                        ),
+                                      ],
                                     ),
-                                    child: const Icon(
-                                      Icons.camera_alt_outlined,
-                                      color: Colors.white,
-                                      size: 18,
+                                    child: ClipOval(
+                                      child: _buildAvatarImage(
+                                        user.avatarUrl,
+                                        user.fullName,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.primarySolid,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.camera_alt_outlined,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                  if (state.isUpdating)
+                                    Positioned.fill(
+                                      child: Container(
+                                        decoration: const BoxDecoration(
+                                          color: Colors.black38,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: AppSpacing.p16),
                             Text(
-                              user.fullName.isNotEmpty
+                              user.fullName.trim().isNotEmpty
                                   ? user.fullName
                                   : 'Anam Wusono',
                               style: AppTextStyles.titleLarge.copyWith(

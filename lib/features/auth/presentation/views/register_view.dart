@@ -29,7 +29,6 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
   final _confirmPasswordController = TextEditingController();
 
   bool _keepMeSignedIn = true;
-  bool _emailPricing = false;
 
   @override
   void dispose() {
@@ -63,6 +62,17 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
           pendingRegistration: pending,
         ),
       );
+    } else if (mounted) {
+      final err = ref.read(registerViewModelProvider).errorMessage;
+      if (err != null && err.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(err),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -161,6 +171,11 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                     controller: _emailController,
                     hintText: 'Email',
                     keyboardType: TextInputType.emailAddress,
+                    onChanged: (_) {
+                      if (state.errorMessage != null) {
+                        viewModel.clearError();
+                      }
+                    },
                     prefixIcon: const Icon(
                       Icons.mail_outline_rounded,
                       color: AppColors.primarySolid,
@@ -175,6 +190,11 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                     controller: _phoneController,
                     hintText: 'Phone Number',
                     keyboardType: TextInputType.phone,
+                    onChanged: (_) {
+                      if (state.errorMessage != null) {
+                        viewModel.clearError();
+                      }
+                    },
                     prefixIcon: const Icon(
                       Icons.phone_outlined,
                       color: AppColors.primarySolid,
@@ -234,30 +254,6 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                       ),
                       Text(
                         'Keep Me Signed In',
-                        style: AppTextStyles.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  // Food Ninja Checkbox 2: Email Me About Special Pricing
-                  Row(
-                    children: [
-                      Checkbox(
-                        value: _emailPricing,
-                        activeColor: AppColors.primarySolid,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        onChanged: (val) {
-                          if (val != null) {
-                            setState(() => _emailPricing = val);
-                          }
-                        },
-                      ),
-                      Text(
-                        'Email Me About Special Pricing',
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                         ),

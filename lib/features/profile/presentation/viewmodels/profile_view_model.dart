@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/errors/app_exception.dart';
+import 'package:ordering_food_system/core/firebase/firebase_providers.dart';
 import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 
@@ -67,21 +72,30 @@ class ProfileViewModel extends Notifier<ProfileState> {
   }) async {
     final currentUser = state.user;
     if (currentUser == null) {
-      state = state.copyWith(errorMessage: 'No active user session found.');
+      state = state.copyWith(
+        isUpdating: false,
+        errorMessage: 'No active user session found.',
+      );
       return false;
     }
 
     if (fullName.trim().isEmpty) {
-      state = state.copyWith(errorMessage: 'Full name cannot be empty.');
+      state = state.copyWith(
+        isUpdating: false,
+        errorMessage: 'Full name cannot be empty.',
+      );
       return false;
     }
 
-    final phoneRegex = RegExp(r'^(0|\+84)[0-9]{9,10}$');
-    if (!phoneRegex.hasMatch(phone.trim())) {
-      state = state.copyWith(
-        errorMessage: 'Please enter a valid 10-digit phone number.',
-      );
-      return false;
+    if (phone.trim().isNotEmpty) {
+      final phoneRegex = RegExp(r'^(0|\+84)[0-9]{9,10}$');
+      if (!phoneRegex.hasMatch(phone.trim())) {
+        state = state.copyWith(
+          isUpdating: false,
+          errorMessage: 'Please enter a valid 10-digit phone number.',
+        );
+        return false;
+      }
     }
 
     state = state.copyWith(
@@ -119,6 +133,89 @@ class ProfileViewModel extends Notifier<ProfileState> {
       state = state.copyWith(
         isUpdating: false,
         errorMessage: 'Failed to update profile. Please try again.',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> uploadAvatar({
+    required Uint8List imageBytes,
+    required String imageName,
+  }) async {
+    final currentUser = state.user;
+    if (currentUser == null) {
+      state = state.copyWith(
+        isUpdating: false,
+        errorMessage: 'No active user session found.',
+      );
+      return false;
+    }
+
+    state = state.copyWith(
+      isUpdating: true,
+      clearError: true,
+      clearSuccess: true,
+    );
+
+    String? newAvatarUrl;
+
+    // 1. Try Firebase Storage with a strict 5-second timeout
+    try {
+      final storage = ref.read(firebaseStorageProvider);
+      final extension = imageName.contains('.')
+          ? imageName.split('.').last.toLowerCase()
+          : 'jpg';
+      final storageRef = storage.ref(
+        'avatars/${currentUser.id}/${DateTime.now().millisecondsSinceEpoch}.$extension',
+      );
+      final contentType = extension == 'png' ? 'image/png' : 'image/jpeg';
+      final uploadTask = storageRef.putData(
+        imageBytes,
+        SettableMetadata(contentType: contentType),
+      );
+      await uploadTask.timeout(const Duration(seconds: 5));
+      newAvatarUrl = await storageRef.getDownloadURL().timeout(
+        const Duration(seconds: 4),
+      );
+    } catch (_) {
+      // Firebase Storage failed, timed out, or blocked by CORS on Web.
+      newAvatarUrl = null;
+    }
+
+    // 2. If Firebase Storage did not return a valid download URL, fallback to Base64 Data URL
+    if (newAvatarUrl == null || newAvatarUrl.isEmpty) {
+      final extension = imageName.contains('.')
+          ? imageName.split('.').last.toLowerCase()
+          : 'jpg';
+      final mime = extension == 'png' ? 'image/png' : 'image/jpeg';
+      final base64String = base64Encode(imageBytes);
+      newAvatarUrl = 'data:$mime;base64,$base64String';
+    }
+
+    try {
+      final profileRepo = ref.read(profileRepositoryProvider);
+      await profileRepo.updateProfile(
+        uid: currentUser.id,
+        fullName: currentUser.fullName,
+        phone: currentUser.phone,
+        avatarUrl: newAvatarUrl,
+      );
+
+      final updatedUser = currentUser.copyWith(
+        avatarUrl: newAvatarUrl,
+        updatedAt: DateTime.now(),
+      );
+
+      state = state.copyWith(
+        isUpdating: false,
+        user: updatedUser,
+        successMessage: 'Profile picture updated successfully!',
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isUpdating: false,
+        errorMessage: 'Failed to update profile picture. Please try again.',
       );
       return false;
     }

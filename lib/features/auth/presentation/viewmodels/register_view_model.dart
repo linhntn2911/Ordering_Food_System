@@ -136,8 +136,12 @@ class RegisterViewModel extends Notifier<RegisterState> {
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final otpRepo = ref.read(otpRepositoryProvider);
-      await otpRepo.sendOtp(email: email.trim(), type: OtpType.registration);
+      final authRepo = ref.read(authRepositoryProvider);
+      await authRepo.checkRegistrationAvailability(
+        email: email.trim(),
+        phone: phone.trim(),
+        password: password,
+      );
 
       final pending = PendingRegistration(
         fullName: fullName.trim(),
@@ -154,7 +158,7 @@ class RegisterViewModel extends Notifier<RegisterState> {
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Không thể gửi mã xác thực. Vui lòng thử lại.',
+        errorMessage: 'Registration preparation failed. Please try again.',
       );
       return null;
     }

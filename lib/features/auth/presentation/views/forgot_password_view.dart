@@ -20,6 +20,7 @@ class ForgotPasswordView extends ConsumerStatefulWidget {
 }
 
 class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
   @override
@@ -28,13 +29,15 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
     super.dispose();
   }
 
-  void _handleNext() {
-    final email = _emailController.text.trim();
-    final isValid = ref
-        .read(forgotPasswordViewModelProvider.notifier)
-        .validateEmail(email);
+  Future<void> _handleNext() async {
+    if (!_formKey.currentState!.validate()) return;
 
-    if (isValid) {
+    final email = _emailController.text.trim();
+    final exists = await ref
+        .read(forgotPasswordViewModelProvider.notifier)
+        .verifyEmailExists(email);
+
+    if (exists && mounted) {
       Navigator.of(context).pushNamed(
         AppRoutes.otpVerification,
         arguments: OtpVerificationArgs(
@@ -42,6 +45,17 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
           type: OtpType.forgotPassword,
         ),
       );
+    } else if (mounted) {
+      final err = ref.read(forgotPasswordViewModelProvider).errorMessage;
+      if (err != null && err.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(err),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -174,17 +188,39 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                   const SizedBox(height: AppSpacing.p16),
                 ],
 
-                CustomTextField(
-                  controller: _emailController,
-                  hintText: 'Enter your email',
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.done,
-                  onChanged: (_) => setState(() {}),
-                  onSubmitted: (_) => _handleNext(),
-                  prefixIcon: const Icon(
-                    Icons.email_outlined,
-                    color: AppColors.primarySolid,
-                    size: 22,
+                Form(
+                  key: _formKey,
+                  child: CustomTextField(
+                    controller: _emailController,
+                    hintText: 'Enter your email',
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.done,
+                    onChanged: (_) {
+                      setState(() {});
+                      if (state.errorMessage != null) {
+                        ref
+                            .read(forgotPasswordViewModelProvider.notifier)
+                            .clearError();
+                      }
+                    },
+                    onSubmitted: (_) => _handleNext(),
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      color: AppColors.primarySolid,
+                      size: 22,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter your email.';
+                      }
+                      final emailRegex = RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      );
+                      if (!emailRegex.hasMatch(value.trim())) {
+                        return 'Please enter a valid email address.';
+                      }
+                      return null;
+                    },
                   ),
                 ),
                 const Spacer(),
@@ -194,7 +230,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                     width: 160,
                     text: 'Next',
                     isLoading: state.isLoading,
-                    onPressed: _handleNext,
+                    onPressed: state.isLoading ? null : _handleNext,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p32),

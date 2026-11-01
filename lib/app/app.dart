@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/services/preferences_service.dart';
 import '../core/theme/app_theme.dart';
 import 'router.dart';
 
-class FoodOrderingApp extends StatelessWidget {
+class FoodOrderingApp extends ConsumerWidget {
   const FoodOrderingApp({
     this.showPreviewBanner = false,
     this.initialHome,
@@ -16,7 +18,19 @@ class FoodOrderingApp extends StatelessWidget {
   final String? initialRoute;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    String defaultRoute = AppRoutes.login;
+    if (initialHome == null && initialRoute == null) {
+      try {
+        final prefs = ref.watch(preferencesServiceProvider);
+        defaultRoute = prefs.isOnboardingCompleted
+            ? AppRoutes.login
+            : AppRoutes.onboarding;
+      } catch (_) {
+        defaultRoute = AppRoutes.login;
+      }
+    }
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Ngô Chicken',
@@ -36,9 +50,7 @@ class FoodOrderingApp extends StatelessWidget {
         );
       },
       home: initialHome,
-      initialRoute: initialHome == null
-          ? (initialRoute ?? AppRoutes.login)
-          : null,
+      initialRoute: initialHome == null ? (initialRoute ?? defaultRoute) : null,
       onGenerateRoute: AppRoutes.onGenerateRoute,
     );
   }
