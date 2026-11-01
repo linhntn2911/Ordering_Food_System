@@ -46,6 +46,20 @@ void main() {
     expect(find.text('route ${AppRoutes.login}'), findsOneWidget);
   });
 
+  testWidgets('login opened by the gate can go back to home', (tester) async {
+    await pumpGate(tester, null);
+    await tester.pumpAndSettle();
+
+    final navigator = tester.state<NavigatorState>(find.byType(Navigator));
+    expect(navigator.canPop(), isTrue);
+
+    navigator.pop();
+    await tester.pumpAndSettle();
+
+    expect(find.text('route ${AppRoutes.home}'), findsOneWidget);
+    expect(find.text('admin screen'), findsNothing);
+  });
+
   testWidgets('customer is sent to login', (tester) async {
     await pumpGate(tester, user(role: 'customer'));
     await tester.pumpAndSettle();

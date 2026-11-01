@@ -299,10 +299,7 @@ class AdminDrawer extends StatelessWidget {
                         ).read(authRepositoryProvider).signOut();
                       } catch (_) {}
                       if (context.mounted) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.login,
-                          (route) => false,
-                        );
+                        AppRoutes.openLoginOverHome(Navigator.of(context));
                       }
                     },
                   ),

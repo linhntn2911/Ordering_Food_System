@@ -14,6 +14,8 @@ import '../../../../core/widgets/app_loading_view.dart';
 import '../../../../core/widgets/food_card.dart';
 import '../../../../core/widgets/offline_banner.dart';
 import '../../../../core/widgets/rating_stars.dart';
+import '../../../auth/presentation/viewmodels/auth_providers.dart';
+import '../../../auth/presentation/views/login_view.dart';
 import '../../domain/entities/item_selection.dart';
 import '../../domain/entities/menu_failure.dart';
 import '../../domain/entities/menu_item.dart';
@@ -27,27 +29,14 @@ import '../widgets/review_section.dart';
 /// (`specs/004-food-details/contracts/food_details_ui.md`).
 ///
 /// Opened by [menuItemId] from Home and search results.
-class MenuItemDetailView extends ConsumerStatefulWidget {
+class MenuItemDetailView extends ConsumerWidget {
   const MenuItemDetailView({super.key, required this.menuItemId});
 
   final String menuItemId;
 
   @override
-  ConsumerState<MenuItemDetailView> createState() => _MenuItemDetailViewState();
-}
-
-class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
-  final _noteController = TextEditingController();
-
-  @override
-  void dispose() {
-    _noteController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final provider = menuItemDetailViewModelProvider(widget.menuItemId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final provider = menuItemDetailViewModelProvider(menuItemId);
     ref.listen(provider.select((state) => state.notice), (_, notice) {
       if (notice == null) {
         return;
@@ -60,6 +49,7 @@ class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
 
     final state = ref.watch(provider);
     final viewModel = ref.read(provider.notifier);
+    final signedIn = ref.watch(authStateProvider).value != null;
     final item = state.item;
     final selection = state.selection;
 
@@ -72,7 +62,9 @@ class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
               total: state.total,
               onDecrease: viewModel.decreaseQuantity,
               onIncrease: viewModel.increaseQuantity,
-              onAddToCart: viewModel.addToCart,
+              onAddToCart: signedIn
+                  ? viewModel.addToCart
+                  : () => _signInThenAddToCart(context, viewModel),
             )
           : null,
       body: LayoutBuilder(
@@ -85,7 +77,7 @@ class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
                 item: item,
                 selection: selection,
                 viewModel: viewModel,
-                noteController: _noteController,
+                showCartButton: signedIn,
                 horizontalPadding: padding,
                 maxImageHeight: constraints.maxHeight * 0.45,
               ),
@@ -114,6 +106,23 @@ class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
         },
       ),
     );
+  }
+
+  /// Guests must sign in before using the cart. Login returns here with
+  /// `true` on success, and the chosen item is then added.
+  static Future<void> _signInThenAddToCart(
+    BuildContext context,
+    MenuItemDetailViewModel viewModel,
+  ) async {
+    // AppRoutes builds untyped routes, so pushNamed must stay untyped too:
+    // pushNamed<bool> would fail to cast the route and never open Login.
+    final result = await Navigator.of(context).pushNamed(
+      AppRoutes.login,
+      arguments: const LoginArgs(returnToCaller: true),
+    );
+    if (result == true) {
+      await viewModel.addToCart();
+    }
   }
 
   static String _noticeMessage(MenuItemDetailNotice notice) {
@@ -176,7 +185,7 @@ class _Details extends StatelessWidget {
     required this.item,
     required this.selection,
     required this.viewModel,
-    required this.noteController,
+    required this.showCartButton,
     required this.horizontalPadding,
     required this.maxImageHeight,
   });
@@ -188,7 +197,9 @@ class _Details extends StatelessWidget {
   final MenuItem item;
   final ItemSelection selection;
   final MenuItemDetailViewModel viewModel;
-  final TextEditingController noteController;
+
+  /// The cart shortcut is only for signed-in users.
+  final bool showCartButton;
   final double horizontalPadding;
   final double maxImageHeight;
 
@@ -224,16 +235,17 @@ class _Details extends StatelessWidget {
                 top: AppSpacing.p16,
                 child: const SafeArea(child: _BackButton()),
               ),
-              Positioned(
-                right: horizontalPadding,
-                top: AppSpacing.p16,
-                child: SafeArea(
-                  child: _CartButton(
-                    onTap: () =>
-                        Navigator.of(context).pushNamed(AppRoutes.cart),
+              if (showCartButton)
+                Positioned(
+                  right: horizontalPadding,
+                  top: AppSpacing.p16,
+                  child: SafeArea(
+                    child: _CartButton(
+                      onTap: () =>
+                          Navigator.of(context).pushNamed(AppRoutes.cart),
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
         ),
@@ -291,11 +303,6 @@ class _Details extends StatelessWidget {
                     enabled: canOrder,
                     onSizeSelected: viewModel.selectSize,
                     onToppingToggled: viewModel.toggleTopping,
-                  ),
-                  _NoteField(
-                    controller: noteController,
-                    enabled: canOrder,
-                    onChanged: viewModel.updateNote,
                   ),
                   const SizedBox(height: AppSpacing.p24),
                   ReviewSection(
@@ -458,62 +465,6 @@ class _DescriptionState extends State<_Description> {
           ],
         );
       },
-    );
-  }
-}
-
-class _NoteField extends StatelessWidget {
-  const _NoteField({
-    required this.controller,
-    required this.enabled,
-    required this.onChanged,
-  });
-
-  final TextEditingController controller;
-  final bool enabled;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(AppRadii.input),
-      borderSide: const BorderSide(color: AppColors.border),
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Semantics(
-          header: true,
-          child: const Text('Ghi chú', style: AppTextStyles.titleMedium),
-        ),
-        const SizedBox(height: AppSpacing.p8),
-        TextField(
-          key: const ValueKey('detail-note'),
-          controller: controller,
-          enabled: enabled,
-          minLines: 2,
-          maxLines: 4,
-          maxLength: ItemSelection.maxNoteLength,
-          onChanged: onChanged,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: AppColors.textPrimary,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Ví dụ: ít đá, không hành',
-            hintStyle: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textMuted,
-            ),
-            border: border,
-            enabledBorder: border,
-            focusedBorder: border.copyWith(
-              borderSide: const BorderSide(
-                color: AppColors.primaryEnd,
-                width: 1.5,
-              ),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -63,6 +63,14 @@ abstract final class AppRoutes {
   static const String notifications = '/notifications';
   static const String notificationDetail = '/notification-detail';
 
+  /// Resets the stack to Home and opens Login on top of it, so the Login
+  /// back button returns to Home instead of leaving the user stranded.
+  static void openLoginOverHome(NavigatorState navigator) {
+    navigator
+      ..pushNamedAndRemoveUntil(home, (route) => false)
+      ..pushNamed(login);
+  }
+
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     final uri = Uri.tryParse(settings.name ?? '') ?? Uri();
     final args = settings.arguments is Map<String, dynamic>
@@ -73,7 +81,8 @@ abstract final class AppRoutes {
       case onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingView());
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginView());
+        final args = settings.arguments as LoginArgs? ?? const LoginArgs();
+        return MaterialPageRoute(builder: (_) => LoginView(args: args));
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterView());
       case forgotPassword:
@@ -117,59 +126,87 @@ abstract final class AppRoutes {
         return MaterialPageRoute(builder: (_) => const CartScreen());
       case checkout:
         return MaterialPageRoute(builder: (_) => const CheckoutScreen());
-      case addresses: {
-        final isSelectionMode = args?['isSelectionMode'] as bool? ?? false;
-        return MaterialPageRoute(
-          builder: (_) => AddressListScreen(isSelectionMode: isSelectionMode),
-        );
-      }
+      case addresses:
+        {
+          final isSelectionMode = args?['isSelectionMode'] as bool? ?? false;
+          return MaterialPageRoute(
+            builder: (_) => AddressListScreen(isSelectionMode: isSelectionMode),
+          );
+        }
       case addAddress:
         return MaterialPageRoute(builder: (_) => const AddEditAddressScreen());
-      case editAddress: {
-        final address = (args?['address'] as AddressModel?) ??
-            (settings.arguments is AddressModel ? settings.arguments as AddressModel : null);
-        return MaterialPageRoute(
-          builder: (_) => AddEditAddressScreen(initialAddress: address),
-        );
-      }
+      case editAddress:
+        {
+          final address =
+              (args?['address'] as AddressModel?) ??
+              (settings.arguments is AddressModel
+                  ? settings.arguments as AddressModel
+                  : null);
+          return MaterialPageRoute(
+            builder: (_) => AddEditAddressScreen(initialAddress: address),
+          );
+        }
       case orderHistory:
         return MaterialPageRoute(builder: (_) => const OrderHistoryView());
-      case orderDetail: {
-        final orderId = uri.queryParameters['orderId'] ??
-            (args?['orderId'] as String?) ??
-            (settings.arguments is String ? settings.arguments as String : '');
-        return MaterialPageRoute(builder: (_) => OrderDetailScreen(orderId: orderId));
-      }
-      case orderTracking: {
-        final orderId = uri.queryParameters['orderId'] ??
-            (args?['orderId'] as String?) ??
-            (settings.arguments is String ? settings.arguments as String : '');
-        return MaterialPageRoute(builder: (_) => OrderTrackingTimelineScreen(orderId: orderId));
-      }
-      case writeReview: {
-        final orderId = uri.queryParameters['orderId'] ??
-            (args?['orderId'] as String?) ??
-            (settings.arguments is String ? settings.arguments as String : '');
-        return MaterialPageRoute(builder: (_) => WriteReviewScreen(orderId: orderId));
-      }
+      case orderDetail:
+        {
+          final orderId =
+              uri.queryParameters['orderId'] ??
+              (args?['orderId'] as String?) ??
+              (settings.arguments is String
+                  ? settings.arguments as String
+                  : '');
+          return MaterialPageRoute(
+            builder: (_) => OrderDetailScreen(orderId: orderId),
+          );
+        }
+      case orderTracking:
+        {
+          final orderId =
+              uri.queryParameters['orderId'] ??
+              (args?['orderId'] as String?) ??
+              (settings.arguments is String
+                  ? settings.arguments as String
+                  : '');
+          return MaterialPageRoute(
+            builder: (_) => OrderTrackingTimelineScreen(orderId: orderId),
+          );
+        }
+      case writeReview:
+        {
+          final orderId =
+              uri.queryParameters['orderId'] ??
+              (args?['orderId'] as String?) ??
+              (settings.arguments is String
+                  ? settings.arguments as String
+                  : '');
+          return MaterialPageRoute(
+            builder: (_) => WriteReviewScreen(orderId: orderId),
+          );
+        }
       case myReviews:
         return MaterialPageRoute(builder: (_) => const MyReviewsScreen());
       case notifications:
-        return MaterialPageRoute(builder: (_) => const NotificationListScreen());
-      case notificationDetail: {
-        final notificationId = uri.queryParameters['notificationId'] ??
-            (args?['notificationId'] as String?) ??
-            '';
-        final orderId = uri.queryParameters['orderId'] ??
-            (args?['orderId'] as String?) ??
-            '';
         return MaterialPageRoute(
-          builder: (_) => NotificationDetailScreen(
-            notificationId: notificationId,
-            orderId: orderId,
-          ),
+          builder: (_) => const NotificationListScreen(),
         );
-      }
+      case notificationDetail:
+        {
+          final notificationId =
+              uri.queryParameters['notificationId'] ??
+              (args?['notificationId'] as String?) ??
+              '';
+          final orderId =
+              uri.queryParameters['orderId'] ??
+              (args?['orderId'] as String?) ??
+              '';
+          return MaterialPageRoute(
+            builder: (_) => NotificationDetailScreen(
+              notificationId: notificationId,
+              orderId: orderId,
+            ),
+          );
+        }
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

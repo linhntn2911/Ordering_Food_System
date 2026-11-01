@@ -197,12 +197,16 @@ class _AddButton extends StatelessWidget {
                         semanticLabel: 'Giỏ hàng',
                       ),
                       const SizedBox(width: AppSpacing.p8),
-                      Text(
-                        label,
-                        style: AppTextStyles.labelLarge.copyWith(
-                          color: AppColors.surface,
+                      // Flexible lets the label wrap on narrow screens
+                      // instead of overflowing next to the icon.
+                      Flexible(
+                        child: Text(
+                          label,
+                          style: AppTextStyles.labelLarge.copyWith(
+                            color: AppColors.surface,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),

@@ -9,6 +9,7 @@ import 'package:ordering_food_system/core/widgets/app_back_button.dart';
 import 'package:ordering_food_system/core/widgets/custom_text_field.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
+import 'package:ordering_food_system/core/widgets/sign_in_required_view.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/profile/presentation/viewmodels/profile_view_model.dart';
 
@@ -134,7 +135,10 @@ class ProfileView extends ConsumerWidget {
         return Dialog(
           backgroundColor: AppColors.surface,
           elevation: 0,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 28,
+            vertical: 24,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadii.dialog),
           ),
@@ -278,31 +282,11 @@ class ProfileView extends ConsumerWidget {
                   ),
                 )
               : user == null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.person_off_outlined,
-                        size: 64,
-                        color: AppColors.textMuted,
-                      ),
-                      const SizedBox(height: AppSpacing.p16),
-                      const Text(
-                        'No active session',
-                        style: AppTextStyles.titleMedium,
-                      ),
-                      const SizedBox(height: AppSpacing.p16),
-                      ElevatedButton(
-                        onPressed: () async {
-                          await Navigator.of(context).pushNamed(AppRoutes.login);
-                          ref.invalidate(profileViewModelProvider);
-                          ref.invalidate(authStateProvider);
-                        },
-                        child: const Text('Go to Login'),
-                      ),
-                    ],
-                  ),
+              ? SignInRequiredView(
+                  onLoginClosed: () {
+                    ref.invalidate(profileViewModelProvider);
+                    ref.invalidate(authStateProvider);
+                  },
                 )
               : SingleChildScrollView(
                   padding: const EdgeInsets.symmetric(
@@ -566,74 +550,112 @@ class ProfileView extends ConsumerWidget {
                           borderRadius: AppSpacing.roundedCard,
                           boxShadow: AppSpacing.cardShadow,
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Activity & Updates',
-                              style: AppTextStyles.titleMedium,
-                            ),
-                            const SizedBox(height: AppSpacing.p12),
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Container(
-                                width: 36,
-                                height: 36,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.primarySoft,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.notifications_outlined,
-                                  color: AppColors.primarySolid,
-                                  size: 20,
-                                ),
+                        // Transparent Material so ListTile ink shows above
+                        // the card's background instead of behind it.
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Activity & Updates',
+                                style: AppTextStyles.titleMedium,
                               ),
-                              title: const Text('Notifications', style: AppTextStyles.bodyMedium),
-                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
-                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
-                            ),
-                            const Divider(height: 1, color: AppColors.borderLight),
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Container(
-                                width: 36,
-                                height: 36,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.warningSurface,
-                                  shape: BoxShape.circle,
+                              const SizedBox(height: AppSpacing.p12),
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primarySoft,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.notifications_outlined,
+                                    color: AppColors.primarySolid,
+                                    size: 20,
+                                  ),
                                 ),
-                                child: const Icon(
-                                  Icons.rate_review_outlined,
-                                  color: AppColors.foodAccentDark,
-                                  size: 20,
+                                title: const Text(
+                                  'Notifications',
+                                  style: AppTextStyles.bodyMedium,
                                 ),
+                                trailing: const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 16,
+                                  color: AppColors.textMuted,
+                                ),
+                                onTap: () =>
+                                    Navigator.of(context)
+                                        .pushNamed(AppRoutes.notifications),
                               ),
-                              title: const Text('My Reviews', style: AppTextStyles.bodyMedium),
-                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
-                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.myReviews),
-                            ),
-                            const Divider(height: 1, color: AppColors.borderLight),
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: Container(
-                                width: 36,
-                                height: 36,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.primarySoft,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(
-                                  Icons.location_on_outlined,
-                                  color: AppColors.primarySolid,
-                                  size: 20,
-                                ),
+                              const Divider(
+                                height: 1,
+                                color: AppColors.borderLight,
                               ),
-                              title: const Text('Delivery Addresses', style: AppTextStyles.bodyMedium),
-                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
-                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
-                            ),
-                          ],
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.warningSurface,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.rate_review_outlined,
+                                    color: AppColors.foodAccentDark,
+                                    size: 20,
+                                  ),
+                                ),
+                                title: const Text(
+                                  'My Reviews',
+                                  style: AppTextStyles.bodyMedium,
+                                ),
+                                trailing: const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 16,
+                                  color: AppColors.textMuted,
+                                ),
+                                onTap: () =>
+                                    Navigator.of(context)
+                                        .pushNamed(AppRoutes.myReviews),
+                              ),
+                              const Divider(
+                                height: 1,
+                                color: AppColors.borderLight,
+                              ),
+                              ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.primarySoft,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.location_on_outlined,
+                                    color: AppColors.primarySolid,
+                                    size: 20,
+                                  ),
+                                ),
+                                title: const Text(
+                                  'Delivery Addresses',
+                                  style: AppTextStyles.bodyMedium,
+                                ),
+                                trailing: const Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 16,
+                                  color: AppColors.textMuted,
+                                ),
+                                onTap: () =>
+                                    Navigator.of(context)
+                                        .pushNamed(AppRoutes.addresses),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.p24),

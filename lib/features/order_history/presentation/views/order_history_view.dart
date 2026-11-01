@@ -4,6 +4,8 @@ import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:ordering_food_system/core/constants/app_colors.dart';
 import 'package:ordering_food_system/core/constants/app_routes.dart';
 import 'package:ordering_food_system/core/widgets/app_empty_state.dart';
+import 'package:ordering_food_system/core/widgets/sign_in_required_view.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
 import 'package:ordering_food_system/features/order_history/presentation/widgets/order_history_card.dart';
 
@@ -12,6 +14,11 @@ class OrderHistoryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    if (authState.value == null) {
+      return _SignedOutOrders(isLoading: authState.isLoading);
+    }
+
     final filter = ref.watch(orderHistoryFilterProvider);
     final ordersAsync = ref.watch(orderHistoryListProvider);
 
@@ -27,11 +34,29 @@ class OrderHistoryView extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        title: const Text('Lịch sử đơn hàng', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+        title: const Text(
+          'Lịch sử đơn hàng',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () => context.push(AppRoutes.notifications), icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary)),
-          IconButton(onPressed: () => context.push(AppRoutes.myReviews), icon: const Icon(Icons.rate_review_outlined, color: AppColors.textPrimary)),
+          IconButton(
+            onPressed: () => context.push(AppRoutes.notifications),
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          IconButton(
+            onPressed: () => context.push(AppRoutes.myReviews),
+            icon: const Icon(
+              Icons.rate_review_outlined,
+              color: AppColors.textPrimary,
+            ),
+          ),
         ],
       ),
       body: Column(
@@ -49,10 +74,26 @@ class OrderHistoryView extends ConsumerWidget {
                     child: ChoiceChip(
                       label: Text(f['label']!),
                       selected: isSelected,
-                      onSelected: (_) => ref.read(orderHistoryFilterProvider.notifier).state = f['key']!,
+                      onSelected: (_) =>
+                          ref.read(orderHistoryFilterProvider.notifier).state =
+                              f['key']!,
                       selectedColor: AppColors.primary.withValues(alpha: 0.12),
-                      labelStyle: TextStyle(color: isSelected ? AppColors.primary : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border)),
+                      labelStyle: TextStyle(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                        side: BorderSide(
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.border,
+                        ),
+                      ),
                       backgroundColor: AppColors.surface,
                     ),
                   );
@@ -63,11 +104,17 @@ class OrderHistoryView extends ConsumerWidget {
           const SizedBox(height: 8),
           Expanded(
             child: ordersAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
               error: (err, _) => Center(child: Text('Lỗi: $err')),
               data: (orders) {
                 if (orders.isEmpty) {
-                  return const AppEmptyState(icon: Icons.receipt_long_outlined, title: 'Chưa có đơn hàng', message: 'Các đơn hàng của bạn sẽ hiển thị tại đây');
+                  return const AppEmptyState(
+                    icon: Icons.receipt_long_outlined,
+                    title: 'Chưa có đơn hàng',
+                    message: 'Các đơn hàng của bạn sẽ hiển thị tại đây',
+                  );
                 }
                 return RefreshIndicator(
                   color: AppColors.primary,
@@ -90,6 +137,38 @@ class OrderHistoryView extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Orders tab for a guest: same "Go to Login" prompt as Profile, without
+/// filters or account shortcuts.
+class _SignedOutOrders extends StatelessWidget {
+  const _SignedOutOrders({required this.isLoading});
+
+  final bool isLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        title: const Text(
+          'Lịch sử đơn hàng',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
+          : const SignInRequiredView(icon: Icons.receipt_long_outlined),
     );
   }
 }

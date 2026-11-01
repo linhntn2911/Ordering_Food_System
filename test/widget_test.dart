@@ -5,6 +5,7 @@ import 'package:ordering_food_system/app/app.dart';
 import 'package:ordering_food_system/app/main_shell.dart';
 import 'package:ordering_food_system/features/auth/data/models/user_model.dart';
 import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/cart/presentation/views/cart_screen.dart';
 import 'package:ordering_food_system/features/cart/presentation/views/member3_navigation_hub.dart';
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/home_menu_view_model.dart';
@@ -19,10 +20,22 @@ void main() {
 
   setUp(() => repository = FakeMenuRepository());
 
-  Future<void> pumpApp(WidgetTester tester) {
+  const customer = AppUser(
+    id: 'customer_1',
+    fullName: 'Khách hàng',
+    email: 'customer@example.com',
+    phone: '0900000002',
+    role: 'customer',
+    status: 'active',
+  );
+
+  Future<void> pumpApp(WidgetTester tester, {AppUser? user = customer}) {
     return tester.pumpWidget(
       ProviderScope(
-        overrides: [menuRepositoryProvider.overrideWithValue(repository)],
+        overrides: [
+          menuRepositoryProvider.overrideWithValue(repository),
+          authStateProvider.overrideWith((ref) => Stream.value(user)),
+        ],
         child: const FoodOrderingApp(initialHome: MainShell()),
       ),
     );
@@ -41,12 +54,36 @@ void main() {
     tester,
   ) async {
     await pumpApp(tester);
+    await tester.pump();
 
     for (final label in ['Trang chủ', 'Giỏ hàng', 'Đơn hàng', 'Tài khoản']) {
       expect(find.bySemanticsLabel(label), findsOneWidget);
     }
     expect(find.bySemanticsLabel(RegExp('Chat|Tin nhắn')), findsNothing);
     expect(find.byType(HomeView), findsOneWidget);
+  });
+
+  testWidgets('signed-out users do not see the Cart tab', (tester) async {
+    await pumpApp(tester, user: null);
+    await tester.pump();
+
+    expect(find.byKey(const ValueKey('shell-tab-1')), findsNothing);
+    expect(find.bySemanticsLabel('Giỏ hàng'), findsNothing);
+    for (final label in ['Trang chủ', 'Đơn hàng', 'Tài khoản']) {
+      expect(find.bySemanticsLabel(label), findsOneWidget);
+    }
+  });
+
+  testWidgets('signed-out Orders tab offers Go to Login', (tester) async {
+    await pumpApp(tester, user: null);
+    await tester.pump();
+
+    await tester.tap(find.byKey(const ValueKey('shell-tab-2')));
+    await tester.pump();
+
+    expect(find.text('Lịch sử đơn hàng'), findsOneWidget);
+    expect(find.text('Go to Login'), findsWidgets);
+    expect(find.text('Chưa có đơn hàng'), findsNothing);
   });
 
   testWidgets('switching tabs keeps the Home selection (FR-018, FR-019)', (
