@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/app/router.dart';
 import 'package:ordering_food_system/core/theme/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_radii.dart';
 import 'package:ordering_food_system/core/theme/app_spacing.dart';
 import 'package:ordering_food_system/core/theme/app_text_styles.dart';
 import 'package:ordering_food_system/core/widgets/app_back_button.dart';
@@ -129,50 +130,132 @@ class ProfileView extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
+        return Dialog(
           backgroundColor: AppColors.surface,
-          shape: const RoundedRectangleBorder(
-            borderRadius: AppSpacing.roundedDialog,
+          elevation: 0,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadii.dialog),
           ),
-          title: const Text('Sign Out', style: AppTextStyles.titleLarge),
-          content: Text(
-            'Are you sure you want to sign out of your account?',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.p24,
+              AppSpacing.p32,
+              AppSpacing.p24,
+              AppSpacing.p24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Food Ninja soft error icon container
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.logout_rounded,
+                      color: AppColors.error,
+                      size: 30,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.p20),
+                const Text(
+                  'Sign Out',
+                  style: AppTextStyles.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.p8),
+                Text(
+                  'Are you sure you want to sign out of your account?',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.p24),
+                // 2 balanced side-by-side buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(AppRadii.card),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppRadii.card),
+                            onTap: () => Navigator.of(dialogContext).pop(),
+                            child: Center(
+                              child: Text(
+                                'Cancel',
+                                style: AppTextStyles.labelLarge.copyWith(
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.p12),
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.error,
+                          borderRadius: BorderRadius.circular(AppRadii.card),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.error.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppRadii.card),
+                            onTap: () async {
+                              Navigator.of(dialogContext).pop();
+                              await ref
+                                  .read(profileViewModelProvider.notifier)
+                                  .signOut();
+                              if (context.mounted) {
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                  AppRoutes.home,
+                                  (route) => false,
+                                );
+                              }
+                            },
+                            child: Center(
+                              child: Text(
+                                'Sign Out',
+                                style: AppTextStyles.labelLarge.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                'Cancel',
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.textMuted,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: AppSpacing.roundedMedium,
-                ),
-              ),
-              onPressed: () async {
-                Navigator.of(dialogContext).pop();
-                await ref.read(profileViewModelProvider.notifier).signOut();
-                if (context.mounted) {
-                  Navigator.of(
-                    context,
-                  ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-                }
-              },
-              child: const Text(
-                'Sign Out',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
         );
       },
     );
