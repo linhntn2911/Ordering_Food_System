@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../features/address/data/models/address_model.dart';
+import '../features/address/presentation/views/add_edit_address_screen.dart';
+import '../features/address/presentation/views/address_list_screen.dart';
 import '../features/auth/domain/repositories/otp_repository.dart';
 import '../features/auth/presentation/views/auth_success_view.dart';
 import '../features/auth/presentation/views/forgot_password_view.dart';
@@ -7,7 +10,9 @@ import '../features/auth/presentation/views/login_view.dart';
 import '../features/auth/presentation/views/otp_verification_view.dart';
 import '../features/auth/presentation/views/register_view.dart';
 import '../features/auth/presentation/views/reset_password_view.dart';
+import '../features/cart/presentation/views/cart_screen.dart';
 import '../features/category/presentation/views/category_management_screen.dart';
+import '../features/checkout/presentation/views/checkout_screen.dart';
 import '../features/menu/presentation/views/admin_menu_item_list_screen.dart';
 import '../features/notifications/views/screens/notification_detail_screen.dart';
 import '../features/notifications/views/screens/notification_list_screen.dart';
@@ -39,6 +44,13 @@ abstract final class AppRoutes {
   static const String adminMenuItems = '/admin/menu-items';
   static const String adminOrders = '/admin/orders';
   static const String adminSalesReport = '/admin/sales-report';
+
+  // Customer features from Member 3 (Hong Anh)
+  static const String cart = '/cart';
+  static const String checkout = '/checkout';
+  static const String addresses = '/addresses';
+  static const String addAddress = '/add-address';
+  static const String editAddress = '/edit-address';
 
   // Customer features from Member 4 (Tienpq)
   static const String orderHistory = '/order-history';
@@ -97,6 +109,25 @@ abstract final class AppRoutes {
         return _adminRoute(const AdminOrderListScreen());
       case adminSalesReport:
         return _adminRoute(const SalesReportScreen());
+      case cart:
+        return MaterialPageRoute(builder: (_) => const CartScreen());
+      case checkout:
+        return MaterialPageRoute(builder: (_) => const CheckoutScreen());
+      case addresses: {
+        final isSelectionMode = args?['isSelectionMode'] as bool? ?? false;
+        return MaterialPageRoute(
+          builder: (_) => AddressListScreen(isSelectionMode: isSelectionMode),
+        );
+      }
+      case addAddress:
+        return MaterialPageRoute(builder: (_) => const AddEditAddressScreen());
+      case editAddress: {
+        final address = (args?['address'] as AddressModel?) ??
+            (settings.arguments is AddressModel ? settings.arguments as AddressModel : null);
+        return MaterialPageRoute(
+          builder: (_) => AddEditAddressScreen(initialAddress: address),
+        );
+      }
       case orderHistory:
         return MaterialPageRoute(builder: (_) => const OrderHistoryView());
       case orderDetail: {

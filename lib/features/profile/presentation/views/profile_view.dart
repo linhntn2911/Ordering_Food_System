@@ -526,6 +526,26 @@ class ProfileView extends ConsumerWidget {
                               trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
                               onTap: () => Navigator.of(context).pushNamed(AppRoutes.myReviews),
                             ),
+                            const Divider(height: 1, color: AppColors.borderLight),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primarySoft,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.location_on_outlined,
+                                  color: AppColors.primarySolid,
+                                  size: 20,
+                                ),
+                              ),
+                              title: const Text('Delivery Addresses', style: AppTextStyles.bodyMedium),
+                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
+                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
+                            ),
                           ],
                         ),
                       ),

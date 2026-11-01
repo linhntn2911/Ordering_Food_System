@@ -5,10 +5,11 @@ import '../core/theme/app_radii.dart';
 import '../core/theme/app_shadows.dart';
 import '../core/theme/app_spacing.dart';
 import '../core/theme/app_text_styles.dart';
-import '../core/widgets/coming_soon_view.dart';
+import '../features/cart/presentation/views/cart_screen.dart';
 import '../features/menu/presentation/views/home_view.dart';
 import '../features/order_history/presentation/views/order_history_view.dart';
 import '../features/profile/presentation/views/profile_view.dart';
+import 'router.dart';
 
 /// Customer app shell with the bottom tabs Home, Cart, Orders and Profile.
 ///
@@ -38,9 +39,10 @@ class _MainShellState extends State<MainShell> {
         index: _index,
         children: [
           const HomeView(),
-          const ComingSoonView(
-            title: 'Giỏ hàng',
-            icon: Icons.shopping_cart_rounded,
+          CartScreen(
+            onNavigateToCheckout: () =>
+                Navigator.of(context).pushNamed(AppRoutes.checkout),
+            onBrowseMenu: () => setState(() => _index = 0),
           ),
           const OrderHistoryView(),
           const ProfileView(),

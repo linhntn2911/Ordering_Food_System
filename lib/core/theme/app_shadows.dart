@@ -7,6 +7,8 @@ abstract final class AppShadows {
     blurRadius: 20,
   );
 
+  static const cardShadow = card;
+  static const primaryShadow = primary;
   static const primary = BoxShadow(
     color: Color(0x2E53E88B),
     offset: Offset(0, 8),

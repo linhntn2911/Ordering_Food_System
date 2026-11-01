@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ordering_food_system/app/app.dart';
 import 'package:ordering_food_system/app/main_shell.dart';
-import 'package:ordering_food_system/core/widgets/coming_soon_view.dart';
 import 'package:ordering_food_system/features/auth/data/models/user_model.dart';
 import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
+import 'package:ordering_food_system/features/cart/presentation/views/cart_screen.dart';
+import 'package:ordering_food_system/features/cart/presentation/views/member3_navigation_hub.dart';
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/home_menu_view_model.dart';
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/menu_providers.dart';
 import 'package:ordering_food_system/features/menu/presentation/views/home_view.dart';
@@ -67,7 +68,7 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey('shell-tab-1')));
     await tester.pump();
-    expect(find.text(ComingSoonView.message), findsOneWidget);
+    expect(find.byType(CartScreen), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('shell-tab-0')));
     await tester.pump();
@@ -101,25 +102,27 @@ void main() {
 
       expect(admin.isAdmin, isTrue);
       expect(admin.isCustomer, isFalse);
+      expect(admin.isActive, isTrue);
+      expect(admin.isDisabled, isFalse);
 
       const disabledUser = AppUser(
-        id: 'disabled_1',
+        id: 'user_2',
         fullName: 'Disabled User',
-        email: 'disabled@foodninja.vn',
+        email: 'disabled@example.com',
         phone: '0900000000',
         role: 'customer',
         status: 'disabled',
       );
 
-      expect(disabledUser.isDisabled, isTrue);
       expect(disabledUser.isActive, isFalse);
+      expect(disabledUser.isDisabled, isTrue);
     });
 
-    test('UserModel converts to and from Map correctly', () {
-      final now = DateTime(2026, 10, 20);
+    test('UserModel converts to and from AppUser entity properly', () {
+      final now = DateTime.now();
       final model = UserModel(
-        id: 'uid_123',
-        fullName: 'Tran Van Thai',
+        id: 'user_thai',
+        fullName: 'Thai Dang Quang',
         email: 'thai@example.com',
         phone: '0987654321',
         avatarUrl: 'https://example.com/avatar.png',
@@ -130,8 +133,8 @@ void main() {
       );
 
       final entity = model.toEntity();
-      expect(entity.id, equals('uid_123'));
-      expect(entity.fullName, equals('Tran Van Thai'));
+      expect(entity.id, equals('user_thai'));
+      expect(entity.fullName, equals('Thai Dang Quang'));
       expect(entity.email, equals('thai@example.com'));
       expect(entity.phone, equals('0987654321'));
       expect(entity.avatarUrl, equals('https://example.com/avatar.png'));
@@ -143,5 +146,42 @@ void main() {
       expect(fromEntity.fullName, equals(model.fullName));
       expect(fromEntity.email, equals(model.email));
     });
+  });
+
+  testWidgets('Member3 Navigation Hub and Cart preloaded smoke test', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: FoodOrderingApp(initialHome: Member3NavigationHub()),
+      ),
+    );
+
+    // Initial pump and settle
+    await tester.pumpAndSettle();
+
+    // Verify AppBar title of CartScreen
+    expect(find.text('Giỏ hàng của bạn'), findsOneWidget);
+
+    // Verify toolbar
+    expect(find.text('Chọn tất cả'), findsOneWidget);
+
+    // Verify preloaded mock food items
+    expect(find.text('Gà sốt cay ngọt Hàn Quốc'), findsOneWidget);
+    expect(find.text('Cơm rang gà chiên mắm tỏi'), findsOneWidget);
+
+    // Verify Bottom Navigation Bar tabs
+    expect(find.text('Giỏ hàng'), findsOneWidget);
+    expect(find.text('Thanh toán'), findsOneWidget);
+    expect(find.text('Sổ địa chỉ'), findsOneWidget);
+
+    // Tap on 'Sổ địa chỉ' tab
+    await tester.tap(find.text('Sổ địa chỉ'));
+    await tester.pumpAndSettle();
+
+    // Verify AddressListScreen is displayed with preloaded default address
+    expect(find.text('Sổ địa chỉ'), findsWidgets);
+    expect(find.textContaining('123 Lê Lợi'), findsOneWidget);
+    expect(find.text('Mặc định'), findsOneWidget);
   });
 }

@@ -22,6 +22,9 @@ import '../viewmodels/menu_item_detail_view_model.dart';
 import '../widgets/item_option_section.dart';
 import '../widgets/item_order_bar.dart';
 import '../widgets/review_section.dart';
+import '../../../cart/data/models/cart_item_model.dart';
+import '../../../cart/presentation/controllers/cart_controller.dart';
+import '../../domain/entities/menu_option.dart';
 
 /// Food Details following the Food Ninja Product Detail frame
 /// (`specs/004-food-details/contracts/food_details_ui.md`).
@@ -122,7 +125,8 @@ class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
         'Một số tùy chọn đã thay đổi, vui lòng chọn lại',
       MenuItemDetailNotice.reviewsNeedConnection =>
         'Cần kết nối mạng để tải thêm đánh giá',
-      MenuItemDetailNotice.addToCartUnavailable => ComingSoonView.message,
+      MenuItemDetailNotice.addToCartUnavailable =>
+        'Đã thêm món vào giỏ hàng thành công!',
     };
   }
 

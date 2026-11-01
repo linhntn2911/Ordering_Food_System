@@ -12,6 +12,15 @@ abstract final class AppSpacing {
   static const double xxl = 32.0;
   static const double xxxl = 40.0;
 
+  // Hong Anh aliases
+  static const double s4 = 4;
+  static const double s8 = 8;
+  static const double s12 = 12;
+  static const double s16 = 16;
+  static const double s20 = 20;
+  static const double s24 = 24;
+  static const double s32 = 32;
+  static const double s40 = 40;
   // 4-point grid
   static const double p4 = 4.0;
   static const double p8 = 8.0;
