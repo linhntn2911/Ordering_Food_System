@@ -31,7 +31,7 @@ class AuthSuccessView extends StatelessWidget {
         (isRegistration
             ? 'Your Profile Is Ready To Use'
             : 'Password reset succesful');
-    final buttonText = isRegistration ? 'Go to Login' : 'Back to Login';
+    final buttonText = isRegistration ? 'Bắt đầu' : 'Back to Login';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -105,10 +105,17 @@ class AuthSuccessView extends StatelessWidget {
                     width: 160,
                     text: buttonText,
                     onPressed: () {
-                      Navigator.of(context).pushNamedAndRemoveUntil(
-                        AppRoutes.login,
-                        (route) => false,
-                      );
+                      if (isRegistration) {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.home,
+                          (route) => false,
+                        );
+                      } else {
+                        Navigator.of(context).pushNamedAndRemoveUntil(
+                          AppRoutes.login,
+                          (route) => false,
+                        );
+                      }
                     },
                   ),
                   const SizedBox(height: AppSpacing.p40),
