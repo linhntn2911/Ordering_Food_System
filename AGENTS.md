@@ -30,7 +30,7 @@ Use the installed Spec Kit skills in this order:
 Do not begin a substantial feature from a chat description alone. Update the feature spec, plan, and tasks first. Small repairs that preserve specified behavior may be implemented directly, but document any changed requirement.
 
 <!-- SPECKIT START -->
-For additional context about technologies, project structure, commands, and decisions, read the current feature plan at `specs/004-food-details/plan.md`.
+For additional context about technologies, project structure, commands, and decisions, read the current feature plan at `specs/008-order-issue-chat/plan.md`.
 <!-- SPECKIT END -->
 
 ## Product Boundaries
