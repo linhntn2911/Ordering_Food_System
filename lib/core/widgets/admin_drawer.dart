@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/router.dart';
+import '../../features/auth/presentation/viewmodels/auth_providers.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_gradients.dart';
 import '../theme/app_radii.dart';
@@ -14,7 +15,14 @@ import '../../features/order/presentation/views/admin_order_list_screen.dart';
 import '../../features/notifications/views/screens/admin_broadcast_screen.dart';
 import '../../features/order/presentation/views/sales_report_screen.dart';
 
-enum AdminDestination { dashboard, categories, menuItems, orders, salesReport, broadcasts }
+enum AdminDestination {
+  dashboard,
+  categories,
+  menuItems,
+  orders,
+  salesReport,
+  broadcasts,
+}
 
 class AdminDrawer extends StatelessWidget {
   const AdminDrawer({required this.currentDestination, super.key});
@@ -285,11 +293,14 @@ class AdminDrawer extends StatelessWidget {
                     onTap: () async {
                       Navigator.of(context).pop();
                       try {
-                        await FirebaseAuth.instance.signOut();
+                        await ProviderScope.containerOf(
+                          context,
+                          listen: false,
+                        ).read(authRepositoryProvider).signOut();
                       } catch (_) {}
                       if (context.mounted) {
                         Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.home,
+                          AppRoutes.login,
                           (route) => false,
                         );
                       }

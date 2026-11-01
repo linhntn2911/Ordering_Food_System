@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_shadows.dart';
@@ -121,8 +122,11 @@ class _MenuItemDetailViewState extends ConsumerState<MenuItemDetailView> {
         'Một số tùy chọn đã thay đổi, vui lòng chọn lại',
       MenuItemDetailNotice.reviewsNeedConnection =>
         'Cần kết nối mạng để tải thêm đánh giá',
+      MenuItemDetailNotice.addedToCart => 'Đã thêm món vào giỏ hàng',
+      MenuItemDetailNotice.addToCartFailed =>
+        'Không thể thêm món vào giỏ hàng. Vui lòng thử lại.',
       MenuItemDetailNotice.addToCartUnavailable =>
-        'Tính năng đang được phát triển',
+        'Không thể thêm món vào giỏ hàng. Vui lòng thử lại.',
     };
   }
 
@@ -219,6 +223,16 @@ class _Details extends StatelessWidget {
                 left: horizontalPadding,
                 top: AppSpacing.p16,
                 child: const SafeArea(child: _BackButton()),
+              ),
+              Positioned(
+                right: horizontalPadding,
+                top: AppSpacing.p16,
+                child: SafeArea(
+                  child: _CartButton(
+                    onTap: () =>
+                        Navigator.of(context).pushNamed(AppRoutes.cart),
+                  ),
+                ),
               ),
             ],
           ),
@@ -324,6 +338,39 @@ class _BackButton extends StatelessWidget {
               size: 20,
               color: AppColors.foodAccentDark,
               semanticLabel: 'Quay lại',
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CartButton extends StatelessWidget {
+  const _CartButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [AppShadows.card],
+      ),
+      child: Material(
+        color: AppColors.surface,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: const SizedBox.square(
+            dimension: AppSpacing.minTouchTarget,
+            child: Icon(
+              Icons.shopping_cart_rounded,
+              size: 20,
+              color: AppColors.primaryEnd,
+              semanticLabel: 'Mở giỏ hàng',
             ),
           ),
         ),

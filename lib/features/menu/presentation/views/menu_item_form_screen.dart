@@ -1,8 +1,5 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
@@ -14,6 +11,7 @@ import '../../../category/presentation/viewmodels/category_management_view_model
 import '../../domain/entities/menu_item.dart';
 import '../../domain/entities/menu_item_draft.dart';
 import '../../domain/entities/menu_option.dart';
+import '../../domain/repositories/menu_repository.dart';
 import '../viewmodels/menu_item_form_view_model.dart';
 
 class MenuItemFormScreen extends ConsumerStatefulWidget {
@@ -34,14 +32,11 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _priceController;
   late final TextEditingController _largeSurchargeController;
+  late final TextEditingController _imageUrlController;
   String? _categoryId;
   bool _isAvailable = true;
   bool _isPublished = true;
   bool _hasSizes = false;
-  Uint8List? _imageBytes;
-  String? _imageName;
-  String? _customImageUrl;
-  bool _isPickingImage = false;
 
   @override
   void initState() {
@@ -58,6 +53,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
     _largeSurchargeController = TextEditingController(
       text: largeSize?.priceDelta.toString() ?? '',
     );
+    _imageUrlController = TextEditingController(text: item?.imageUrl ?? '');
     _categoryId = item?.categoryId ?? widget.initialCategoryId;
     _isAvailable = item?.isAvailable ?? true;
     _isPublished = item?.isPublished ?? true;
@@ -70,6 +66,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
     _descriptionController.dispose();
     _priceController.dispose();
     _largeSurchargeController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -132,10 +129,10 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                             ),
                             const SizedBox(height: AppSpacing.lg),
                             _ImagePickerCard(
-                              bytes: _imageBytes,
-                              imageUrl: widget.item?.imageUrl ?? '',
-                              isBusy: _isPickingImage || saveState.isLoading,
-                              onPick: _pickImage,
+                              imageUrl: _imageUrlController.text.trim(),
+                              imageUrlController: _imageUrlController,
+                              isBusy: saveState.isLoading,
+                              onUrlChanged: (_) => setState(() {}),
                             ),
                             const SizedBox(height: AppSpacing.lg),
                             _SectionTitle(
@@ -289,43 +286,6 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
     return null;
   }
 
-  Future<void> _pickImage() async {
-    setState(() => _isPickingImage = true);
-    try {
-      final file = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 85,
-        maxWidth: 1600,
-      );
-      if (file == null || !mounted) return;
-      final bytes = await file.readAsBytes();
-      if (bytes.length > 5 * 1024 * 1024) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Choose an image smaller than 5 MB.'),
-            backgroundColor: AppColors.error,
-          ),
-        );
-        return;
-      }
-      setState(() {
-        _imageBytes = bytes;
-        _imageName = file.name;
-      });
-    } catch (_) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('The image could not be selected.'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-    } finally {
-      if (mounted) setState(() => _isPickingImage = false);
-    }
-  }
-
   Future<void> _submit() async {
     final valid = _formKey.currentState?.validate() ?? false;
     if (_categoryId == null) {
@@ -337,7 +297,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
       );
       return;
     }
-    if (_imageBytes == null && (widget.item?.imageUrl.isEmpty ?? true)) {
+    if (_imageUrlController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Select an item image.'),
@@ -363,9 +323,9 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
       categoryId: _categoryId!,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
-      existingImageUrl: _customImageUrl ?? widget.item?.imageUrl ?? '',
-      imageBytes: _imageBytes,
-      imageName: _imageName,
+      existingImageUrl: _imageUrlController.text.trim(),
+      imageBytes: null,
+      imageName: null,
       basePrice: _parseMoney(_priceController.text),
       isAvailable: _isAvailable,
       isPublished: _isPublished,
@@ -384,6 +344,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
 
   String _messageFor(Object? error) {
     if (error is ArgumentError) return error.message.toString();
+    if (error is MenuImageUploadException) return error.message;
     return 'The menu item could not be saved. Please try again.';
   }
 }
@@ -431,23 +392,21 @@ class _FormTopBar extends StatelessWidget {
 
 class _ImagePickerCard extends StatelessWidget {
   const _ImagePickerCard({
-    required this.bytes,
     required this.imageUrl,
+    required this.imageUrlController,
     required this.isBusy,
-    required this.onPick,
+    required this.onUrlChanged,
   });
 
-  final Uint8List? bytes;
   final String imageUrl;
+  final TextEditingController imageUrlController;
   final bool isBusy;
-  final VoidCallback onPick;
+  final ValueChanged<String> onUrlChanged;
 
   @override
   Widget build(BuildContext context) {
     Widget image;
-    if (bytes != null) {
-      image = Image.memory(bytes!, fit: BoxFit.cover);
-    } else if (imageUrl.isNotEmpty) {
+    if (imageUrl.isNotEmpty) {
       image = Image.network(
         imageUrl,
         fit: BoxFit.cover,
@@ -471,25 +430,22 @@ class _ImagePickerCard extends StatelessWidget {
             child: AspectRatio(aspectRatio: 16 / 9, child: image),
           ),
           const SizedBox(height: AppSpacing.sm),
-          OutlinedButton.icon(
-            key: const ValueKey('pick-menu-item-image'),
-            onPressed: isBusy ? null : onPick,
-            icon: isBusy
-                ? const SizedBox.square(
-                    dimension: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Icon(Icons.add_photo_alternate_outlined),
-            label: Text(
-              imageUrl.isEmpty && bytes == null
-                  ? 'Choose image *'
-                  : 'Replace image',
-            ),
-          ),
           Text(
-            'JPG or PNG, up to 5 MB',
+            'Free mode: paste a public image URL. Firebase Storage upload requires Blaze.',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodySmall,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          TextFormField(
+            controller: imageUrlController,
+            enabled: !isBusy,
+            keyboardType: TextInputType.url,
+            onChanged: onUrlChanged,
+            decoration: const InputDecoration(
+              labelText: 'Image URL (free)',
+              hintText: 'https://.../food.jpg',
+              prefixIcon: Icon(Icons.link_rounded),
+            ),
           ),
         ],
       ),

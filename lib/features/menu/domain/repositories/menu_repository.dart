@@ -4,6 +4,16 @@ import '../entities/menu_item.dart';
 import '../entities/menu_item_draft.dart';
 import '../entities/menu_item_feed.dart';
 
+class MenuImageUploadException implements Exception {
+  const MenuImageUploadException(this.message, {this.code});
+
+  final String message;
+  final String? code;
+
+  @override
+  String toString() => message;
+}
+
 /// Menu contract shared by customer browsing
 /// (`specs/002-browse-menu/contracts/menu_repository.md`) and Admin menu
 /// management.

@@ -8,6 +8,11 @@ enum MenuItemDetailStatus { loading, ready, unavailable, error }
 enum MenuItemDetailNotice {
   optionsRemoved,
   reviewsNeedConnection,
+  addedToCart,
+  addToCartFailed,
+
+  /// Kept for compatibility with older callers; new cart actions use
+  /// [addedToCart] or [addToCartFailed].
   addToCartUnavailable,
 }
 

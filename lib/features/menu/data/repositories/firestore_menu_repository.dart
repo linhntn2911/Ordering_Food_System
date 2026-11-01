@@ -197,11 +197,24 @@ class FirestoreMenuRepository implements MenuRepository {
         'menu_items/${reference.id}/${DateTime.now().millisecondsSinceEpoch}.$extension',
       );
       final contentType = extension == 'png' ? 'image/png' : 'image/jpeg';
-      await imageReference.putData(
-        draft.imageBytes!,
-        SettableMetadata(contentType: contentType),
-      );
-      imageUrl = await imageReference.getDownloadURL();
+      try {
+        await imageReference
+            .putData(
+              draft.imageBytes!,
+              SettableMetadata(contentType: contentType),
+            )
+            .timeout(const Duration(seconds: 30));
+        imageUrl = await imageReference.getDownloadURL().timeout(
+          const Duration(seconds: 15),
+        );
+      } on TimeoutException {
+        throw const MenuImageUploadException(
+          'Image upload timed out. Firebase Storage may be unavailable.',
+          code: 'upload-timeout',
+        );
+      } on FirebaseException catch (error) {
+        throw _imageUploadFailure(error);
+      }
     }
 
     var sortOrder = draft.sortOrder;
@@ -294,5 +307,31 @@ class FirestoreMenuRepository implements MenuRepository {
   static String _extension(String? fileName) {
     final normalized = fileName?.toLowerCase() ?? '';
     return normalized.endsWith('.png') ? 'png' : 'jpg';
+  }
+
+  static MenuImageUploadException _imageUploadFailure(FirebaseException error) {
+    final details = '${error.code} ${error.message ?? ''}'.toLowerCase();
+    final requiresBilling =
+        details.contains('quota') ||
+        details.contains('billing') ||
+        details.contains('blaze') ||
+        details.contains('402') ||
+        details.contains('userprojectaccountproblem');
+    if (requiresBilling) {
+      return const MenuImageUploadException(
+        'Firebase Storage requires the Blaze plan. Upgrade the project or keep the current image.',
+        code: 'storage-plan-required',
+      );
+    }
+    if (error.code == 'unauthorized' || error.code == 'permission-denied') {
+      return const MenuImageUploadException(
+        'You do not have permission to upload menu images.',
+        code: 'storage-unauthorized',
+      );
+    }
+    return MenuImageUploadException(
+      error.message ?? 'The image could not be uploaded to Firebase Storage.',
+      code: error.code,
+    );
   }
 }

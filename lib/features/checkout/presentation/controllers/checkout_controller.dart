@@ -8,6 +8,7 @@ import 'package:ordering_food_system/features/cart/data/models/cart_item_model.d
 import 'package:ordering_food_system/features/cart/presentation/controllers/cart_controller.dart';
 import 'package:ordering_food_system/features/checkout/data/checkout_repository.dart';
 import 'package:ordering_food_system/features/checkout/data/models/order_model.dart';
+import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
 
 /// Immutable UI State for the Checkout process
 @immutable
@@ -207,6 +208,10 @@ class CheckoutController extends Notifier<CheckoutState> {
       await ref
           .read(cartControllerProvider.notifier)
           .removePurchasedItems(purchasedIds);
+
+      // The customer shell keeps the order-history tab alive in an
+      // IndexedStack, so refresh it immediately after a successful checkout.
+      ref.invalidate(orderHistoryListProvider);
 
       state = state.copyWith(
         isSubmitting: false,

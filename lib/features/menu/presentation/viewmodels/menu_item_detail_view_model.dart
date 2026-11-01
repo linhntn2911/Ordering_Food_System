@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ordering_food_system/features/cart/data/models/cart_item_model.dart';
+import 'package:ordering_food_system/features/cart/presentation/controllers/cart_controller.dart';
 
 import '../../../reviews/domain/entities/review.dart';
 import '../../../reviews/presentation/review_providers.dart';
@@ -76,13 +78,56 @@ class MenuItemDetailViewModel extends Notifier<MenuItemDetailState> {
   void updateNote(String note) =>
       _updateSelection((selection, _) => selection.withNote(note));
 
-  /// The cart feature does not exist yet; tell the user and keep the
-  /// selection (FR-013).
-  void addToCart() {
+  /// Adds the current configured item to the shared cart (FR-011, BR-006).
+  Future<void> addToCart() async {
     if (!state.canOrder) {
       return;
     }
-    _notice = MenuItemDetailNotice.addToCartUnavailable;
+    final item = state.item;
+    final selection = state.selection;
+    if (item == null || selection == null) return;
+
+    final selectedSize = item.sizes
+        .where((size) => size.id == selection.sizeId)
+        .firstOrNull;
+    final size = selectedSize == null
+        ? const CartOptionItem(id: 'default', name: 'Standard')
+        : CartOptionItem(
+            id: selectedSize.id,
+            name: selectedSize.name,
+            additionalPrice: selectedSize.priceDelta.toDouble(),
+          );
+    final toppings = item.toppings
+        .where((topping) => selection.toppingIds.contains(topping.id))
+        .map(
+          (topping) => CartOptionItem(
+            id: topping.id,
+            name: topping.name,
+            additionalPrice: topping.priceDelta.toDouble(),
+          ),
+        )
+        .toList(growable: false);
+
+    final cartItem = CartItemModel(
+      id: '${item.id}-${DateTime.now().microsecondsSinceEpoch}',
+      menuItemId: item.id,
+      name: item.name,
+      imageUrl: item.imageUrl,
+      basePrice: item.basePrice.toDouble(),
+      selectedSize: size,
+      selectedToppings: toppings,
+      note: selection.trimmedNote.isEmpty ? null : selection.trimmedNote,
+      quantity: selection.quantity,
+      isAvailable: item.isAvailable,
+      createdAt: DateTime.now(),
+    );
+
+    try {
+      await ref.read(cartControllerProvider.notifier).addItem(cartItem);
+      _notice = MenuItemDetailNotice.addedToCart;
+    } catch (_) {
+      _notice = MenuItemDetailNotice.addToCartFailed;
+    }
     _emit();
   }
 

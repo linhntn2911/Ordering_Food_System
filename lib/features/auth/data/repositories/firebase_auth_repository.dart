@@ -17,7 +17,6 @@ class FirebaseAuthRepository implements AuthRepository {
   // In-memory failed attempts tracker for lockout (FR-044 / BR-017)
   int _failedAttempts = 0;
   DateTime? _lockoutUntil;
-  AppUser? _currentSessionUser;
 
   FirebaseAuthRepository(this._firebaseAuth, this._firestore);
 
@@ -67,11 +66,9 @@ class FirebaseAuthRepository implements AuthRepository {
             await docRef.set(profile.toFirestore());
           } catch (_) {}
           final user = profile.toEntity();
-          _currentSessionUser = user;
           return user;
         }
         final user = UserModel.fromFirestore(doc).toEntity();
-        _currentSessionUser = user;
         return user;
       } catch (_) {
         final fallback = AppUser(
@@ -83,7 +80,6 @@ class FirebaseAuthRepository implements AuthRepository {
           role: 'customer',
           status: 'active',
         );
-        _currentSessionUser = fallback;
         return fallback;
       }
     } on FirebaseAuthException catch (e) {
@@ -101,7 +97,9 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Stream<AppUser?> authStateChanges() {
     return _firebaseAuth.authStateChanges().asyncMap((firebaseUser) async {
-      if (firebaseUser == null) return _currentSessionUser;
+      if (firebaseUser == null) {
+        return null;
+      }
       try {
         final doc = await _firestore
             .doc(FirestorePaths.user(firebaseUser.uid))
@@ -110,10 +108,8 @@ class FirebaseAuthRepository implements AuthRepository {
           final user = UserModel.fromFirestore(doc).toEntity();
           if (user.isDisabled) {
             await _firebaseAuth.signOut();
-            _currentSessionUser = null;
             return null;
           }
-          _currentSessionUser = user;
           return user;
         }
         final fallback = AppUser(
@@ -125,7 +121,6 @@ class FirebaseAuthRepository implements AuthRepository {
           role: 'customer',
           status: 'active',
         );
-        _currentSessionUser = fallback;
         return fallback;
       } catch (_) {
         final fallback = AppUser(
@@ -137,7 +132,6 @@ class FirebaseAuthRepository implements AuthRepository {
           role: 'customer',
           status: 'active',
         );
-        _currentSessionUser = fallback;
         return fallback;
       }
     });
@@ -146,7 +140,9 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<AppUser?> getCurrentUser() async {
     final firebaseUser = _firebaseAuth.currentUser;
-    if (firebaseUser == null) return _currentSessionUser;
+    if (firebaseUser == null) {
+      return null;
+    }
 
     try {
       final doc = await _firestore
@@ -245,7 +241,6 @@ class FirebaseAuthRepository implements AuthRepository {
       // Successful sign-in resets failed attempts
       _failedAttempts = 0;
       _lockoutUntil = null;
-      _currentSessionUser = user;
       return user;
     } on FirebaseAuthException catch (e) {
       _failedAttempts++;
@@ -343,7 +338,6 @@ class FirebaseAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {
-    _currentSessionUser = null;
     await _firebaseAuth.signOut();
   }
 }
