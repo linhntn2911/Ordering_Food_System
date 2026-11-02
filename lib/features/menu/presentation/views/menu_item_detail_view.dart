@@ -196,6 +196,10 @@ class _Details extends StatelessWidget {
   Widget build(BuildContext context) {
     final range = item.priceRange;
     final canOrder = state.canOrder;
+    final imageHeight = (MediaQuery.sizeOf(context).width * 3 / 4).clamp(
+      0.0,
+      maxImageHeight,
+    );
 
     return CustomScrollView(
       key: const PageStorageKey('menu-item-detail-scroll'),
@@ -203,21 +207,18 @@ class _Details extends StatelessWidget {
         SliverToBoxAdapter(
           child: Stack(
             children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: maxImageHeight),
-                child: AspectRatio(
-                  aspectRatio: 4 / 3,
-                  child: SizedBox.expand(
-                    child: item.imageUrl.isEmpty
-                        ? const FoodImagePlaceholder()
-                        : Image.network(
-                            item.imageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) =>
-                                const FoodImagePlaceholder(),
-                          ),
-                  ),
-                ),
+              SizedBox(
+                width: double.infinity,
+                height: imageHeight,
+                child: item.imageUrl.isEmpty
+                    ? const FoodImagePlaceholder()
+                    : Image.network(
+                        item.imageUrl,
+                        width: double.infinity,
+                        height: imageHeight,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => const FoodImagePlaceholder(),
+                      ),
               ),
               Positioned(
                 left: horizontalPadding,

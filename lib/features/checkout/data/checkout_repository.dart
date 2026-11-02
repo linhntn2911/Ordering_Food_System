@@ -1,8 +1,12 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/config/restaurant_config.dart';
 import 'package:ordering_food_system/core/errors/failures.dart';
+import 'package:ordering_food_system/core/firebase/firebase_providers.dart';
+import 'package:ordering_food_system/core/firebase/firestore_paths.dart';
 import 'package:ordering_food_system/features/address/data/models/address_model.dart';
 import 'package:ordering_food_system/features/cart/data/cart_repository.dart';
 import 'package:ordering_food_system/features/cart/data/models/cart_item_model.dart';
@@ -16,6 +20,7 @@ abstract class CheckoutRepository {
     required AddressModel deliveryAddress,
     required List<CartItemModel> cartItems,
     required String idempotencyKey,
+    String customerNote = '',
   });
 
   /// Retrieve order by ID
@@ -28,13 +33,14 @@ abstract class CheckoutRepository {
 /// Implementation of CheckoutRepository with atomic verification and idempotency guard
 class CheckoutRepositoryImpl implements CheckoutRepository {
   final CartRepository cartRepository;
+  final FirebaseFirestore? firestore;
 
   // In-memory backing store for demo/offline and fast validation
   final Map<String, OrderModel> _orders = {};
   final Set<String> _processedIdempotencyKeys = {};
   final Map<String, OrderModel> _idempotentOrderCache = {};
 
-  CheckoutRepositoryImpl({required this.cartRepository});
+  CheckoutRepositoryImpl({required this.cartRepository, this.firestore});
 
   @override
   Future<OrderModel> placeOrder({
@@ -42,6 +48,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
     required AddressModel deliveryAddress,
     required List<CartItemModel> cartItems,
     required String idempotencyKey,
+    String customerNote = '',
   }) async {
     // 1. Authenticated customer check (BR-008)
     if (customerId.trim().isEmpty) {
@@ -126,7 +133,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
 
       final calculatedSubtotal = cartItems.fold(
         0.0,
-        (sum, item) => sum + item.subtotal,
+        (runningTotal, item) => runningTotal + item.subtotal,
       );
       final calculatedTotal = calculatedSubtotal + deliveryFee;
 
@@ -151,6 +158,7 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
       );
 
       // 9. Persist Order
+      await _persistOrderToFirestore(order, customerNote.trim());
       _orders[orderId] = order;
       _idempotentOrderCache[idempotencyKey] = order;
 
@@ -171,6 +179,58 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
     }
   }
 
+  Future<void> _persistOrderToFirestore(
+    OrderModel order,
+    String customerNote,
+  ) async {
+    final database = firestore;
+    if (database == null) return;
+
+    final orderRef = database.collection(FirestorePaths.orders).doc(order.id);
+    final batch = database.batch();
+    batch.set(orderRef, {
+      'orderCode': order.orderCode,
+      'customerId': order.customerId,
+      'customerName': order.addressSnapshot.recipientName,
+      'customerPhone': order.addressSnapshot.phoneNumber,
+      'deliveryAddress': order.addressSnapshot.fullAddress,
+      'addressSnapshot': order.addressSnapshot.toMap(),
+      'totalAmount': order.total.round(),
+      'subtotal': order.subtotal.round(),
+      'deliveryFee': order.deliveryFee.round(),
+      'deliveryDistanceKm': order.deliveryDistanceKm,
+      'paymentMethod': 'cod',
+      'paymentStatus': 'unpaid',
+      'orderStatus': 'Pending',
+      'customerNote': customerNote,
+      'cancellationReason': '',
+      'rejectionReason': '',
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    for (var index = 0; index < order.items.length; index++) {
+      final item = order.items[index];
+      final itemRef = orderRef.collection('items').doc('item_$index');
+      batch.set(itemRef, {
+        'menuItemId': item.menuItemId,
+        'name': item.name,
+        'imageUrl': item.imageUrl,
+        'basePrice': item.basePrice.round(),
+        'selectedSize': item.selectedSize.name,
+        'selectedToppings': item.selectedToppings
+            .map((topping) => topping.name)
+            .toList(growable: false),
+        'quantity': item.quantity,
+        'unitPrice': item.unitPrice.round(),
+        'lineTotal': item.subtotal.round(),
+        'note': item.note ?? '',
+        'reviewed': false,
+      });
+    }
+    await batch.commit();
+  }
+
   @override
   Future<OrderModel?> getOrderById(String orderId) async {
     return _orders[orderId];
@@ -188,5 +248,8 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
 /// Provider for CheckoutRepository
 final checkoutRepositoryProvider = Provider<CheckoutRepository>((ref) {
   final cartRepo = ref.watch(cartRepositoryProvider);
-  return CheckoutRepositoryImpl(cartRepository: cartRepo);
+  final firestore = Firebase.apps.isEmpty
+      ? null
+      : ref.watch(firebaseFirestoreProvider);
+  return CheckoutRepositoryImpl(cartRepository: cartRepo, firestore: firestore);
 });
