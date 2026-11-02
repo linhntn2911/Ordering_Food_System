@@ -45,8 +45,25 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
   void initState() {
     super.initState();
     for (int i = 0; i < _codeLength; i++) {
-      _controllers.add(TextEditingController());
-      _focusNodes.add(FocusNode());
+      final controller = TextEditingController();
+      final focusNode = FocusNode();
+      final index = i;
+
+      // Handle backspace navigation smoothly on active focus node
+      focusNode.onKeyEvent = (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.backspace) {
+          if (controller.text.isEmpty && index > 0) {
+            _controllers[index - 1].clear();
+            _focusNodes[index - 1].requestFocus();
+            return KeyEventResult.handled;
+          }
+        }
+        return KeyEventResult.ignored;
+      };
+
+      _controllers.add(controller);
+      _focusNodes.add(focusNode);
     }
 
     // Trigger initial OTP send if not already started
@@ -99,22 +116,12 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
     }
   }
 
-  void _onKeyDown(int index, KeyEvent event) {
-    if (event is KeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.backspace) {
-      if (_controllers[index].text.isEmpty && index > 0) {
-        _focusNodes[index - 1].requestFocus();
-        _controllers[index - 1].text = '';
-      }
-    }
-  }
-
   Future<void> _handleVerify() async {
     final code = _currentCode;
     if (code.length != _codeLength) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Vui lòng nhập đủ 6 chữ số mã OTP.'),
+          content: Text('Please enter all 6 digits of the verification code.'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -158,7 +165,9 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
     if (otp != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Mã OTP mới đã được gửi đến ${widget.args.email}'),
+          content: Text(
+            'A new verification code has been sent to ${widget.args.email}',
+          ),
           backgroundColor: AppColors.success,
         ),
       );
@@ -205,7 +214,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                       height: 1.5,
                     ),
                     children: [
-                      const TextSpan(text: 'Code has been send to '),
+                      const TextSpan(text: 'Code has been sent to '),
                       TextSpan(
                         text: widget.args.email,
                         style: const TextStyle(
@@ -213,7 +222,9 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const TextSpan(text: '.\nThe code will expire in 05:00'),
+                      const TextSpan(
+                        text: '.\nThe code will expire in 5 minutes.',
+                      ),
                     ],
                   ),
                 ),
@@ -259,45 +270,41 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                     final hasFocus = _focusNodes[index].hasFocus;
                     final hasValue = _controllers[index].text.isNotEmpty;
 
-                    return KeyboardListener(
-                      focusNode: FocusNode(),
-                      onKeyEvent: (event) => _onKeyDown(index, event),
-                      child: Container(
-                        width: 48,
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(15),
-                          border: Border.all(
-                            color: (hasFocus || hasValue)
-                                ? AppColors.primaryEnd
-                                : AppColors.borderLight,
-                            width: (hasFocus || hasValue) ? 1.8 : 1.2,
-                          ),
-                          boxShadow: AppSpacing.cardShadow,
+                    return Container(
+                      width: 48,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: (hasFocus || hasValue)
+                              ? AppColors.primaryEnd
+                              : AppColors.borderLight,
+                          width: (hasFocus || hasValue) ? 1.8 : 1.2,
                         ),
-                        child: Center(
-                          child: TextField(
-                            controller: _controllers[index],
-                            focusNode: _focusNodes[index],
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            maxLength: 1,
-                            style: AppTextStyles.headlineMedium.copyWith(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                            decoration: const InputDecoration(
-                              counterText: '',
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            onChanged: (val) => _onDigitChanged(index, val),
+                        boxShadow: AppSpacing.cardShadow,
+                      ),
+                      child: Center(
+                        child: TextField(
+                          controller: _controllers[index],
+                          focusNode: _focusNodes[index],
+                          textAlign: TextAlign.center,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          maxLength: 1,
+                          style: AppTextStyles.headlineMedium.copyWith(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
                           ),
+                          decoration: const InputDecoration(
+                            counterText: '',
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                          onChanged: (val) => _onDigitChanged(index, val),
                         ),
                       ),
                     );

@@ -29,6 +29,7 @@ class ResetPasswordView extends ConsumerStatefulWidget {
 }
 
 class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
+  final _formKey = GlobalKey<FormState>();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -40,6 +41,8 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
   }
 
   Future<void> _handleSubmit() async {
+    if (!_formKey.currentState!.validate()) return;
+
     final success = await ref
         .read(resetPasswordViewModelProvider.notifier)
         .resetPassword(
@@ -132,31 +135,47 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                   const SizedBox(height: AppSpacing.p16),
                 ],
 
-                // New Password Field
-                CustomTextField(
-                  controller: _newPasswordController,
-                  hintText: 'New Password',
-                  isPassword: true,
-                  textInputAction: TextInputAction.next,
-                  prefixIcon: const Icon(
-                    Icons.lock_outline_rounded,
-                    color: AppColors.primarySolid,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.p20),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      // New Password Field
+                      CustomTextField(
+                        controller: _newPasswordController,
+                        hintText: 'New Password',
+                        isPassword: true,
+                        textInputAction: TextInputAction.next,
+                        prefixIcon: const Icon(
+                          Icons.lock_outline_rounded,
+                          color: AppColors.primarySolid,
+                          size: 22,
+                        ),
+                        validator: ref
+                            .read(resetPasswordViewModelProvider.notifier)
+                            .validatePassword,
+                      ),
+                      const SizedBox(height: AppSpacing.p20),
 
-                // Confirm Password Field
-                CustomTextField(
-                  controller: _confirmPasswordController,
-                  hintText: 'Confirm Password',
-                  isPassword: true,
-                  textInputAction: TextInputAction.done,
-                  onSubmitted: (_) => _handleSubmit(),
-                  prefixIcon: const Icon(
-                    Icons.lock_outline_rounded,
-                    color: AppColors.primarySolid,
-                    size: 22,
+                      // Confirm Password Field
+                      CustomTextField(
+                        controller: _confirmPasswordController,
+                        hintText: 'Confirm Password',
+                        isPassword: true,
+                        textInputAction: TextInputAction.done,
+                        onSubmitted: (_) => _handleSubmit(),
+                        prefixIcon: const Icon(
+                          Icons.lock_outline_rounded,
+                          color: AppColors.primarySolid,
+                          size: 22,
+                        ),
+                        validator: (val) => ref
+                            .read(resetPasswordViewModelProvider.notifier)
+                            .validateConfirmPassword(
+                              val,
+                              _newPasswordController.text,
+                            ),
+                      ),
+                    ],
                   ),
                 ),
 

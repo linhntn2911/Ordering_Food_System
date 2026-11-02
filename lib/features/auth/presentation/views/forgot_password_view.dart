@@ -8,8 +8,9 @@ import 'package:ordering_food_system/core/widgets/app_back_button.dart';
 import 'package:ordering_food_system/core/widgets/custom_text_field.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
+import 'package:ordering_food_system/features/auth/domain/repositories/otp_repository.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/forgot_password_view_model.dart';
-import 'package:ordering_food_system/features/auth/presentation/views/auth_success_view.dart';
+import 'package:ordering_food_system/features/auth/presentation/views/otp_verification_view.dart';
 
 class ForgotPasswordView extends ConsumerStatefulWidget {
   const ForgotPasswordView({super.key});
@@ -19,6 +20,7 @@ class ForgotPasswordView extends ConsumerStatefulWidget {
 }
 
 class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
   @override
@@ -28,21 +30,32 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
   }
 
   Future<void> _handleNext() async {
-    final email = _emailController.text.trim();
-    final sent = await ref
-        .read(forgotPasswordViewModelProvider.notifier)
-        .sendResetEmail(email);
+    if (!_formKey.currentState!.validate()) return;
 
-    if (sent && mounted) {
-      Navigator.of(context).pushReplacementNamed(
-        AppRoutes.authSuccess,
-        arguments: AuthSuccessArgs(
-          type: AuthSuccessType.passwordReset,
-          title: 'Check your email',
-          subtitle:
-              'We sent a Firebase password reset link to $email. Open the link to choose a new password.',
+    final email = _emailController.text.trim();
+    final exists = await ref
+        .read(forgotPasswordViewModelProvider.notifier)
+        .verifyEmailExists(email);
+
+    if (exists && mounted) {
+      Navigator.of(context).pushNamed(
+        AppRoutes.otpVerification,
+        arguments: OtpVerificationArgs(
+          email: email,
+          type: OtpType.forgotPassword,
         ),
       );
+    } else if (mounted) {
+      final err = ref.read(forgotPasswordViewModelProvider).errorMessage;
+      if (err != null && err.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(err),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
   }
 
@@ -77,7 +90,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                 ),
                 const SizedBox(height: AppSpacing.p8),
                 Text(
-                  'Enter your registered email. Firebase will send you a secure password reset link.',
+                  'Select which contact details should we use to reset your password',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.5,
@@ -175,17 +188,39 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                   const SizedBox(height: AppSpacing.p16),
                 ],
 
-                CustomTextField(
-                  controller: _emailController,
-                  hintText: 'Enter your email',
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.done,
-                  onChanged: (_) => setState(() {}),
-                  onSubmitted: (_) => _handleNext(),
-                  prefixIcon: const Icon(
-                    Icons.email_outlined,
-                    color: AppColors.primarySolid,
-                    size: 22,
+                Form(
+                  key: _formKey,
+                  child: CustomTextField(
+                    controller: _emailController,
+                    hintText: 'Enter your email',
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.done,
+                    onChanged: (_) {
+                      setState(() {});
+                      if (state.errorMessage != null) {
+                        ref
+                            .read(forgotPasswordViewModelProvider.notifier)
+                            .clearError();
+                      }
+                    },
+                    onSubmitted: (_) => _handleNext(),
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      color: AppColors.primarySolid,
+                      size: 22,
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return 'Please enter your email.';
+                      }
+                      final emailRegex = RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      );
+                      if (!emailRegex.hasMatch(value.trim())) {
+                        return 'Please enter a valid email address.';
+                      }
+                      return null;
+                    },
                   ),
                 ),
                 const Spacer(),
@@ -195,7 +230,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                     width: 160,
                     text: 'Next',
                     isLoading: state.isLoading,
-                    onPressed: _handleNext,
+                    onPressed: state.isLoading ? null : _handleNext,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.p32),

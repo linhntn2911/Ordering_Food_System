@@ -48,7 +48,7 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow create: if validCustomerProfile(userId);
-      allow read: if owns(userId) || isAdmin();
+      allow read: if true;
       allow update: if owns(userId)
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'fullName', 'phone', 'avatarUrl', 'updatedAt'
@@ -212,6 +212,10 @@ service cloud.firestore {
 
     match /user_credentials/{userId} {
       allow read, write: if false;
+    }
+
+    match /registered_identities/{identityKey} {
+      allow read, write: if true;
     }
 
     match /mail/{mailId} {

@@ -142,6 +142,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     controller: _emailController,
                     hintText: 'Email',
                     keyboardType: TextInputType.emailAddress,
+                    onChanged: (_) {
+                      if (state.errorMessage != null) {
+                        ref.read(loginViewModelProvider.notifier).clearError();
+                      }
+                    },
                     prefixIcon: const Icon(
                       Icons.mail_outline_rounded,
                       color: AppColors.primarySolid,
@@ -149,7 +154,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email';
+                        return 'Please enter your email.';
+                      }
+                      final emailRegex = RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      );
+                      if (!emailRegex.hasMatch(value.trim())) {
+                        return 'Please enter a valid email address.';
                       }
                       return null;
                     },
@@ -161,6 +172,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     controller: _passwordController,
                     hintText: 'Password',
                     isPassword: true,
+                    onChanged: (_) {
+                      if (state.errorMessage != null) {
+                        ref.read(loginViewModelProvider.notifier).clearError();
+                      }
+                    },
                     textInputAction: TextInputAction.done,
                     onSubmitted: (_) => _handleLogin(),
                     prefixIcon: const Icon(
@@ -170,7 +186,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return 'Please enter your password.';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters.';
                       }
                       return null;
                     },
