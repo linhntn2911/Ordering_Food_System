@@ -94,11 +94,7 @@ class AddressController extends Notifier<AddressState> {
     _repository = ref.watch(addressRepositoryProvider);
     final userId = ref.watch(currentCustomerIdProvider);
 
-    final initialAddresses = userId != null && userId.isNotEmpty
-        ? _repository.getCachedAddresses(userId)
-        : const <AddressModel>[];
-
-    return AddressState(userId: userId, addresses: initialAddresses);
+    return AddressState(userId: userId, addresses: const []);
   }
 
   String _requireAuth() {

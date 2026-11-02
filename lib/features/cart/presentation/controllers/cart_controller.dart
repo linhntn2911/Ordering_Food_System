@@ -155,11 +155,7 @@ class CartController extends Notifier<CartState> {
     _repository = ref.watch(cartRepositoryProvider);
     final customerId = ref.watch(currentCustomerIdProvider);
 
-    final initialItems = customerId != null && customerId.isNotEmpty
-        ? _repository.getCachedCart(customerId)
-        : const <CartItemModel>[];
-
-    return CartState(customerId: customerId, items: initialItems);
+    return CartState(customerId: customerId, items: const []);
   }
 
   /// Load cart items for customer
