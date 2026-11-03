@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/admin_gate.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_shadows.dart';
@@ -208,10 +209,11 @@ class AdminOrderListScreen extends ConsumerWidget {
                                       }
                                       Navigator.of(context).push(
                                         MaterialPageRoute<void>(
-                                          builder: (_) =>
-                                              AdminOrderDetailsScreen(
-                                                initialOrder: order,
-                                              ),
+                                          builder: (_) => AdminGate(
+                                            child: AdminOrderDetailsScreen(
+                                              initialOrder: order,
+                                            ),
+                                          ),
                                         ),
                                       );
                                     },

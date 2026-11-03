@@ -29,6 +29,10 @@ class OrderFailure extends Failure {
   const OrderFailure(super.message);
 }
 
+class NotificationFailure extends Failure {
+  const NotificationFailure(super.message);
+}
+
 class ValidationFailure extends Failure {
   const ValidationFailure(super.message);
 }

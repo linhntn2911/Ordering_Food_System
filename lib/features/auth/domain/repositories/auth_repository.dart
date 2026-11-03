@@ -25,6 +25,18 @@ abstract class AuthRepository {
     required String password,
   });
 
+  /// Checks whether [email] or [phone] are already registered before sending OTP.
+  /// Throws [ValidationException] or [AuthException] if a duplicate is found.
+  Future<void> checkRegistrationAvailability({
+    required String email,
+    required String phone,
+    String? password,
+  });
+
+  /// Checks whether an account exists with [email] for password recovery.
+  /// Returns true if the email exists in the system, false otherwise.
+  Future<bool> checkEmailExists(String email);
+
   /// Sends a password reset email via Firebase Authentication.
   Future<void> sendPasswordResetEmail(String email);
 

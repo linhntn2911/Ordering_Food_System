@@ -43,7 +43,9 @@ class FirestoreProfileRepository implements ProfileRepository {
         updateData['avatarUrl'] = avatarUrl;
       }
 
-      await _firestore.doc(FirestorePaths.user(uid)).update(updateData);
+      await _firestore
+          .doc(FirestorePaths.user(uid))
+          .set(updateData, SetOptions(merge: true));
     } on AppException {
       rethrow;
     } catch (e) {

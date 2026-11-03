@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../../core/config/restaurant_config.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -11,7 +13,9 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/address_model.dart';
+import '../../domain/entities/resolved_location.dart';
 import '../controllers/address_controller.dart';
+import '../viewmodels/location_selection_view_model.dart';
 
 /// AddEditAddressScreen (Màn hình Thêm hoặc Sửa Địa chỉ - Member 3)
 /// Xác thực đầy đủ form, tọa độ, cự ly và phí giao hàng theo SPEC.md
@@ -27,6 +31,7 @@ class AddEditAddressScreen extends ConsumerStatefulWidget {
 
 class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _mapController = MapController();
 
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
@@ -34,8 +39,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
   late TextEditingController _wardController;
   late TextEditingController _districtController;
   late TextEditingController _cityController;
-  late TextEditingController _latController;
-  late TextEditingController _lngController;
 
   late FocusNode _nameFocus;
   late FocusNode _phoneFocus;
@@ -43,12 +46,11 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
   late FocusNode _wardFocus;
   late FocusNode _districtFocus;
   late FocusNode _cityFocus;
-  late FocusNode _latFocus;
-  late FocusNode _lngFocus;
 
   String _selectedLabel = 'Nhà riêng';
   bool _isDefault = false;
   bool _isSubmitting = false;
+  String? _lastResolvedAddressQuery;
 
   final List<String> _labelOptions = ['Nhà riêng', 'Văn phòng', 'Khác'];
 
@@ -65,12 +67,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     _cityController = TextEditingController(
       text: item?.city ?? 'TP. Hồ Chí Minh',
     );
-    _latController = TextEditingController(
-      text: item?.latitude != null ? item!.latitude.toString() : '10.7720',
-    );
-    _lngController = TextEditingController(
-      text: item?.longitude != null ? item!.longitude.toString() : '106.6980',
-    );
 
     _nameFocus = FocusNode();
     _phoneFocus = FocusNode();
@@ -78,11 +74,14 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     _wardFocus = FocusNode();
     _districtFocus = FocusNode();
     _cityFocus = FocusNode();
-    _latFocus = FocusNode();
-    _lngFocus = FocusNode();
-
     _selectedLabel = item?.label ?? 'Nhà riêng';
     _isDefault = item?.isDefault ?? false;
+
+    Future.microtask(
+      () => ref
+          .read(locationSelectionProvider.notifier)
+          .initialize(widget.initialAddress),
+    );
   }
 
   @override
@@ -93,8 +92,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     _wardController.dispose();
     _districtController.dispose();
     _cityController.dispose();
-    _latController.dispose();
-    _lngController.dispose();
 
     _nameFocus.dispose();
     _phoneFocus.dispose();
@@ -102,39 +99,86 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     _wardFocus.dispose();
     _districtFocus.dispose();
     _cityFocus.dispose();
-    _latFocus.dispose();
-    _lngFocus.dispose();
     super.dispose();
   }
 
-  double? get _currentDistance {
-    final lat = double.tryParse(_latController.text.trim());
-    final lng = double.tryParse(_lngController.text.trim());
-    if (lat == null || lng == null) return null;
-    return RestaurantConfig.calculateDistanceToRestaurant(lat, lng);
+  void _applyResolvedLocation(ResolvedLocation location) {
+    if (location.streetAddress?.trim().isNotEmpty == true) {
+      _streetController.text = location.streetAddress!.trim();
+    }
+    if (location.ward?.trim().isNotEmpty == true) {
+      _wardController.text = location.ward!.trim();
+    }
+    if (location.district?.trim().isNotEmpty == true) {
+      _districtController.text = location.district!.trim();
+    }
+    if (location.city?.trim().isNotEmpty == true) {
+      _cityController.text = location.city!.trim();
+    }
+    _lastResolvedAddressQuery = _normalizedAddressQuery;
+    _mapController.move(LatLng(location.latitude, location.longitude), 16);
   }
 
-  double? get _currentDeliveryFee =>
-      RestaurantConfig.calculateDeliveryFee(_currentDistance);
+  String get _addressQuery => [
+    _streetController.text.trim(),
+    _wardController.text.trim(),
+    _districtController.text.trim(),
+    _cityController.text.trim(),
+    'Việt Nam',
+  ].where((part) => part.isNotEmpty).join(', ');
 
-  void _applyPresetLocation(String name, double lat, double lng) {
-    setState(() {
-      _latController.text = lat.toString();
-      _lngController.text = lng.toString();
-      if (_districtController.text.isEmpty) {
-        _districtController.text = name;
-      }
-    });
-  }
+  String get _normalizedAddressQuery =>
+      _addressQuery.toLowerCase().replaceAll(RegExp(r'\s+'), ' ').trim();
 
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final lat = double.tryParse(_latController.text.trim());
-    final lng = double.tryParse(_lngController.text.trim());
+    var locationState = ref.read(locationSelectionProvider);
+    var location = locationState.location;
+    var distance = locationState.distanceKm;
+    final typedAddressChanged =
+        _lastResolvedAddressQuery != null &&
+        _normalizedAddressQuery != _lastResolvedAddressQuery;
 
-    final distance = _currentDistance;
-    if (distance != null && distance > RestaurantConfig.maxDeliveryDistanceKm) {
+    if (location == null || typedAddressChanged) {
+      setState(() => _isSubmitting = true);
+      final found = await ref
+          .read(locationSelectionProvider.notifier)
+          .findAddress(_addressQuery);
+      if (!mounted) return;
+      locationState = ref.read(locationSelectionProvider);
+      location = locationState.location;
+      distance = locationState.distanceKm;
+
+      if (!found || location == null || distance == null) {
+        setState(() => _isSubmitting = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              locationState.errorMessage ??
+                  'Không thể tự xác định vị trí từ địa chỉ đã nhập.',
+            ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+      _applyResolvedLocation(location);
+    }
+
+    if (distance == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Vui lòng dùng vị trí hiện tại hoặc chạm bản đồ để chọn điểm giao hàng.',
+          ),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      if (_isSubmitting) setState(() => _isSubmitting = false);
+      return;
+    }
+    if (distance > RestaurantConfig.maxDeliveryDistanceKm) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -143,10 +187,11 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
           backgroundColor: AppColors.error,
         ),
       );
+      if (_isSubmitting) setState(() => _isSubmitting = false);
       return;
     }
 
-    setState(() => _isSubmitting = true);
+    if (!_isSubmitting) setState(() => _isSubmitting = true);
 
     final address = AddressModel(
       id: widget.initialAddress?.id ?? '',
@@ -154,12 +199,25 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
       label: _selectedLabel,
       recipientName: _nameController.text.trim(),
       phoneNumber: _phoneController.text.trim(),
-      streetAddress: _streetController.text.trim(),
-      ward: _wardController.text.trim(),
-      district: _districtController.text.trim(),
-      city: _cityController.text.trim(),
-      latitude: lat,
-      longitude: lng,
+      streetAddress: location.streetAddress?.trim().isNotEmpty == true
+          ? location.streetAddress!.trim()
+          : _streetController.text.trim(),
+      ward: location.ward?.trim().isNotEmpty == true
+          ? location.ward!.trim()
+          : _wardController.text.trim(),
+      district: location.district?.trim().isNotEmpty == true
+          ? location.district!.trim()
+          : _districtController.text.trim(),
+      city: location.city?.trim().isNotEmpty == true
+          ? location.city!.trim()
+          : _cityController.text.trim(),
+      latitude: location.latitude,
+      longitude: location.longitude,
+      placeId: location.placeId,
+      locationProvider: locationState.isGeocodingConfigured
+          ? 'geoapify'
+          : 'device',
+      routeDistanceKm: distance,
       isDefault: _isDefault,
       createdAt: widget.initialAddress?.createdAt ?? DateTime.now(),
     );
@@ -194,8 +252,21 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.initialAddress != null;
-    final distance = _currentDistance;
-    final deliveryFee = _currentDeliveryFee;
+    final locationState = ref.watch(locationSelectionProvider);
+    final distance = locationState.distanceKm;
+    final deliveryFee = locationState.deliveryFee;
+
+    ref.listen<LocationSelectionState>(locationSelectionProvider, (
+      previous,
+      next,
+    ) {
+      final location = next.location;
+      if (location != null && location != previous?.location) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _applyResolvedLocation(location);
+        });
+      }
+    });
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -307,7 +378,15 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                 },
               ),
 
-              const SizedBox(height: AppSpacing.s16),
+              const SizedBox(height: AppSpacing.s24),
+
+              _buildLocationPicker(
+                state: locationState,
+                distance: distance,
+                deliveryFee: deliveryFee,
+              ),
+
+              const SizedBox(height: AppSpacing.s20),
 
               // Detailed Street Address
               _buildFieldLabel('Số nhà, tên đường *'),
@@ -371,155 +450,6 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                 controller: _cityController,
                 focusNode: _cityFocus,
                 decoration: _inputDecoration(hint: 'TP. Hồ Chí Minh'),
-              ),
-
-              const SizedBox(height: AppSpacing.s24),
-
-              // Coordinates and Serviceability Section (FR-046, FR-048)
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.s16),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceMuted,
-                  borderRadius: AppRadii.radiusCard,
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.radar_rounded,
-                          color: AppColors.primarySolid,
-                          size: 20,
-                        ),
-                        const SizedBox(width: AppSpacing.s8),
-                        Text(
-                          'Tọa độ & Cự ly giao hàng (FR-046)',
-                          style: AppTextStyles.labelLarge.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.s8),
-                    Text(
-                      'Khoảng cách được tính từ ${RestaurantConfig.name} – '
-                      '${RestaurantConfig.address} (tối đa '
-                      '${RestaurantConfig.maxDeliveryDistanceKm.toStringAsFixed(0)}km).',
-                      style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.s12),
-
-                    // Preset buttons for convenience
-                    Wrap(
-                      spacing: AppSpacing.s8,
-                      runSpacing: AppSpacing.s4,
-                      children: [
-                        _presetChip('Quận 1 (~1.2km)', 10.7720, 106.6980),
-                        _presetChip('Quận 3 (~2.8km)', 10.7850, 106.6850),
-                        _presetChip('Quận 7 (~6.2km)', 10.7320, 106.7150),
-                        _presetChip('Thủ Đức (>10km)', 10.8500, 106.7720),
-                      ],
-                    ),
-
-                    const SizedBox(height: AppSpacing.s12),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _latController,
-                            focusNode: _latFocus,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            decoration: _inputDecoration(hint: 'Vĩ độ (Lat)'),
-                            onChanged: (_) => setState(() {}),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.s12),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _lngController,
-                            focusNode: _lngFocus,
-                            keyboardType: const TextInputType.numberWithOptions(
-                              decimal: true,
-                            ),
-                            decoration: _inputDecoration(hint: 'Kinh độ (Lng)'),
-                            onChanged: (_) => setState(() {}),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    if (distance != null) ...[
-                      const SizedBox(height: AppSpacing.s12),
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.s12),
-                        decoration: BoxDecoration(
-                          color:
-                              distance <= RestaurantConfig.maxDeliveryDistanceKm
-                              ? AppColors.primarySoft
-                              : AppColors.errorSoft,
-                          borderRadius: AppRadii.radiusMedium,
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              distance <= RestaurantConfig.maxDeliveryDistanceKm
-                                  ? Icons.check_circle_rounded
-                                  : Icons.cancel_rounded,
-                              color:
-                                  distance <=
-                                      RestaurantConfig.maxDeliveryDistanceKm
-                                  ? AppColors.primaryEnd
-                                  : AppColors.error,
-                              size: 20,
-                            ),
-                            const SizedBox(width: AppSpacing.s8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Khoảng cách: ${distance.toStringAsFixed(1)} km',
-                                    style: AppTextStyles.labelLarge.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      color:
-                                          distance <=
-                                              RestaurantConfig
-                                                  .maxDeliveryDistanceKm
-                                          ? AppColors.primaryEnd
-                                          : AppColors.error,
-                                    ),
-                                  ),
-                                  Text(
-                                    distance <=
-                                            RestaurantConfig
-                                                .maxDeliveryDistanceKm
-                                        ? 'Phí giao dự kiến: ${CurrencyFormatter.formatVND(deliveryFee ?? 0)}'
-                                        : 'Vượt quá bán kính 8km! Không thể giao hàng đến vị trí này.',
-                                    style: AppTextStyles.bodySmall.copyWith(
-                                      color:
-                                          distance <=
-                                              RestaurantConfig
-                                                  .maxDeliveryDistanceKm
-                                          ? AppColors.textPrimary
-                                          : AppColors.error,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
               ),
 
               const SizedBox(height: AppSpacing.s20),
@@ -593,20 +523,269 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
     );
   }
 
-  Widget _presetChip(String label, double lat, double lng) {
-    return ActionChip(
-      label: Text(label),
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: AppRadii.radiusSmall,
-        side: BorderSide(color: AppColors.border),
+  Widget _buildLocationPicker({
+    required LocationSelectionState state,
+    required double? distance,
+    required double? deliveryFee,
+  }) {
+    final location = state.location;
+    final center = location == null
+        ? const LatLng(
+            RestaurantConfig.restaurantLat,
+            RestaurantConfig.restaurantLng,
+          )
+        : LatLng(location.latitude, location.longitude);
+    final isServiceable =
+        distance != null && distance <= RestaurantConfig.maxDeliveryDistanceKm;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.s16),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: AppRadii.radiusCard,
+        border: Border.all(color: AppColors.border),
       ),
-      labelStyle: const TextStyle(
-        fontFamily: AppTextStyles.fontFamily,
-        fontSize: 12,
-        color: AppColors.textPrimary,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(
+                Icons.location_searching_rounded,
+                color: AppColors.primarySolid,
+                size: 20,
+              ),
+              const SizedBox(width: AppSpacing.s8),
+              Expanded(
+                child: Text(
+                  'Chọn vị trí giao hàng',
+                  style: AppTextStyles.labelLarge.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            'Dùng GPS hoặc chạm bản đồ để đặt ghim. Hãy kiểm tra lại số nhà trước khi lưu.',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.s12),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: FilledButton.icon(
+              onPressed: state.isLoading
+                  ? null
+                  : () => ref
+                        .read(locationSelectionProvider.notifier)
+                        .useCurrentLocation(),
+              icon: state.isLoading
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : const Icon(Icons.my_location_rounded),
+              label: Text(
+                state.isLoading
+                    ? 'Đang xác định vị trí...'
+                    : 'Dùng vị trí hiện tại',
+                style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primarySolid,
+                disabledBackgroundColor: AppColors.primarySolid.withValues(
+                  alpha: 0.55,
+                ),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: AppRadii.radiusInput,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.s12),
+          ClipRRect(
+            borderRadius: AppRadii.radiusMedium,
+            child: SizedBox(
+              height: 260,
+              child: FlutterMap(
+                mapController: _mapController,
+                options: MapOptions(
+                  initialCenter: center,
+                  initialZoom: location == null ? 14 : 16,
+                  minZoom: 10,
+                  maxZoom: 19,
+                  onTap: (_, point) => ref
+                      .read(locationSelectionProvider.notifier)
+                      .selectPoint(
+                        latitude: point.latitude,
+                        longitude: point.longitude,
+                      ),
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.example.ordering_food_system',
+                  ),
+                  MarkerLayer(
+                    markers: [
+                      Marker(
+                        point: const LatLng(
+                          RestaurantConfig.restaurantLat,
+                          RestaurantConfig.restaurantLng,
+                        ),
+                        width: 42,
+                        height: 42,
+                        child: const Tooltip(
+                          message: RestaurantConfig.name,
+                          child: Icon(
+                            Icons.storefront_rounded,
+                            size: 34,
+                            color: AppColors.warning,
+                          ),
+                        ),
+                      ),
+                      if (location != null)
+                        Marker(
+                          point: center,
+                          width: 48,
+                          height: 48,
+                          child: const Icon(
+                            Icons.location_pin,
+                            size: 46,
+                            color: AppColors.primaryEnd,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SimpleAttributionWidget(
+                    source: Text('© OpenStreetMap contributors'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.s8),
+          Text(
+            'Chạm đúng vị trí cổng hoặc mặt tiền nơi nhận hàng.',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          if (!state.isGeocodingConfigured) ...[
+            const SizedBox(height: AppSpacing.s8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppSpacing.s12),
+              decoration: const BoxDecoration(
+                color: AppColors.warningSoft,
+                borderRadius: AppRadii.radiusMedium,
+              ),
+              child: Text(
+                'Chưa cấu hình GEOAPIFY_API_KEY nên app chỉ lấy GPS và tính khoảng cách đường chim bay; địa chỉ sẽ không tự điền.',
+                style: AppTextStyles.bodySmall.copyWith(
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ],
+          if (state.errorMessage != null) ...[
+            const SizedBox(height: AppSpacing.s8),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(AppSpacing.s12),
+              decoration: const BoxDecoration(
+                color: AppColors.errorSoft,
+                borderRadius: AppRadii.radiusMedium,
+              ),
+              child: Text(
+                state.errorMessage!,
+                style: AppTextStyles.bodySmall.copyWith(color: AppColors.error),
+              ),
+            ),
+          ],
+          if (location?.formattedAddress.trim().isNotEmpty == true) ...[
+            const SizedBox(height: AppSpacing.s12),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.place_outlined,
+                  size: 20,
+                  color: AppColors.primaryEnd,
+                ),
+                const SizedBox(width: AppSpacing.s8),
+                Expanded(
+                  child: Text(
+                    location!.formattedAddress,
+                    style: AppTextStyles.bodySmall,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          if (distance != null) ...[
+            const SizedBox(height: AppSpacing.s12),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.s12),
+              decoration: BoxDecoration(
+                color: isServiceable
+                    ? AppColors.primarySoft
+                    : AppColors.errorSoft,
+                borderRadius: AppRadii.radiusMedium,
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    isServiceable
+                        ? Icons.check_circle_rounded
+                        : Icons.cancel_rounded,
+                    color: isServiceable
+                        ? AppColors.primaryEnd
+                        : AppColors.error,
+                    size: 20,
+                  ),
+                  const SizedBox(width: AppSpacing.s8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Khoảng cách: ${distance.toStringAsFixed(1)} km',
+                          style: AppTextStyles.labelLarge.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: isServiceable
+                                ? AppColors.primaryEnd
+                                : AppColors.error,
+                          ),
+                        ),
+                        Text(
+                          isServiceable
+                              ? 'Phí giao dự kiến: ${CurrencyFormatter.formatVND(deliveryFee ?? 0)}'
+                              : 'Ngoài bán kính phục vụ ${RestaurantConfig.maxDeliveryDistanceKm.toStringAsFixed(0)} km.',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color: isServiceable
+                                ? AppColors.textPrimary
+                                : AppColors.error,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
-      onPressed: () => _applyPresetLocation(label, lat, lng),
     );
   }
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/admin_gate.dart';
+import '../../../../core/firebase/firebase_providers.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_shadows.dart';
@@ -9,6 +11,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_time_formatter.dart';
 import '../../../../core/widgets/gradient_button.dart';
+import '../../../auth/presentation/viewmodels/auth_providers.dart';
 import '../../domain/entities/food_order.dart';
 import '../../domain/entities/order_item.dart';
 import '../../domain/entities/order_status.dart';
@@ -17,12 +20,30 @@ import '../viewmodels/admin_order_details_view_model.dart';
 import '../widgets/order_status_chip.dart';
 
 class AdminOrderDetailsScreen extends ConsumerWidget {
-  const AdminOrderDetailsScreen({required this.initialOrder, super.key});
+  const AdminOrderDetailsScreen({
+    required this.initialOrder,
+    this.requireAdminSession = true,
+    super.key,
+  });
 
   final FoodOrder initialOrder;
+  final bool requireAdminSession;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (requireAdminSession) {
+      final authState = ref.watch(authStateProvider);
+      final user = authState.value;
+      final firebaseUser = ref.watch(firebaseAuthProvider).currentUser;
+      if (firebaseUser == null ||
+          user == null ||
+          user.id != firebaseUser.uid ||
+          !user.isAdmin ||
+          !user.isActive) {
+        return const AdminGate(child: SizedBox.shrink());
+      }
+    }
+
     final orderAsync = ref.watch(adminOrderProvider(initialOrder.id));
     final order = orderAsync.value ?? initialOrder;
     final action = ref.watch(adminOrderActionProvider);
@@ -33,6 +54,11 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
         SnackBar(
           content: Text(_friendlyError(next.error!)),
           backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(AppSpacing.md),
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadii.radiusMedium,
+          ),
         ),
       );
     });
@@ -89,6 +115,24 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                         ],
                         const SizedBox(height: AppSpacing.lg),
                         _CustomerCard(order: order),
+                        const SizedBox(height: AppSpacing.md),
+                        _SectionCard(
+                          title: 'Customer note',
+                          icon: Icons.sticky_note_2_rounded,
+                          child: Text(
+                            order.customerNote.isEmpty
+                                ? 'No note was provided for this order.'
+                                : order.customerNote,
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: order.customerNote.isEmpty
+                                  ? AppColors.textMuted
+                                  : AppColors.textPrimary,
+                              fontStyle: order.customerNote.isEmpty
+                                  ? FontStyle.italic
+                                  : FontStyle.normal,
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: AppSpacing.md),
                         _SectionCard(
                           title: 'Order items',
@@ -296,14 +340,6 @@ class _CustomerCard extends StatelessWidget {
               ? '${order.deliveryDistanceKm.toStringAsFixed(1)} km from restaurant'
               : 'Delivery address',
         ),
-        if (order.customerNote.isNotEmpty) ...[
-          const SizedBox(height: AppSpacing.sm),
-          _InfoRow(
-            icon: Icons.sticky_note_2_rounded,
-            title: 'Customer note',
-            subtitle: order.customerNote,
-          ),
-        ],
       ],
     ),
   );
@@ -629,10 +665,16 @@ class _OrderActions extends StatelessWidget {
                         key: const ValueKey('reject-order-button'),
                         onPressed: loading ? null : () => _showReject(context),
                         icon: const Icon(Icons.close_rounded),
-                        label: const Text('Reject'),
+                        label: const Text(
+                          'Reject',
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.clip,
+                        ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.error,
                           minimumSize: const Size(0, 56),
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
                         ),
                       ),
                     ),
@@ -659,19 +701,26 @@ class _OrderActions extends StatelessWidget {
   }
 
   Future<void> _confirm(BuildContext context, OrderStatus target) async {
+    final title = switch (target) {
+      OrderStatus.confirmed => 'Xác nhận đơn hàng?',
+      OrderStatus.preparing => 'Bắt đầu chuẩn bị món?',
+      OrderStatus.outForDelivery => 'Chuyển sang giao hàng?',
+      OrderStatus.completed => 'Đánh dấu đã hoàn thành?',
+      _ => 'Cập nhật trạng thái đơn?',
+    };
     final approved = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Move to ${target.label}?'),
-        content: const Text('This update will be added to the order history.'),
+        title: Text(title),
+        content: const Text('Thay đổi này sẽ được lưu vào lịch sử đơn hàng.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('Hủy'),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Confirm'),
+            child: const Text('Xác nhận'),
           ),
         ],
       ),
@@ -741,15 +790,18 @@ class _InlineError extends StatelessWidget {
 
 String _friendlyError(Object error) {
   final value = error.toString().toLowerCase();
-  if (value.contains('permission-denied') || value.contains('sign-in')) {
-    return 'Admin sign-in is required to update this order.';
+  if (value.contains('sign-in')) {
+    return 'Bạn cần đăng nhập bằng tài khoản Admin để cập nhật đơn hàng.';
+  }
+  if (value.contains('permission-denied')) {
+    return 'Tài khoản hiện tại không có quyền cập nhật đơn hàng này.';
   }
   if (value.contains('updated by another') ||
       value.contains('updated. refresh')) {
-    return 'The order changed. Refresh it before trying again.';
+    return 'Đơn hàng đã thay đổi. Hãy tải lại trước khi thử lại.';
   }
   if (error is ArgumentError) {
     return error.message?.toString() ?? 'Check the order update.';
   }
-  return 'The order could not be updated. Please try again.';
+  return 'Không thể cập nhật đơn hàng. Vui lòng thử lại.';
 }

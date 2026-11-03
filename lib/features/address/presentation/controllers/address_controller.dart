@@ -1,10 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/errors/failures.dart';
-import 'package:ordering_food_system/features/cart/presentation/controllers/cart_controller.dart';
+import 'package:ordering_food_system/core/firebase/firebase_providers.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 
 import '../../data/address_repository.dart';
 import '../../data/models/address_model.dart';
+
+/// Resolves the real Firebase UID and remains overrideable in unit tests.
+final addressUserIdProvider = Provider<String?>((ref) {
+  // Watching authStateProvider makes this provider refresh on sign-in/sign-out.
+  // FirebaseAuth remains authoritative so a stale cached profile cannot keep a
+  // signed-out user attached to an address book.
+  ref.watch(authStateProvider);
+  return ref.watch(firebaseAuthProvider).currentUser?.uid;
+});
 
 /// Immutable State for Address Feature
 @immutable
@@ -92,7 +102,17 @@ class AddressController extends Notifier<AddressState> {
   @override
   AddressState build() {
     _repository = ref.watch(addressRepositoryProvider);
-    final userId = ref.watch(currentCustomerIdProvider);
+    final userId = ref.watch(addressUserIdProvider);
+
+    if (userId != null && userId.trim().isNotEmpty) {
+      Future.microtask(() {
+        if (state.userId == userId &&
+            state.addresses.isEmpty &&
+            !state.isLoading) {
+          loadAddresses(userId);
+        }
+      });
+    }
 
     return AddressState(userId: userId, addresses: const []);
   }

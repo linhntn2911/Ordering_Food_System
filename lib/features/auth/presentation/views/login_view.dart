@@ -11,12 +11,24 @@ import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_logo.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
 import 'package:ordering_food_system/core/widgets/social_login_button.dart';
+import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/login_view_model.dart';
 import 'package:ordering_food_system/features/profile/presentation/viewmodels/profile_view_model.dart';
 
+/// Arguments for [AppRoutes.login].
+class LoginArgs {
+  const LoginArgs({this.returnToCaller = false});
+
+  /// When true, a signed-in Customer is popped back to the screen that
+  /// opened Login (with result `true`) instead of being sent to Home.
+  final bool returnToCaller;
+}
+
 class LoginView extends ConsumerStatefulWidget {
-  const LoginView({super.key});
+  const LoginView({super.key, this.args = const LoginArgs()});
+
+  final LoginArgs args;
 
   @override
   ConsumerState<LoginView> createState() => _LoginViewState();
@@ -53,14 +65,23 @@ class _LoginViewState extends ConsumerState<LoginView> {
         );
 
     if (user != null && mounted) {
-      ref.invalidate(authStateProvider);
-      ref.invalidate(profileViewModelProvider);
-
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        user.isAdmin ? AppRoutes.adminDashboard : AppRoutes.home,
-        (route) => false,
-      );
+      _onSignedIn(user);
     }
+  }
+
+  void _onSignedIn(AppUser user) {
+    ref.invalidate(authStateProvider);
+    ref.invalidate(profileViewModelProvider);
+
+    final navigator = Navigator.of(context);
+    if (widget.args.returnToCaller && !user.isAdmin && navigator.canPop()) {
+      navigator.pop(true);
+      return;
+    }
+    navigator.pushNamedAndRemoveUntil(
+      user.isAdmin ? AppRoutes.adminDashboard : AppRoutes.home,
+      (route) => false,
+    );
   }
 
   @override
@@ -142,6 +163,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     controller: _emailController,
                     hintText: 'Email',
                     keyboardType: TextInputType.emailAddress,
+                    onChanged: (_) {
+                      if (state.errorMessage != null) {
+                        ref.read(loginViewModelProvider.notifier).clearError();
+                      }
+                    },
                     prefixIcon: const Icon(
                       Icons.mail_outline_rounded,
                       color: AppColors.primarySolid,
@@ -149,7 +175,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email';
+                        return 'Please enter your email.';
+                      }
+                      final emailRegex = RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      );
+                      if (!emailRegex.hasMatch(value.trim())) {
+                        return 'Please enter a valid email address.';
                       }
                       return null;
                     },
@@ -161,6 +193,11 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     controller: _passwordController,
                     hintText: 'Password',
                     isPassword: true,
+                    onChanged: (_) {
+                      if (state.errorMessage != null) {
+                        ref.read(loginViewModelProvider.notifier).clearError();
+                      }
+                    },
                     textInputAction: TextInputAction.done,
                     onSubmitted: (_) => _handleLogin(),
                     prefixIcon: const Icon(
@@ -170,7 +207,10 @@ class _LoginViewState extends ConsumerState<LoginView> {
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter your password';
+                        return 'Please enter your password.';
+                      }
+                      if (value.length < 6) {
+                        return 'Password must be at least 6 characters.';
                       }
                       return null;
                     },
@@ -275,15 +315,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                 .signInWithGoogle();
                             if (!context.mounted) return;
                             if (user != null) {
-                              ref.invalidate(authStateProvider);
-                              ref.invalidate(profileViewModelProvider);
-
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                user.isAdmin
-                                    ? AppRoutes.adminDashboard
-                                    : AppRoutes.home,
-                                (route) => false,
-                              );
+                              _onSignedIn(user);
                             }
                           },
                         ),

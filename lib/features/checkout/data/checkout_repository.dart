@@ -28,6 +28,12 @@ abstract class CheckoutRepository {
 
   /// Retrieve all orders placed by the customer
   Future<List<OrderModel>> getCustomerOrders(String customerId);
+
+  /// Watch all customer orders so Admin status changes appear immediately.
+  Stream<List<OrderModel>> watchCustomerOrders(String customerId);
+
+  /// Watch one customer-owned order by document ID or public order code.
+  Stream<OrderModel?> watchCustomerOrder(String customerId, String orderId);
 }
 
 /// Implementation of CheckoutRepository with atomic verification and idempotency guard
@@ -113,10 +119,11 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
         );
       }
 
-      final distanceKm = RestaurantConfig.calculateDistanceToRestaurant(
-        lat,
-        lng,
-      );
+      // Prefer the driving-route distance resolved while the Customer confirms
+      // the map pin; older addresses fall back to the Haversine calculation.
+      final distanceKm =
+          deliveryAddress.routeDistanceKm ??
+          RestaurantConfig.calculateDistanceToRestaurant(lat, lng);
       if (distanceKm > RestaurantConfig.maxDeliveryDistanceKm) {
         throw CheckoutFailure(
           'Khoảng cách giao hàng là ${distanceKm.toStringAsFixed(1)}km, vượt quá bán kính phục vụ 8km của nhà hàng. Vui lòng chọn địa chỉ khác.',
@@ -231,95 +238,151 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
     await batch.commit();
   }
 
+  Future<OrderModel> _fromFirestoreDocument(
+    DocumentSnapshot<Map<String, dynamic>> document,
+  ) async {
+    final data = document.data() ?? const <String, dynamic>{};
+    final itemSnapshot = await document.reference.collection('items').get();
+    final items = itemSnapshot.docs
+        .map((itemDocument) {
+          final item = itemDocument.data();
+          final sizeName = item['selectedSize']?.toString() ?? '';
+          final toppings =
+              (item['selectedToppings'] as List<dynamic>? ?? const [])
+                  .map(
+                    (topping) => CartOptionItem(
+                      id: topping.toString(),
+                      name: topping.toString(),
+                    ),
+                  )
+                  .toList(growable: false);
+          final unitPrice = (item['unitPrice'] as num?)?.toDouble() ?? 0;
+          final quantity = (item['quantity'] as num?)?.toInt() ?? 1;
+          return OrderItemSnapshot(
+            menuItemId: item['menuItemId']?.toString() ?? '',
+            name: item['name']?.toString() ?? 'Món ăn',
+            imageUrl: item['imageUrl']?.toString() ?? '',
+            basePrice: (item['basePrice'] as num?)?.toDouble() ?? unitPrice,
+            selectedSize: CartOptionItem(id: sizeName, name: sizeName),
+            selectedToppings: toppings,
+            note: item['note']?.toString(),
+            unitPrice: unitPrice,
+            quantity: quantity,
+            subtotal:
+                (item['lineTotal'] as num?)?.toDouble() ??
+                (unitPrice * quantity),
+          );
+        })
+        .toList(growable: false);
+
+    final addressData = data['addressSnapshot'];
+    final createdAt = data['createdAt'];
+    final updatedAt = data['updatedAt'];
+    return OrderModel(
+      id: document.id,
+      orderCode: data['orderCode']?.toString() ?? document.id,
+      customerId: data['customerId']?.toString() ?? '',
+      items: items,
+      addressSnapshot: OrderAddressSnapshot.fromMap(
+        addressData is Map<String, dynamic>
+            ? addressData
+            : <String, dynamic>{
+                'fullAddress': data['deliveryAddress']?.toString() ?? '',
+              },
+      ),
+      deliveryDistanceKm: (data['deliveryDistanceKm'] as num?)?.toDouble() ?? 0,
+      deliveryFee: (data['deliveryFee'] as num?)?.toDouble() ?? 0,
+      subtotal: (data['subtotal'] as num?)?.toDouble() ?? 0,
+      total: (data['totalAmount'] as num?)?.toDouble() ?? 0,
+      paymentMethod: data['paymentMethod']?.toString().toUpperCase() ?? 'COD',
+      status: OrderStatusExtension.fromDbString(
+        data['orderStatus']?.toString(),
+      ),
+      cancellationReason: data['cancellationReason']?.toString(),
+      rejectionReason: data['rejectionReason']?.toString(),
+      createdAt: createdAt is Timestamp ? createdAt.toDate() : DateTime.now(),
+      updatedAt: updatedAt is Timestamp ? updatedAt.toDate() : null,
+    );
+  }
+
   @override
   Future<OrderModel?> getOrderById(String orderId) async {
-    return _orders[orderId];
+    final database = firestore;
+    if (database == null) return _orders[orderId];
+
+    final direct = await database
+        .collection(FirestorePaths.orders)
+        .doc(orderId)
+        .get();
+    if (direct.exists) return _fromFirestoreDocument(direct);
+
+    final byCode = await database
+        .collection(FirestorePaths.orders)
+        .where('orderCode', isEqualTo: orderId)
+        .limit(1)
+        .get();
+    if (byCode.docs.isEmpty) return null;
+    return _fromFirestoreDocument(byCode.docs.first);
   }
 
   @override
   Future<List<OrderModel>> getCustomerOrders(String customerId) async {
     final database = firestore;
-    final remote = database == null
-        ? const <OrderModel>[]
-        : await _fetchCustomerOrdersFromFirestore(database, customerId);
-    final byId = <String, OrderModel>{
-      for (final order in _orders.values)
-        if (order.customerId == customerId) order.id: order,
-      for (final order in remote) order.id: order,
-    };
-    final list = byId.values.toList()
-      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    if (database != null) {
+      final snapshot = await database
+          .collection(FirestorePaths.orders)
+          .where('customerId', isEqualTo: customerId)
+          .orderBy('createdAt', descending: true)
+          .get();
+      final orders = await Future.wait(
+        snapshot.docs.map(_fromFirestoreDocument),
+      );
+      for (final order in orders) {
+        _orders[order.id] = order;
+      }
+      return List.unmodifiable(orders);
+    }
+
+    final list =
+        _orders.values.where((order) => order.customerId == customerId).toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return List.unmodifiable(list);
   }
 
-  Future<List<OrderModel>> _fetchCustomerOrdersFromFirestore(
-    FirebaseFirestore database,
-    String customerId,
-  ) async {
-    final snapshot = await database
+  @override
+  Stream<List<OrderModel>> watchCustomerOrders(String customerId) {
+    final database = firestore;
+    if (database == null) {
+      final orders =
+          _orders.values
+              .where((order) => order.customerId == customerId)
+              .toList(growable: false)
+            ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return Stream.value(List<OrderModel>.unmodifiable(orders));
+    }
+
+    return database
         .collection(FirestorePaths.orders)
         .where('customerId', isEqualTo: customerId)
-        .get();
-    final orders = <OrderModel>[];
-    for (final doc in snapshot.docs) {
-      final itemsSnapshot = await doc.reference.collection('items').get();
-      orders.add(
-        _orderFromFirestore(
-          doc.id,
-          doc.data(),
-          itemsSnapshot.docs.map((item) => item.data()).toList(),
-        ),
-      );
-    }
-    return orders;
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .asyncMap((snapshot) async {
+          final orders = await Future.wait(
+            snapshot.docs.map(_fromFirestoreDocument),
+          );
+          for (final order in orders) {
+            _orders[order.id] = order;
+          }
+          return List<OrderModel>.unmodifiable(orders);
+        });
   }
 
-  OrderModel _orderFromFirestore(
-    String id,
-    Map<String, dynamic> data,
-    List<Map<String, dynamic>> items,
-  ) {
-    return OrderModel(
-      id: id,
-      orderCode: data['orderCode'] as String? ?? id,
-      customerId: data['customerId'] as String? ?? '',
-      items: items.map(_itemFromFirestore).toList(growable: false),
-      addressSnapshot: OrderAddressSnapshot.fromMap(
-        data['addressSnapshot'] as Map<String, dynamic>? ?? const {},
-      ),
-      deliveryDistanceKm:
-          (data['deliveryDistanceKm'] as num?)?.toDouble() ?? 0.0,
-      deliveryFee: (data['deliveryFee'] as num?)?.toDouble() ?? 0.0,
-      subtotal: (data['subtotal'] as num?)?.toDouble() ?? 0.0,
-      total: (data['totalAmount'] as num?)?.toDouble() ?? 0.0,
-      paymentMethod: 'COD',
-      status: OrderStatusExtension.fromDbString(
-        (data['orderStatus'] ?? data['status']) as String?,
-      ),
-      cancellationReason: data['cancellationReason'] as String?,
-      rejectionReason: data['rejectionReason'] as String?,
-      createdAt:
-          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
-    );
-  }
-
-  OrderItemSnapshot _itemFromFirestore(Map<String, dynamic> data) {
-    final sizeName = data['selectedSize'] as String? ?? '';
-    final toppingNames = data['selectedToppings'] as List<dynamic>? ?? const [];
-    return OrderItemSnapshot(
-      menuItemId: data['menuItemId'] as String? ?? '',
-      name: data['name'] as String? ?? '',
-      imageUrl: data['imageUrl'] as String? ?? '',
-      basePrice: (data['basePrice'] as num?)?.toDouble() ?? 0.0,
-      selectedSize: CartOptionItem(id: sizeName, name: sizeName),
-      selectedToppings: toppingNames
-          .map((name) => CartOptionItem(id: name as String, name: name))
-          .toList(growable: false),
-      note: data['note'] as String?,
-      unitPrice: (data['unitPrice'] as num?)?.toDouble() ?? 0.0,
-      quantity: (data['quantity'] as num?)?.toInt() ?? 1,
-      subtotal: (data['lineTotal'] as num?)?.toDouble() ?? 0.0,
+  @override
+  Stream<OrderModel?> watchCustomerOrder(String customerId, String orderId) {
+    return watchCustomerOrders(customerId).map(
+      (orders) => orders
+          .where((order) => order.id == orderId || order.orderCode == orderId)
+          .firstOrNull,
     );
   }
 }

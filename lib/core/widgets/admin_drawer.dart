@@ -8,12 +8,6 @@ import '../theme/app_gradients.dart';
 import '../theme/app_radii.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
-import '../../features/category/presentation/views/category_management_screen.dart';
-import '../../features/menu/presentation/views/admin_menu_item_list_screen.dart';
-import '../../features/order/presentation/views/admin_dashboard_screen.dart';
-import '../../features/order/presentation/views/admin_order_list_screen.dart';
-import '../../features/notifications/views/screens/admin_broadcast_screen.dart';
-import '../../features/order/presentation/views/sales_report_screen.dart';
 
 enum AdminDestination {
   dashboard,
@@ -37,37 +31,22 @@ class AdminDrawer extends StatelessWidget {
 
     Navigator.of(context).pop();
 
-    Widget target;
-    switch (destination) {
-      case AdminDestination.dashboard:
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute<void>(builder: (_) => const AdminDashboardScreen()),
-          (route) => false,
-        );
-        return;
-      case AdminDestination.categories:
-        target = const CategoryManagementScreen();
-        break;
-      case AdminDestination.menuItems:
-        target = const AdminMenuItemListScreen();
-        break;
-      case AdminDestination.orders:
-        target = const AdminOrderListScreen();
-        break;
-      case AdminDestination.salesReport:
-        target = const SalesReportScreen();
-        break;
-      case AdminDestination.broadcasts:
-        target = const AdminBroadcastScreen();
-        break;
-    }
+    final targetRoute = switch (destination) {
+      AdminDestination.dashboard => AppRoutes.adminDashboard,
+      AdminDestination.categories => AppRoutes.adminCategories,
+      AdminDestination.menuItems => AppRoutes.adminMenuItems,
+      AdminDestination.orders => AppRoutes.adminOrders,
+      AdminDestination.salesReport => AppRoutes.adminSalesReport,
+      AdminDestination.broadcasts => AppRoutes.adminBroadcast,
+    };
 
-    if (currentDestination == AdminDestination.dashboard) {
+    if (destination == AdminDestination.dashboard) {
       Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => target));
+          .pushNamedAndRemoveUntil(targetRoute, (route) => false);
+    } else if (currentDestination == AdminDestination.dashboard) {
+      Navigator.of(context).pushNamed(targetRoute);
     } else {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute<void>(builder: (_) => target));
+      Navigator.of(context).pushReplacementNamed(targetRoute);
     }
   }
 
@@ -299,10 +278,7 @@ class AdminDrawer extends StatelessWidget {
                         ).read(authRepositoryProvider).signOut();
                       } catch (_) {}
                       if (context.mounted) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.login,
-                          (route) => false,
-                        );
+                        AppRoutes.openLoginOverHome(Navigator.of(context));
                       }
                     },
                   ),
@@ -322,7 +298,7 @@ class AdminDrawer extends StatelessWidget {
                   const SizedBox(width: AppSpacing.xs),
                   Expanded(
                     child: Text(
-                      'Ngô Chicken · Food Ninja',
+                      'Ngô Chicken',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextStyles.labelSmall.copyWith(

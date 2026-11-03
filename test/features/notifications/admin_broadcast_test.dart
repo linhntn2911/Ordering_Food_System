@@ -14,15 +14,13 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           notificationRepositoryProvider.overrideWithValue(
-            MockNotificationRepository(),
+            _FakeNotificationRepository(),
           ),
         ],
       );
       addTearDown(container.dispose);
 
-      final notifier = container.read(
-        adminBroadcastViewModelProvider.notifier,
-      );
+      final notifier = container.read(adminBroadcastViewModelProvider.notifier);
 
       final success = await notifier.sendBroadcast(
         title: '   ',
@@ -40,15 +38,13 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           notificationRepositoryProvider.overrideWithValue(
-            MockNotificationRepository(),
+            _FakeNotificationRepository(),
           ),
         ],
       );
       addTearDown(container.dispose);
 
-      final notifier = container.read(
-        adminBroadcastViewModelProvider.notifier,
-      );
+      final notifier = container.read(adminBroadcastViewModelProvider.notifier);
 
       final success = await notifier.sendBroadcast(
         title: 'Siêu sale 50%',
@@ -62,34 +58,37 @@ void main() {
       expect(state.isSuccess, isFalse);
     });
 
-    test('Successfully broadcasts promo notification and adds to repository', () async {
-      final repo = MockNotificationRepository();
-      final container = ProviderContainer(
-        overrides: [notificationRepositoryProvider.overrideWithValue(repo)],
-      );
-      addTearDown(container.dispose);
+    test(
+      'Successfully broadcasts promo notification and adds to repository',
+      () async {
+        final repo = _FakeNotificationRepository();
+        final container = ProviderContainer(
+          overrides: [notificationRepositoryProvider.overrideWithValue(repo)],
+        );
+        addTearDown(container.dispose);
 
-      final notifier = container.read(
-        adminBroadcastViewModelProvider.notifier,
-      );
+        final notifier = container.read(
+          adminBroadcastViewModelProvider.notifier,
+        );
 
-      final success = await notifier.sendBroadcast(
-        title: 'Siêu giảm giá gà rán 25%',
-        body: 'Áp dụng cho toàn bộ combo gia đình hôm nay!',
-        type: NotificationType.promo,
-      );
+        final success = await notifier.sendBroadcast(
+          title: 'Siêu giảm giá gà rán 25%',
+          body: 'Áp dụng cho toàn bộ combo gia đình hôm nay!',
+          type: NotificationType.promo,
+        );
 
-      expect(success, isTrue);
-      final state = container.read(adminBroadcastViewModelProvider);
-      expect(state.isSuccess, isTrue);
-      expect(state.errorMessage, isNull);
+        expect(success, isTrue);
+        final state = container.read(adminBroadcastViewModelProvider);
+        expect(state.isSuccess, isTrue);
+        expect(state.errorMessage, isNull);
 
-      final notifications = await repo.getNotifications();
-      final added = notifications.first;
-      expect(added.title, 'Siêu giảm giá gà rán 25%');
-      expect(added.body, 'Áp dụng cho toàn bộ combo gia đình hôm nay!');
-      expect(added.type, NotificationType.promo);
-    });
+        final notifications = await repo.getNotifications();
+        final added = notifications.first;
+        expect(added.title, 'Siêu giảm giá gà rán 25%');
+        expect(added.body, 'Áp dụng cho toàn bộ combo gia đình hôm nay!');
+        expect(added.type, NotificationType.promo);
+      },
+    );
   });
 
   group('AdminBroadcastScreen Widget Tests', () {
@@ -100,7 +99,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
 
-      final repo = MockNotificationRepository();
+      final repo = _FakeNotificationRepository();
 
       await tester.pumpWidget(
         ProviderScope(
@@ -123,8 +122,14 @@ void main() {
       expect(find.text('Hệ thống'), findsWidgets);
 
       // Verify Form inputs
-      expect(find.byKey(const ValueKey('broadcast-title-input')), findsOneWidget);
-      expect(find.byKey(const ValueKey('broadcast-body-input')), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('broadcast-title-input')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey('broadcast-body-input')),
+        findsOneWidget,
+      );
       expect(
         find.byKey(const ValueKey('broadcast-send-button')),
         findsOneWidget,
@@ -167,4 +172,56 @@ void main() {
       );
     });
   });
+}
+
+/// Test-only repository. The production provider is Firestore-backed and does
+/// not ship notification sample data to Customers.
+class _FakeNotificationRepository implements NotificationRepository {
+  final List<NotificationModel> _items = [
+    NotificationModel(
+      id: 'test-promo',
+      title: 'Ưu đãi hôm nay',
+      body: 'Ưu đãi chỉ dùng cho kiểm thử giao diện.',
+      type: NotificationType.promo,
+      createdAt: DateTime(2026, 11, 3),
+    ),
+  ];
+
+  @override
+  Future<NotificationModel> broadcastNotification({
+    required String title,
+    required String body,
+    required NotificationType type,
+  }) async {
+    final notification = NotificationModel(
+      id: 'test-${_items.length + 1}',
+      title: title,
+      body: body,
+      type: type,
+      createdAt: DateTime.now(),
+    );
+    _items.insert(0, notification);
+    return notification;
+  }
+
+  @override
+  Future<List<NotificationModel>> getNotifications() async =>
+      List.unmodifiable(_items);
+
+  @override
+  Future<void> markAllAsRead() async {
+    for (var index = 0; index < _items.length; index++) {
+      _items[index] = _items[index].copyWith(isRead: true);
+    }
+  }
+
+  @override
+  Future<void> markAsRead(String notificationId) async {
+    final index = _items.indexWhere((item) => item.id == notificationId);
+    if (index >= 0) _items[index] = _items[index].copyWith(isRead: true);
+  }
+
+  @override
+  Stream<List<NotificationModel>> watchNotifications() =>
+      Stream.value(List.unmodifiable(_items));
 }

@@ -12,4 +12,11 @@ class OrderHistoryRepositoryImpl implements OrderHistoryRepository {
 
   @override
   Future<OrderModel?> getOrderById(String orderId) async => null;
+
+  @override
+  Stream<List<OrderModel>> watchOrders({String? filter}) =>
+      Stream.value(const []);
+
+  @override
+  Stream<OrderModel?> watchOrderById(String orderId) => Stream.value(null);
 }

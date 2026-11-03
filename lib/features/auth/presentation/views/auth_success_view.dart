@@ -22,6 +22,16 @@ class AuthSuccessView extends StatelessWidget {
 
   const AuthSuccessView({super.key, required this.args});
 
+  void _handleNavigate(BuildContext context) {
+    if (args.type == AuthSuccessType.registration) {
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+    } else {
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isRegistration = args.type == AuthSuccessType.registration;
@@ -30,96 +40,91 @@ class AuthSuccessView extends StatelessWidget {
         args.subtitle ??
         (isRegistration
             ? 'Your Profile Is Ready To Use'
-            : 'Password reset succesful');
+            : 'Password reset successful');
     final buttonText = isRegistration ? 'Bắt đầu' : 'Back to Login';
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: FoodNinjaBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.screenHorizontal,
-            ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Spacer(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        _handleNavigate(context);
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: FoodNinjaBackground(
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.screenHorizontal,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Spacer(),
 
-                  // Food Ninja circular checkmark illustration
-                  Container(
-                    width: 160,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primaryEnd.withValues(alpha: 0.35),
-                          blurRadius: 35,
-                          offset: const Offset(0, 15),
+                    // Food Ninja circular checkmark illustration
+                    Container(
+                      width: 160,
+                      height: 160,
+                      decoration: BoxDecoration(
+                        gradient: AppColors.primaryGradient,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primaryEnd.withValues(alpha: 0.35),
+                            blurRadius: 35,
+                            offset: const Offset(0, 15),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.check_rounded,
+                          color: Colors.white,
+                          size: 85,
                         ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.check_rounded,
-                        color: Colors.white,
-                        size: 85,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.p32),
+                    const SizedBox(height: AppSpacing.p32),
 
-                  // Gradient "Congrats!" headline
-                  ShaderMask(
-                    shaderCallback: (bounds) =>
-                        AppColors.primaryGradient.createShader(bounds),
-                    child: Text(
-                      headline,
-                      style: AppTextStyles.headlineLarge.copyWith(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                    // Gradient "Congrats!" headline
+                    ShaderMask(
+                      shaderCallback: (bounds) =>
+                          AppColors.primaryGradient.createShader(bounds),
+                      child: Text(
+                        headline,
+                        style: AppTextStyles.headlineLarge.copyWith(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.p12),
+                    const SizedBox(height: AppSpacing.p12),
 
-                  // Subtitle message
-                  Text(
-                    message,
-                    style: AppTextStyles.titleLarge.copyWith(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
+                    // Subtitle message
+                    Text(
+                      message,
+                      style: AppTextStyles.titleLarge.copyWith(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
-                  ),
 
-                  const Spacer(),
+                    const Spacer(),
 
-                  // Bottom Action Button
-                  PrimaryButton(
-                    width: 160,
-                    text: buttonText,
-                    onPressed: () {
-                      if (isRegistration) {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.home,
-                          (route) => false,
-                        );
-                      } else {
-                        Navigator.of(context).pushNamedAndRemoveUntil(
-                          AppRoutes.login,
-                          (route) => false,
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.p40),
-                ],
+                    // Bottom Action Button
+                    PrimaryButton(
+                      width: 160,
+                      text: buttonText,
+                      onPressed: () => _handleNavigate(context),
+                    ),
+                    const SizedBox(height: AppSpacing.p40),
+                  ],
+                ),
               ),
             ),
           ),

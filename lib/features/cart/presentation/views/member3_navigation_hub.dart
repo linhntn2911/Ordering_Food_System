@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../address/presentation/views/address_list_screen.dart';
 import '../../../checkout/presentation/views/checkout_screen.dart';
+import '../../../order_history/presentation/views/order_history_view.dart';
 import 'cart_screen.dart';
 
 /// Navigation Hub for Member 3 independent testing (Cart -> Checkout -> Address)
@@ -26,9 +27,10 @@ class _Member3NavigationHubState extends State<Member3NavigationHub> {
       CartScreen(onNavigateToCheckout: () => setState(() => _currentIndex = 1)),
       CheckoutScreen(
         onBackPressed: () => setState(() => _currentIndex = 0),
-        onOrderSuccess: () => setState(() => _currentIndex = 0),
+        onOrderSuccess: () => setState(() => _currentIndex = 3),
       ),
       const AddressListScreen(),
+      const OrderHistoryView(),
     ];
   }
 
@@ -67,6 +69,11 @@ class _Member3NavigationHubState extends State<Member3NavigationHub> {
             icon: Icon(Icons.location_on_outlined),
             activeIcon: Icon(Icons.location_on_rounded),
             label: 'Sổ địa chỉ',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long_outlined),
+            activeIcon: Icon(Icons.receipt_long_rounded),
+            label: 'Đơn hàng',
           ),
         ],
       ),

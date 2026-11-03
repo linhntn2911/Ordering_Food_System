@@ -25,6 +25,11 @@
 - H: Lựa chọn của người dùng có được giữ khi mở lại cùng món? → Đ: Không; mỗi lần mở chi tiết đều về mặc định (size giá thấp nhất, không topping, số lượng 1, ghi chú trống).
 - H: Phần đánh giá hoạt động thế nào khi mất mạng? → Đ: Hiện các đánh giá đã lưu trên thiết bị dưới cùng nhãn ngoại tuyến; "Xem thêm đánh giá" báo cần kết nối mạng; chưa từng tải thì báo lỗi kèm "Thử lại" trong phần đánh giá.
 
+### Phiên 2026-11-01
+
+- H: Màn hình chi tiết món có giữ ô "Ghi chú" không? → Đ: Không. Bỏ ô nhập ghi chú khỏi màn hình chi tiết; món được thêm vào giỏ không kèm ghi chú. Các yêu cầu về ghi chú bên dưới (Kịch bản 4 của User Story 4, phần ghi chú trong FR-012) không còn hiệu lực.
+- H: Khách chưa đăng nhập chạm "Thêm vào giỏ" thì sao? → Đ: Nút vẫn hiển thị như bình thường; chạm vào mở màn Đăng nhập. Đăng nhập thành công (Customer) thì quay lại đúng món đó và món đang chọn được thêm vào giỏ; hủy đăng nhập thì không có gì thay đổi. Tab "Giỏ hàng" trên Trang chủ ẩn khi chưa đăng nhập.
+
 ## Kịch bản người dùng & Kiểm thử (User Scenarios & Testing) *(bắt buộc)*
 
 ### User Story 1 - Xem thông tin đầy đủ của một món (Ưu tiên: P1)
@@ -136,7 +141,7 @@ Từ chi tiết món, người dùng chọn số lượng, nhập ghi chú và t
 - **FR-009**: Màn hình PHẢI có các trạng thái: đang tải, có dữ liệu, món không còn được bán, lỗi kèm "Thử lại", và nhãn ngoại tuyến; phần đánh giá có trạng thái tải, trống và lỗi riêng không ảnh hưởng phần thông tin món; khi ngoại tuyến phần đánh giá hiện đánh giá đã lưu và "Xem thêm đánh giá" báo cần kết nối mạng.
 - **FR-010**: Thay đổi của món (đăng bán, còn/hết hàng, giá, tên, mô tả, ảnh, tùy chọn, tóm tắt đánh giá) PHẢI phản ánh lên màn hình đang mở mà không cần mở lại.
 - **FR-011**: Khi tùy chọn đang chọn bị nhà hàng xóa, lựa chọn đó PHẢI bị bỏ, giá tạm tính được tính lại và người dùng được báo ngắn.
-- **FR-012**: Người dùng PHẢI chọn được số lượng từ 1 đến 99 và nhập ghi chú tối đa 200 ký tự cho món.
+- **FR-012**: Người dùng PHẢI chọn được số lượng từ 1 đến 99 cho món. Màn hình chi tiết KHÔNG có ô ghi chú (Làm rõ 2026-11-01).
 - **FR-013**: Nút "Thêm vào giỏ" PHẢI hiển thị ở cuối màn hình kèm giá tạm tính; khi món còn hàng, chạm nút PHẢI báo "Tính năng đang được phát triển" và KHÔNG lưu dữ liệu nào cho tới khi có tính năng Giỏ hàng (FR-011 gốc); lựa chọn đang có PHẢI được giữ nguyên.
 - **FR-014**: Màn hình chi tiết PHẢI được mở theo mã món từ Trang chủ và kết quả tìm kiếm, và quay lại PHẢI trả về đúng màn hình trước với trạng thái được giữ.
 - **FR-015**: Giao diện PHẢI theo khung Product Detail của mẫu Food Ninja, chỉ chế độ sáng, dùng token và thẻ dùng chung của hệ thống thiết kế; không tràn bố cục ở chiều rộng 320 điểm ảnh logic và cỡ chữ 1,3×.

@@ -2,14 +2,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/features/checkout/data/checkout_repository.dart';
 import 'package:ordering_food_system/features/checkout/data/models/order_model.dart'
     as checkout;
-import 'package:ordering_food_system/features/cart/presentation/controllers/cart_controller.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/order_history/data/models/order_model.dart';
 import 'package:ordering_food_system/features/order_history/domain/repositories/order_history_repository.dart';
 
 final orderHistoryRepositoryProvider = Provider<OrderHistoryRepository>((ref) {
   return _CheckoutOrderHistoryRepository(
     checkoutRepository: ref.watch(checkoutRepositoryProvider),
-    customerId: ref.watch(activeCustomerIdProvider),
+    customerId: ref.watch(authStateProvider).value?.id,
   );
 });
 
@@ -26,18 +26,18 @@ final orderHistoryFilterProvider =
       OrderHistoryFilterNotifier.new,
     );
 
-final orderHistoryListProvider = FutureProvider<List<OrderModel>>((ref) async {
+final orderHistoryListProvider = StreamProvider<List<OrderModel>>((ref) {
   final repo = ref.watch(orderHistoryRepositoryProvider);
   final filter = ref.watch(orderHistoryFilterProvider);
-  return repo.getOrders(filter: filter);
+  return repo.watchOrders(filter: filter);
 });
 
-final orderDetailByIdProvider = FutureProvider.family<OrderModel?, String>((
+final orderDetailByIdProvider = StreamProvider.family<OrderModel?, String>((
   ref,
   orderId,
-) async {
+) {
   final repo = ref.watch(orderHistoryRepositoryProvider);
-  return repo.getOrderById(orderId);
+  return repo.watchOrderById(orderId);
 });
 
 /// Presents orders created by checkout using the model expected by the
@@ -79,6 +79,36 @@ class _CheckoutOrderHistoryRepository implements OrderHistoryRepository {
     return order == null ? null : _map(order);
   }
 
+  @override
+  Stream<List<OrderModel>> watchOrders({String? filter}) {
+    final id = customerId;
+    if (id == null || id.isEmpty) return Stream.value(const []);
+    return checkoutRepository
+        .watchCustomerOrders(id)
+        .map(
+          (orders) => orders
+              .map(_map)
+              .where((order) {
+                return switch (filter) {
+                  'ongoing' => order.status.isOngoing,
+                  'completed' => order.status.isCompleted,
+                  'cancelled' => order.status.isCancelled,
+                  _ => true,
+                };
+              })
+              .toList(growable: false),
+        );
+  }
+
+  @override
+  Stream<OrderModel?> watchOrderById(String orderId) {
+    final id = customerId;
+    if (id == null || id.isEmpty) return Stream.value(null);
+    return checkoutRepository
+        .watchCustomerOrder(id, orderId)
+        .map((order) => order == null ? null : _map(order));
+  }
+
   OrderModel _map(checkout.OrderModel order) {
     return OrderModel(
       orderId: order.orderCode,
@@ -107,8 +137,8 @@ class _CheckoutOrderHistoryRepository implements OrderHistoryRepository {
 
   OrderStatus _mapStatus(checkout.OrderStatus status) {
     return switch (status) {
-      checkout.OrderStatus.pending ||
-      checkout.OrderStatus.confirmed => OrderStatus.pending,
+      checkout.OrderStatus.pending => OrderStatus.pending,
+      checkout.OrderStatus.confirmed => OrderStatus.confirmed,
       checkout.OrderStatus.preparing => OrderStatus.preparing,
       checkout.OrderStatus.outForDelivery => OrderStatus.delivering,
       checkout.OrderStatus.completed => OrderStatus.completed,

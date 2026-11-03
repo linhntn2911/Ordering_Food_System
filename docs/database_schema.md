@@ -32,7 +32,23 @@ Document ID equals the Firebase Authentication UID. Customers can update only pe
 
 ### `users/{uid}/addresses/{addressId}`
 
-Fields: `label`, `recipientName`, `phone`, `addressLine`, `latitude`, `longitude`, `isDefault`, `createdAt`, `updatedAt`. Only the owner can read or write. Exactly one default address is maintained by repository transaction or trusted operation.
+| Field | Type | Required | Notes |
+|---|---|---:|---|
+| `userId` | string | yes | Must equal the authenticated UID and parent user ID |
+| `label` | string | yes | For example `Nhà riêng` or `Văn phòng` |
+| `recipientName` | string | yes | Delivery recipient |
+| `phoneNumber` | string | yes | Validated Vietnamese mobile number |
+| `streetAddress` | string | yes | House number and street |
+| `ward`, `district`, `city` | string | no | Normalized administrative divisions |
+| `latitude`, `longitude` | number | no | Resolved delivery pin; required by the app before saving |
+| `placeId` | string | no | Geocoding-provider place identifier |
+| `locationProvider` | string | no | Currently `geoapify` |
+| `routeDistanceKm` | number | no | Resolved driving distance preview |
+| `isDefault` | boolean | yes | Exactly one default when the address book is non-empty |
+| `createdAt`, `updatedAt` | timestamp | yes | Firestore server timestamps |
+
+Only the owner can read or write. The repository uses atomic write batches when
+changing or promoting the default address.
 
 ### `users/{uid}/favorites/{menuItemId}`
 

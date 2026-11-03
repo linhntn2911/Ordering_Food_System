@@ -1,14 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ordering_food_system/core/firebase/firebase_providers.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/notifications/models/notification_model.dart';
 import 'package:ordering_food_system/features/notifications/repositories/notification_repository.dart';
 
-final notificationRepositoryProvider =
-    Provider<NotificationRepository>((ref) => MockNotificationRepository());
+final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
+  return FirestoreNotificationRepository(
+    ref.watch(firebaseFirestoreProvider),
+    ref.watch(authStateProvider).value?.id,
+  );
+});
 
-final notificationsListProvider =
-    FutureProvider<List<NotificationModel>>((ref) async {
+final notificationsListProvider = StreamProvider<List<NotificationModel>>((
+  ref,
+) {
   final repo = ref.watch(notificationRepositoryProvider);
-  return repo.getNotifications();
+  return repo.watchNotifications();
 });
 
 final unreadCountProvider = Provider<int>((ref) {
@@ -31,12 +38,10 @@ class NotificationActions {
 
   Future<void> markAsRead(String id) async {
     await repo.markAsRead(id);
-    ref.invalidate(notificationsListProvider);
   }
 
   Future<void> markAllAsRead() async {
     await repo.markAllAsRead();
-    ref.invalidate(notificationsListProvider);
   }
 
   Future<NotificationModel> broadcastNotification({
@@ -49,6 +54,8 @@ class NotificationActions {
       body: body,
       type: type,
     );
+    // Firestore streams refresh themselves; invalidating also lets an injected
+    // in-memory test repository publish the newly created test notification.
     ref.invalidate(notificationsListProvider);
     return result;
   }

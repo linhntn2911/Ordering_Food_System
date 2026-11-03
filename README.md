@@ -1,5 +1,18 @@
 # ordering_food_system
 
+## GPS-assisted delivery address
+
+The delivery-address form uses device GPS, an OpenStreetMap pin picker, and
+Geoapify reverse geocoding/routing. Create a free Geoapify key, then run:
+
+```powershell
+flutter run --dart-define=GEOAPIFY_API_KEY=YOUR_KEY
+```
+
+Do not commit the key. Without it, GPS and map pin selection still work, but
+automatic address resolution and road-route distance fall back to manual
+address fields and the existing Haversine distance preview.
+
 A new Flutter project.
 
 ## Getting Started

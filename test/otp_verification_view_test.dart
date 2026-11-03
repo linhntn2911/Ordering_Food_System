@@ -79,7 +79,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Congrats!'), findsOneWidget);
-    expect(find.text('Password reset succesful'), findsOneWidget);
+    expect(find.text('Password reset successful'), findsOneWidget);
     expect(find.text('Back to Login'), findsOneWidget);
   });
 }
