@@ -4,11 +4,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:oder_food/core/errors/app_exception.dart';
-import 'package:oder_food/core/firebase/firestore_paths.dart';
-import 'package:oder_food/features/auth/data/models/user_model.dart';
-import 'package:oder_food/features/auth/domain/entities/app_user.dart';
-import 'package:oder_food/features/auth/domain/repositories/auth_repository.dart';
+import 'package:ordering_food_system/core/errors/app_exception.dart';
+import 'package:ordering_food_system/core/firebase/firestore_paths.dart';
+import 'package:ordering_food_system/features/auth/data/models/user_model.dart';
+import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
+import 'package:ordering_food_system/features/auth/domain/repositories/auth_repository.dart';
 
 class FirebaseAuthRepository implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
@@ -28,17 +28,12 @@ class FirebaseAuthRepository implements AuthRepository {
       if (kIsWeb) {
         result = await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
       } else {
-        final googleSignIn = GoogleSignIn();
-        googleUser = await googleSignIn.signIn();
-        if (googleUser == null) {
-          throw const AuthException(
-            'Google sign-in cancelled.',
-            code: 'google-sign-in-cancelled',
-          );
-        }
-        final googleAuth = await googleUser.authentication;
+        await GoogleSignIn.instance.initialize(
+          clientId: '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
+        );
+        googleUser = await GoogleSignIn.instance.authenticate();
+        final googleAuth = googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
         result = await _firebaseAuth.signInWithCredential(credential);
