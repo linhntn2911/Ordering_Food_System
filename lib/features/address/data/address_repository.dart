@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/firebase/firebase_providers.dart';
 import '../../../core/errors/failures.dart';
+import 'repositories/firestore_address_repository.dart';
 import 'models/address_model.dart';
 
 /// Abstract repository for delivery address operations (FR-017, FR-018, BR-008)
@@ -34,7 +36,6 @@ abstract class AddressRepository {
 
 /// Implementation of AddressRepository with user-isolated data store (BR-008)
 class AddressRepositoryImpl implements AddressRepository {
-
   // Backing store isolated by customer UID (BR-008)
   final Map<String, List<AddressModel>> _userAddresses = {};
   final Map<String, StreamController<List<AddressModel>>> _controllers = {};
@@ -269,7 +270,5 @@ extension _StreamConcat<T> on Stream<T> {
 
 /// Provider for AddressRepository
 final addressRepositoryProvider = Provider<AddressRepository>((ref) {
-  final repo = AddressRepositoryImpl();
-  ref.onDispose(() => repo.dispose());
-  return repo;
+  return FirestoreAddressRepository(ref.watch(firebaseFirestoreProvider));
 });

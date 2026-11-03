@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../app/admin_gate.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_gradients.dart';
 import '../../../../core/theme/app_radii.dart';
@@ -663,7 +664,9 @@ class _RecentOrdersList extends StatelessWidget {
             order: order,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (_) => AdminOrderDetailsScreen(initialOrder: order),
+                builder: (_) => AdminGate(
+                  child: AdminOrderDetailsScreen(initialOrder: order),
+                ),
               ),
             ),
           ),

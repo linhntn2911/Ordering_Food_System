@@ -1,12 +1,21 @@
 import 'package:equatable/equatable.dart';
 
-enum OrderStatus { pending, preparing, delivering, completed, cancelled }
+enum OrderStatus {
+  pending,
+  confirmed,
+  preparing,
+  delivering,
+  completed,
+  cancelled,
+}
 
 extension OrderStatusX on OrderStatus {
   String get label {
     switch (this) {
       case OrderStatus.pending:
         return 'Đã đặt';
+      case OrderStatus.confirmed:
+        return 'Đã xác nhận';
       case OrderStatus.preparing:
         return 'Đang chuẩn bị';
       case OrderStatus.delivering:
@@ -19,7 +28,10 @@ extension OrderStatusX on OrderStatus {
   }
 
   bool get isOngoing {
-    return this == OrderStatus.pending || this == OrderStatus.preparing || this == OrderStatus.delivering;
+    return this == OrderStatus.pending ||
+        this == OrderStatus.confirmed ||
+        this == OrderStatus.preparing ||
+        this == OrderStatus.delivering;
   }
 
   bool get isCompleted => this == OrderStatus.completed;
@@ -27,7 +39,13 @@ extension OrderStatusX on OrderStatus {
 }
 
 class OrderItem extends Equatable {
-  const OrderItem({required this.id, required this.name, required this.imageUrl, required this.quantity, required this.price});
+  const OrderItem({
+    required this.id,
+    required this.name,
+    required this.imageUrl,
+    required this.quantity,
+    required this.price,
+  });
 
   final String id;
   final String name;
@@ -75,5 +93,19 @@ class OrderModel extends Equatable {
   int get itemCount => items.fold(0, (sum, e) => sum + e.quantity);
 
   @override
-  List<Object?> get props => [orderId, userId, items, subtotal, deliveryFee, discount, totalPrice, status, createdAt, address, paymentMethod, note, estimatedDeliveryTime];
+  List<Object?> get props => [
+    orderId,
+    userId,
+    items,
+    subtotal,
+    deliveryFee,
+    discount,
+    totalPrice,
+    status,
+    createdAt,
+    address,
+    paymentMethod,
+    note,
+    estimatedDeliveryTime,
+  ];
 }

@@ -39,6 +39,12 @@ Future<void> bootstrap() async {
         _authEmulatorPort,
       );
     }
+    // Keep the authenticated Admin session across browser reloads. Without an
+    // explicit local persistence policy, a web development restart can leave
+    // an already-open Admin screen without a Firebase Auth current user.
+    if (kIsWeb) {
+      await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+    }
   } catch (e) {
     debugPrint('Firebase initialization warning: $e');
   }

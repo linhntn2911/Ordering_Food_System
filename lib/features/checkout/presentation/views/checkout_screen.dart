@@ -7,10 +7,13 @@ import 'package:ordering_food_system/core/theme/app_shadows.dart';
 import 'package:ordering_food_system/core/theme/app_spacing.dart';
 import 'package:ordering_food_system/core/theme/app_text_styles.dart';
 import 'package:ordering_food_system/core/utils/currency_formatter.dart';
+import 'package:ordering_food_system/app/main_shell_controller.dart';
 import 'package:ordering_food_system/features/address/data/models/address_model.dart';
 import 'package:ordering_food_system/features/address/presentation/views/address_list_screen.dart';
 import 'package:ordering_food_system/features/checkout/presentation/controllers/checkout_controller.dart';
 import 'package:ordering_food_system/features/checkout/data/models/order_model.dart';
+
+enum CheckoutSuccessAction { stayInCart, viewOrders }
 
 /// CheckoutScreen (Màn hình Thanh toán & Xác nhận Đơn hàng - Member 3)
 /// Đáp ứng FR-014, FR-015, FR-016, FR-046, FR-047, FR-048, FR-049, FR-050, SC-005
@@ -147,7 +150,7 @@ class CheckoutScreen extends ConsumerWidget {
                     onPlaceOrder: () async {
                       final order = await controller.placeOrder();
                       if (order != null && context.mounted) {
-                        _showOrderSuccessDialog(context, order);
+                        _showOrderSuccessDialog(context, ref, order);
                       }
                     },
                   ),
@@ -171,7 +174,11 @@ class CheckoutScreen extends ConsumerWidget {
     }
   }
 
-  void _showOrderSuccessDialog(BuildContext context, OrderModel order) {
+  void _showOrderSuccessDialog(
+    BuildContext context,
+    WidgetRef ref,
+    OrderModel order,
+  ) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -229,16 +236,12 @@ class CheckoutScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppSpacing.s24),
               GestureDetector(
-                onTap: () {
-                  Navigator.of(dialogCtx).pop();
-                  if (onOrderSuccess != null) {
-                    onOrderSuccess!();
-                  } else if (onBackPressed != null) {
-                    onBackPressed!();
-                  } else if (Navigator.of(context).canPop()) {
-                    Navigator.of(context).pop();
-                  }
-                },
+                onTap: () => _finishCheckout(
+                  context: context,
+                  dialogContext: dialogCtx,
+                  ref: ref,
+                  action: CheckoutSuccessAction.viewOrders,
+                ),
                 child: Container(
                   height: 48,
                   decoration: const BoxDecoration(
@@ -246,11 +249,45 @@ class CheckoutScreen extends ConsumerWidget {
                     borderRadius: AppRadii.radiusMedium,
                   ),
                   alignment: Alignment.center,
-                  child: Text(
-                    'Hoàn tất',
-                    style: AppTextStyles.labelLarge.copyWith(
-                      color: Colors.white,
-                      fontSize: 16,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.receipt_long_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                      const SizedBox(width: AppSpacing.s8),
+                      Text(
+                        'Xem lịch sử đơn hàng',
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: Colors.white,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.s12),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: OutlinedButton.icon(
+                  onPressed: () => _finishCheckout(
+                    context: context,
+                    dialogContext: dialogCtx,
+                    ref: ref,
+                    action: CheckoutSuccessAction.stayInCart,
+                  ),
+                  icon: const Icon(Icons.shopping_cart_outlined, size: 20),
+                  label: const Text('Quay lại giỏ hàng'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primaryEnd,
+                    side: const BorderSide(color: AppColors.primaryEnd),
+                    textStyle: AppTextStyles.labelLarge.copyWith(fontSize: 16),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: AppRadii.radiusMedium,
                     ),
                   ),
                 ),
@@ -260,6 +297,35 @@ class CheckoutScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  void _finishCheckout({
+    required BuildContext context,
+    required BuildContext dialogContext,
+    required WidgetRef ref,
+    required CheckoutSuccessAction action,
+  }) {
+    Navigator.of(dialogContext).pop();
+
+    ref
+        .read(mainShellTabProvider.notifier)
+        .select(
+          action == CheckoutSuccessAction.viewOrders
+              ? MainShellTab.orders
+              : MainShellTab.cart,
+        );
+
+    if (action == CheckoutSuccessAction.viewOrders && onOrderSuccess != null) {
+      onOrderSuccess!();
+      return;
+    }
+    if (action == CheckoutSuccessAction.stayInCart && onBackPressed != null) {
+      onBackPressed!();
+      return;
+    }
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop(action);
+    }
   }
 }
 

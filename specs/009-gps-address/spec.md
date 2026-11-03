@@ -31,6 +31,11 @@ can validate whether Ngô Chicken can deliver to me.
 7. Given forward geocoding returns no usable result, when saving is attempted,
    then saving is blocked with a correction message; the app never invents
    coordinates.
+8. Given an authenticated Customer saves an address, when the app is reloaded
+   or reopened, then the address is restored from
+   `users/{uid}/addresses/{addressId}` in Firestore.
+9. A Customer can read and mutate only the address documents below their own
+   Firebase Authentication UID.
 
 ## Out of Scope
 

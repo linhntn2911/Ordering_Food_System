@@ -9,6 +9,11 @@
 - [x] T007 Add repository/ViewModel tests for success and failure states.
 - [x] T009 Forward-geocode a complete typed address automatically on submit.
 - [x] T010 Add tests for successful and failed automatic address resolution.
-- [ ] T008 Run formatting, analyzer, and relevant tests. Formatting and analyzer
-  pass; Flutter test is currently blocked by an `objective_c` native-asset hook
-  crash in the local Windows Flutter SDK.
+- [x] T011 Persist Customer addresses in UID-scoped Firestore subcollections.
+- [x] T012 Resolve address ownership from Firebase Authentication.
+- [x] T013 Protect address documents with owner-only Firestore rules and
+  validated server timestamps.
+- [ ] T008 Run formatting, analyzer, and relevant tests. Formatting and the
+  full-project analyzer pass; Flutter test execution is currently blocked by
+  the local Flutter SDK attempting a network version fetch and writing SDK
+  cache stamps in the restricted environment.

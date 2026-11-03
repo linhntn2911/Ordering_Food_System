@@ -81,6 +81,7 @@ As a Customer, I want to configure food items, manage quantities, choose an addr
 5. **Given** the address is more than 8 km away or its distance cannot be determined, **When** confirmation is attempted, **Then** the system blocks the order and asks the Customer to choose or correct the address.
 6. **Given** a valid serviceable address, **When** the Customer confirms COD checkout, **Then** one `Pending` order is created with immutable distance and delivery-fee snapshots and the submitted cart lines are cleared.
 7. **Given** price or availability changed before confirmation, **When** checkout validates the cart, **Then** submission stops and the Customer is shown which lines require attention.
+8. **Given** checkout succeeds, **When** the Customer selects **View order history** in the success dialog, **Then** Checkout closes and the Customer shell opens the **Orders** tab.
 
 ### User Story 4 - Track and Cancel an Order (Priority: P1)
 

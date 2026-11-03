@@ -31,8 +31,7 @@ class FirebaseAuthRepository implements AuthRepository {
         result = await _firebaseAuth.signInWithPopup(GoogleAuthProvider());
       } else {
         await GoogleSignIn.instance.initialize(
-          clientId:
-              '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
+          clientId: '455542165389-n7p93dh52aoanon45dp29bm4l49i0h9f.apps.googleusercontent.com',
         );
         googleUser = await GoogleSignIn.instance.authenticate();
         final googleAuth = googleUser.authentication;
@@ -110,7 +109,14 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Stream<AppUser?> authStateChanges() {
     return _firebaseAuth.authStateChanges().asyncMap((firebaseUser) async {
-      if (firebaseUser == null) return _cachedUser;
+      // Firebase Auth is the source of truth for an authenticated session.
+      // Never expose a cached profile after the underlying session is gone,
+      // otherwise protected Admin screens appear usable but every Firestore
+      // write is unauthenticated.
+      if (firebaseUser == null) {
+        _cachedUser = null;
+        return null;
+      }
       try {
         final doc = await _firestore
             .doc(FirestorePaths.user(firebaseUser.uid))
@@ -155,7 +161,10 @@ class FirebaseAuthRepository implements AuthRepository {
   @override
   Future<AppUser?> getCurrentUser() async {
     final firebaseUser = _firebaseAuth.currentUser;
-    if (firebaseUser == null) return _cachedUser;
+    if (firebaseUser == null) {
+      _cachedUser = null;
+      return null;
+    }
 
     try {
       final doc = await _firestore
@@ -201,7 +210,8 @@ class FirebaseAuthRepository implements AuthRepository {
     // Check lockout status
     if (_lockoutUntil != null) {
       if (DateTime.now().isBefore(_lockoutUntil!)) {
-        final remaining = _lockoutUntil!.difference(DateTime.now()).inMinutes + 1;
+        final remaining =
+            _lockoutUntil!.difference(DateTime.now()).inMinutes + 1;
         throw AuthException(
           'Account is temporarily locked. Please try again in $remaining minute(s).',
           code: 'too-many-requests',

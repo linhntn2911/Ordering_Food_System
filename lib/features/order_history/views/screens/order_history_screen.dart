@@ -28,11 +28,29 @@ class OrderHistoryScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        title: const Text('Lịch sử đơn hàng', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+        title: const Text(
+          'Lịch sử đơn hàng',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () => context.push(AppRoutes.notifications), icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary)),
-          IconButton(onPressed: () => context.push(AppRoutes.myReviews), icon: const Icon(Icons.rate_review_outlined, color: AppColors.textPrimary)),
+          IconButton(
+            onPressed: () => context.push(AppRoutes.notifications),
+            icon: const Icon(
+              Icons.notifications_outlined,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          IconButton(
+            onPressed: () => context.push(AppRoutes.myReviews),
+            icon: const Icon(
+              Icons.rate_review_outlined,
+              color: AppColors.textPrimary,
+            ),
+          ),
         ],
       ),
       body: Column(
@@ -50,10 +68,26 @@ class OrderHistoryScreen extends ConsumerWidget {
                     child: ChoiceChip(
                       label: Text(f['label']!),
                       selected: isSelected,
-                      onSelected: (_) => ref.read(orderHistoryFilterProvider.notifier).state = f['key']!,
+                      onSelected: (_) =>
+                          ref.read(orderHistoryFilterProvider.notifier).state =
+                              f['key']!,
                       selectedColor: AppColors.primary.withValues(alpha: 0.12),
-                      labelStyle: TextStyle(color: isSelected ? AppColors.primary : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border)),
+                      labelStyle: TextStyle(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(999),
+                        side: BorderSide(
+                          color: isSelected
+                              ? AppColors.primary
+                              : AppColors.border,
+                        ),
+                      ),
                       backgroundColor: AppColors.surface,
                     ),
                   );
@@ -64,15 +98,22 @@ class OrderHistoryScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Expanded(
             child: ordersAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
               error: (err, _) => Center(child: Text('Lỗi: $err')),
               data: (orders) {
                 if (orders.isEmpty) {
-                  return const AppEmptyState(icon: Icons.receipt_long_outlined, title: 'Chưa có đơn hàng', message: 'Các đơn hàng của bạn sẽ hiển thị tại đây');
+                  return const AppEmptyState(
+                    icon: Icons.receipt_long_outlined,
+                    title: 'Chưa có đơn hàng',
+                    message: 'Các đơn hàng của bạn sẽ hiển thị tại đây',
+                  );
                 }
                 return RefreshIndicator(
                   color: AppColors.primary,
-                  onRefresh: () async => ref.refresh(orderHistoryListProvider.future),
+                  onRefresh: () async =>
+                      ref.refresh(orderHistoryListProvider.future),
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: orders.length,
@@ -100,6 +141,8 @@ class _OrderHistoryCard extends StatelessWidget {
     switch (status) {
       case OrderStatus.pending:
         return AppColors.warning;
+      case OrderStatus.confirmed:
+        return AppColors.primary;
       case OrderStatus.preparing:
         return AppColors.info;
       case OrderStatus.delivering:
@@ -118,9 +161,14 @@ class _OrderHistoryCard extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
-      onTap: () => context.push('${AppRoutes.orderDetail}?orderId=${order.orderId}'),
+      onTap: () =>
+          context.push('${AppRoutes.orderDetail}?orderId=${order.orderId}'),
       child: Container(
-        decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.border)),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -128,16 +176,43 @@ class _OrderHistoryCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Expanded(child: Text('Mã đơn: ${order.orderId}', style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary))),
+                  Expanded(
+                    child: Text(
+                      'Mã đơn: ${order.orderId}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
-                    child: Text(order.status.label, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w600)),
-                  )
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      order.status.label,
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 6),
-              Text(dateFormat.format(order.createdAt), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              Text(
+                dateFormat.format(order.createdAt),
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
+              ),
               const Divider(height: 24, color: AppColors.border),
               Row(
                 children: [
@@ -148,7 +223,16 @@ class _OrderHistoryCard extends StatelessWidget {
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(width: 56, height: 56, color: AppColors.greyLight, alignment: Alignment.center, child: const Icon(Icons.fastfood, color: AppColors.textSecondary)),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 56,
+                        height: 56,
+                        color: AppColors.greyLight,
+                        alignment: Alignment.center,
+                        child: const Icon(
+                          Icons.fastfood,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -156,26 +240,97 @@ class _OrderHistoryCard extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(order.items.first.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
+                        Text(
+                          order.items.first.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
                         const SizedBox(height: 4),
-                        Text(order.items.length == 1 ? '${order.itemCount} món' : '+${order.items.length - 1} món khác • ${order.itemCount} món', style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                        Text(
+                          order.items.length == 1
+                              ? '${order.itemCount} món'
+                              : '+${order.items.length - 1} món khác • ${order.itemCount} món',
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  Text(NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(order.totalPrice), style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary))
+                  Text(
+                    NumberFormat.currency(
+                      locale: 'vi_VN',
+                      symbol: 'đ',
+                    ).format(order.totalPrice),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Expanded(child: OutlinedButton(onPressed: () => context.push('${AppRoutes.orderDetail}?orderId=${order.orderId}'), style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.border), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Xem chi tiết', style: TextStyle(color: AppColors.textPrimary)))),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => context.push(
+                        '${AppRoutes.orderDetail}?orderId=${order.orderId}',
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: AppColors.border),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Xem chi tiết',
+                        style: TextStyle(color: AppColors.textPrimary),
+                      ),
+                    ),
+                  ),
                   const SizedBox(width: 10),
                   if (order.status.isCompleted)
-                    Expanded(child: ElevatedButton(onPressed: () => context.push('${AppRoutes.writeReview}?orderId=${order.orderId}'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 0), child: const Text('Đánh giá'))),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => context.push(
+                          '${AppRoutes.writeReview}?orderId=${order.orderId}',
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text('Đánh giá'),
+                      ),
+                    ),
                   if (order.status.isOngoing)
-                    Expanded(child: ElevatedButton(onPressed: () => context.push('${AppRoutes.orderTracking}?orderId=${order.orderId}'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 0), child: const Text('Theo dõi đơn'))),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => context.push(
+                          '${AppRoutes.orderTracking}?orderId=${order.orderId}',
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text('Theo dõi đơn'),
+                      ),
+                    ),
                 ],
-              )
+              ),
             ],
           ),
         ),

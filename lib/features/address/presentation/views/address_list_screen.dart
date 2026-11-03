@@ -552,7 +552,7 @@ class _EmptyAddressView extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.s8),
             Text(
-              'Vui lòng thêm địa chỉ nhận hàng để Food Ninja có thể giao những bữa ăn nóng hổi đến cho bạn!',
+              'Vui lòng thêm địa chỉ nhận hàng để Ngô Chicken có thể giao những bữa ăn nóng hổi đến cho bạn!',
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.textSecondary,
               ),

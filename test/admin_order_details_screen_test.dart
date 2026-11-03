@@ -75,6 +75,7 @@ Widget _app() {
     deliveryDistanceKm: 2.4,
     paymentMethod: 'cod',
     paymentStatus: 'unpaid',
+    customerNote: 'Gọi trước khi giao.',
     status: OrderStatus.pending,
     createdAt: now,
     updatedAt: now,
@@ -87,6 +88,11 @@ Widget _app() {
         return repository;
       }),
     ],
-    child: MaterialApp(home: AdminOrderDetailsScreen(initialOrder: order)),
+    child: MaterialApp(
+      home: AdminOrderDetailsScreen(
+        initialOrder: order,
+        requireAdminSession: false,
+      ),
+    ),
   );
 }

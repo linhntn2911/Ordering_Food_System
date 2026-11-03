@@ -3,4 +3,6 @@ import 'package:ordering_food_system/features/order_history/data/models/order_mo
 abstract class OrderHistoryRepository {
   Future<List<OrderModel>> getOrders({String? filter});
   Future<OrderModel?> getOrderById(String orderId);
+  Stream<List<OrderModel>> watchOrders({String? filter});
+  Stream<OrderModel?> watchOrderById(String orderId);
 }

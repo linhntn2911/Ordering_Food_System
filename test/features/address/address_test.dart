@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ordering_food_system/core/errors/failures.dart';
+import 'package:ordering_food_system/features/address/data/address_repository.dart';
 import 'package:ordering_food_system/features/address/data/models/address_model.dart';
 import 'package:ordering_food_system/features/address/presentation/controllers/address_controller.dart';
-import 'package:ordering_food_system/features/cart/presentation/controllers/cart_controller.dart';
 
 void main() {
   group('AddressModel Unit Tests', () {
@@ -66,10 +66,12 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
-      container
-          .read(currentCustomerIdProvider.notifier)
-          .setCustomerId('customer_honganh_1');
+      container = ProviderContainer(
+        overrides: [
+          addressRepositoryProvider.overrideWithValue(AddressRepositoryImpl()),
+          addressUserIdProvider.overrideWithValue('customer_honganh_1'),
+        ],
+      );
     });
 
     tearDown(() {
@@ -85,8 +87,18 @@ void main() {
     test(
       'BR-008: Auth check throws AuthFailure if customer not logged in',
       () async {
-        container.read(currentCustomerIdProvider.notifier).setCustomerId(null);
-        final controller = container.read(addressControllerProvider.notifier);
+        final unauthenticatedContainer = ProviderContainer(
+          overrides: [
+            addressRepositoryProvider.overrideWithValue(
+              AddressRepositoryImpl(),
+            ),
+            addressUserIdProvider.overrideWithValue(null),
+          ],
+        );
+        addTearDown(unauthenticatedContainer.dispose);
+        final controller = unauthenticatedContainer.read(
+          addressControllerProvider.notifier,
+        );
 
         final address = AddressModel(
           id: 'addr_1',

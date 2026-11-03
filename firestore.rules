@@ -46,6 +46,35 @@ service cloud.firestore {
         && request.resource.data.phone is string;
     }
 
+    function validAddress(userId) {
+      return owns(userId)
+        && request.resource.data.keys().hasAll([
+          'userId', 'label', 'recipientName', 'phoneNumber',
+          'streetAddress', 'isDefault', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'userId', 'label', 'recipientName', 'phoneNumber',
+          'streetAddress', 'ward', 'district', 'city', 'latitude',
+          'longitude', 'placeId', 'locationProvider', 'routeDistanceKm',
+          'isDefault', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.userId == userId
+        && request.resource.data.label is string
+        && request.resource.data.recipientName is string
+        && request.resource.data.phoneNumber is string
+        && request.resource.data.streetAddress is string
+        && request.resource.data.isDefault is bool
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp
+        && (!request.resource.data.keys().hasAny(['latitude'])
+          || request.resource.data.latitude is number)
+        && (!request.resource.data.keys().hasAny(['longitude'])
+          || request.resource.data.longitude is number)
+        && (!request.resource.data.keys().hasAny(['routeDistanceKm'])
+          || (request.resource.data.routeDistanceKm is number
+            && request.resource.data.routeDistanceKm >= 0));
+    }
+
     match /users/{userId} {
       allow create: if validCustomerProfile(userId);
       allow read: if true;
@@ -56,7 +85,14 @@ service cloud.firestore {
       allow update, delete: if isAdmin();
 
       match /addresses/{addressId} {
-        allow read, create, update, delete: if owns(userId);
+        allow read, delete: if owns(userId);
+        allow create: if validAddress(userId)
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.updatedAt == request.time;
+        allow update: if validAddress(userId)
+          && request.resource.data.userId == resource.data.userId
+          && request.resource.data.createdAt == resource.data.createdAt
+          && request.resource.data.updatedAt == request.time;
       }
 
       match /favorites/{menuItemId} {
@@ -78,7 +114,9 @@ service cloud.firestore {
           && request.resource.data.keys().hasAll([
             'type', 'title', 'body', 'orderId', 'isRead', 'createdAt'
           ])
-          && request.resource.data.type == 'order_status'
+          && request.resource.data.type in ['order_status', 'promo', 'system']
+          && request.resource.data.title is string
+          && request.resource.data.body is string
           && request.resource.data.orderId is string
           && request.resource.data.isRead == false
           && request.resource.data.createdAt == request.time;
@@ -193,7 +231,34 @@ service cloud.firestore {
               == request.auth.uid
             || isAdmin()
           );
-        allow write: if false;
+        // Audit events are append-only and may only be created by the same
+        // active Admin who atomically moves the parent order to that status.
+        allow create: if isAdmin()
+          && request.resource.data.keys().hasAll([
+            'fromStatus', 'toStatus', 'actorId', 'actorRole', 'createdAt'
+          ])
+          && request.resource.data.keys().hasOnly([
+            'fromStatus', 'toStatus', 'actorId', 'actorRole', 'reason',
+            'createdAt'
+          ])
+          && request.resource.data.fromStatus is string
+          && request.resource.data.toStatus is string
+          && request.resource.data.actorId == request.auth.uid
+          && request.resource.data.actorRole == 'admin'
+          && request.resource.data.createdAt == request.time
+          && (!request.resource.data.keys().hasAny(['reason'])
+            || request.resource.data.reason is string)
+          && validAdminOrderTransition(
+            request.resource.data.fromStatus,
+            request.resource.data.toStatus
+          )
+          && get(
+            /databases/$(database)/documents/orders/$(orderId)
+          ).data.orderStatus == request.resource.data.fromStatus
+          && getAfter(
+            /databases/$(database)/documents/orders/$(orderId)
+          ).data.orderStatus == request.resource.data.toStatus;
+        allow update, delete: if false;
       }
     }
 

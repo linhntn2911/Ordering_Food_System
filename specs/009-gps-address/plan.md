@@ -17,6 +17,11 @@
   still required before a production release.
 - A failed or ambiguous first-result lookup blocks saving and leaves the typed
   fields available for correction; coordinates are never guessed.
+- Use Firestore `users/{uid}/addresses/{addressId}` as the address source of
+  truth. Firebase Authentication supplies `uid`; no demo customer ID is used.
+- Use Firestore server timestamps and a single write batch when changing the
+  default address so the repository maintains exactly one default document.
+- Keep the in-memory repository only as a unit-test fake.
 
 ## Privacy and Scope
 

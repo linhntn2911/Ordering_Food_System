@@ -28,7 +28,7 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
       'iconColor': AppColors.primarySolid,
     },
     {
-      'title': 'Food Ninja is Where\nYour Comfort Food Lives',
+      'title': 'Ngô Chicken –\nMón ngon mỗi ngày',
       'description': 'Enjoy a fast and smooth food delivery directly to your doorstep with Cash on Delivery.',
       'icon': Icons.delivery_dining_rounded,
       'accentColor': AppColors.warningSurface,

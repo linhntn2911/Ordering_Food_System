@@ -5,6 +5,8 @@ import 'package:ordering_food_system/features/order_history/models/order_model.d
 abstract class OrderHistoryRepository {
   Future<List<OrderModel>> getOrders({String? filter});
   Future<OrderModel?> getOrderById(String orderId);
+  Stream<List<OrderModel>> watchOrders({String? filter});
+  Stream<OrderModel?> watchOrderById(String orderId);
 }
 
 class MockOrderHistoryRepository implements OrderHistoryRepository {
@@ -15,4 +17,11 @@ class MockOrderHistoryRepository implements OrderHistoryRepository {
 
   @override
   Future<OrderModel?> getOrderById(String orderId) async => null;
+
+  @override
+  Stream<List<OrderModel>> watchOrders({String? filter}) =>
+      Stream.value(const []);
+
+  @override
+  Stream<OrderModel?> watchOrderById(String orderId) => Stream.value(null);
 }
