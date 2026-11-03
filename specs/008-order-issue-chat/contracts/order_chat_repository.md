@@ -1,0 +1,69 @@
+# Contract: OrderChatRepository
+
+`lib/features/order_chat/domain/repositories/order_chat_repository.dart`. Implemented by `FirestoreOrderChatRepository` (data layer) and `FakeOrderChatRepository` (`test/support/`). ViewModels depend only on this interface (constitution II).
+
+```dart
+abstract interface class OrderChatRepository {
+  /// Conversation metadata for one order, or null when none exists yet.
+  Stream<OrderChat?> watchChat(String orderId);
+
+  /// Newest-first messages, at most [limit] (R8). Pending local writes are
+  /// included with isPending = true.
+  Stream<List<ChatMessage>> watchMessages(String orderId, {required int limit});
+
+  /// Generates a message ID once per draft; reused for every retry (R3).
+  String newMessageId(String orderId);
+
+  /// Uploads one photo to order_chats/{orderId}/{messageId}/{index}.jpg and
+  /// returns its storage path. Throws ChatFailure on rule, size or network
+  /// errors.
+  Future<String> uploadPhoto({
+    required String orderId,
+    required String messageId,
+    required int index,
+    required XFile photo,
+  });
+
+  /// One transaction: creates the conversation if absent (with issueType and
+  /// openedByRole), creates the message unless it already exists, and updates
+  /// metadata plus the other side's unread flag (R2, R3).
+  Future<void> sendMessage({
+    required String orderId,
+    required String messageId,
+    required ChatRole senderRole,
+    required String text,
+    required List<String> imagePaths,
+    ChatIssueType? issueType,
+  });
+
+  /// Sets the viewer's own unread flag to false. No-op if no conversation.
+  Future<void> markRead(String orderId, ChatRole viewerRole);
+
+  /// Resolves a storage path to a displayable URL (rule-checked).
+  Future<String> photoUrl(String storagePath);
+
+  /// Admin: conversations ordered by lastMessageAt desc, at most [limit].
+  Stream<List<OrderChat>> watchAdminChats({int limit = 100});
+
+  /// Customer: whether any own conversation has unread Admin messages.
+  Stream<bool> watchCustomerHasUnread(String customerId);
+}
+```
+
+## Failures
+
+`ChatFailure` with `type`:
+
+| Type | When | UI message (vi) |
+|---|---|---|
+| `closed` | Rules reject because the 24-hour window ended | "Cuộc trò chuyện đã đóng" |
+| `permissionDenied` | Not a participant or disabled account | "Bạn không có quyền xem cuộc trò chuyện này" |
+| `photoTooLarge` | Storage rejects size | "Ảnh vượt quá 5 MB" |
+| `unavailable` | Network / offline | "Không gửi được. Kiểm tra kết nối và thử lại" |
+| `unknown` | Anything else | "Đã có lỗi, vui lòng thử lại" |
+
+## Fake repository behaviour (tests)
+
+- Emits through controllable streams (`emitChat`, `emitMessages`).
+- Records `sendMessage` calls and can be told to fail the next N calls with a given `ChatFailure`.
+- `sendMessage` with an already-recorded `messageId` is a no-op (mirrors R3).

@@ -3,7 +3,7 @@
 Read `AGENTS.md` first. It is the shared engineering policy for every coding agent in this repository. Read `SPEC.md`, `.specify/memory/constitution.md`, and the active feature plan and tasks before making material changes.
 
 <!-- SPECKIT START -->
-For additional context about technologies, project structure, shell commands, and decisions, read the current feature plan at `specs/004-food-details/plan.md` and follow the installed `.claude/skills/speckit-*` workflow.
+For additional context about technologies, project structure, shell commands, and decisions, read the current feature plan at `specs/008-order-issue-chat/plan.md` and follow the installed `.claude/skills/speckit-*` workflow.
 <!-- SPECKIT END -->
 
 ## Required Working Method

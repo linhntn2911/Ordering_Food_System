@@ -3,22 +3,23 @@
 **Feature ID**: `001-food-ordering-system`  
 **Created**: 2026-10-17  
 **Status**: Draft ready for clarification and planning  
+**Revised**: 2026-11-01 - added order-issue chat between Customer and Admin (User Story 11)  
 **Product**: Flutter mobile application for one restaurant (Ngô Chicken)  
 **Input**: Course requirements, the revised `Project_PRM (3).docx` Food Ordering System SRS, and the architecture patterns reviewed in `Example-PRM393`
 
 ## Scope Decision
 
-The application supports food ordering from one restaurant, Ngô Chicken, which sells fried chicken, rice, noodles, snacks, combos, and drinks. Guests can browse the menu. Registered customers can manage a cart, delivery addresses, COD orders, reviews, favorites, and notifications. Pre-provisioned administrators manage the menu and process orders from the same mobile application through role-based navigation.
+The application supports food ordering from one restaurant, Ngô Chicken, which sells fried chicken, rice, noodles, snacks, combos, and drinks. Guests can browse the menu. Registered customers can manage a cart, delivery addresses, COD orders, reviews, favorites, and notifications, and can chat with the restaurant about a problem with one of their orders. Pre-provisioned administrators manage the menu, process orders, and answer order-issue chats from the same mobile application through role-based navigation.
 
-The first release uses Cash on Delivery only. It does not include an online payment gateway, a driver application, live GPS tracking, chat, multi-restaurant support, or complex voucher rules.
+The first release uses Cash on Delivery only. It does not include an online payment gateway, a driver application, live GPS tracking, general-purpose or pre-sale chat, multi-restaurant support, or complex voucher rules. Chat exists only as an order-issue conversation attached to a specific order (User Story 11).
 
 ## Actors
 
 ### Human Actors
 
 - **Guest**: An unauthenticated state that can browse, search, filter, and view food details.
-- **Customer**: An authenticated user who can manage personal data, addresses, favorites, cart, orders, reviews, and notifications.
-- **Admin**: A pre-provisioned internal user who can manage categories and menu items, process orders, and view sales reports.
+- **Customer**: An authenticated user who can manage personal data, addresses, favorites, cart, orders, reviews, and notifications, and can chat with the restaurant about an issue with their own order.
+- **Admin**: A pre-provisioned internal user who can manage categories and menu items, process orders, answer and resolve order-issue chats, and view sales reports.
 
 ### External Systems
 
@@ -181,6 +182,25 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 1. **Given** completed orders exist, **When** the Admin chooses a date range, **Then** the report shows completed order count, COD revenue, and top-selling items for that range.
 2. **Given** no completed orders exist in the selected range, **When** the report loads, **Then** it shows a clear zero-data state.
 
+### User Story 11 - Chat About an Order Issue (Priority: P2)
+
+As a Customer, I want to message the restaurant about a problem with one of my orders, and as an Admin, I want to reply in the same conversation, so that issues such as a missing item, late delivery, wrong address, or out-of-stock item are resolved quickly without a phone call.
+
+**Why this priority**: Order problems are time-sensitive and currently have no in-app channel. The ordering lifecycle still works without chat, so it follows the P1 order flow.
+
+**Independent Test**: Place an order as a Customer, open chat from Order Details, choose an issue type and send a message with a photo; as an Admin, see the order's "new message" badge in the Admin Order List without refresh, open the conversation from Admin Order Details and reply; verify both sides see the messages in real time with unread badges, and another Customer cannot read the conversation or its photos. Details: `specs/008-order-issue-chat/spec.md`.
+
+**Acceptance Scenarios**:
+
+1. **Given** a Customer owns an order that is active or reached a terminal status less than 24 hours ago, **When** the Customer opens chat from Order Details, chooses an issue type, and sends a first message, **Then** one conversation is created for that order and the message appears in it.
+2. **Given** a conversation already exists for the order, **When** the Customer opens chat again, **Then** the existing conversation opens instead of a second one being created.
+3. **Given** an open conversation, **When** either side sends a message with text, photos, or both, **Then** the other side sees it without manual refresh, or sees an unread badge if elsewhere in the app.
+4. **Given** a Customer message is unread by Admins, **When** an Admin views the Admin Order List, **Then** the order shows a "new message" badge and appears under the "Has messages" filter.
+5. **Given** an Admin needs to contact the Customer about an order (for example an out-of-stock item or an unclear address), **When** the Admin opens chat from Admin Order Details, **Then** a conversation for that order is created or opened and the Customer sees an unread badge.
+6. **Given** an order reached `Completed`, `Cancelled`, or `Rejected` more than 24 hours ago, **When** either side opens its conversation, **Then** the history is readable but no new message can be sent.
+7. **Given** a Guest, another Customer, or a disabled account, **When** they try to read or write a conversation or view its photos, **Then** the app and Firebase rules deny it.
+8. **Given** the device is offline or a send or photo upload fails, **When** the user sends a message, **Then** the message shows a pending or failed state with a retry action, is never duplicated after retry, and never shows a missing photo.
+
 ## Edge Cases
 
 - The device loses connectivity during a write; the UI must show pending or failed state and prevent accidental duplicate submissions.
@@ -195,6 +215,11 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - Review image upload partially succeeds; unsaved files must not create a broken review.
 - Delivery distance cannot be resolved, falls exactly on a fee-band boundary, or exceeds the 8 km service radius.
 - A disabled account or temporarily locked account attempts to reuse an existing local session.
+- A Customer and an Admin both start a conversation for the same order at nearly the same time; only one conversation may exist per order.
+- A Customer tries to report an issue on an order that reached a terminal status more than 24 hours ago.
+- The 24-hour chat window closes while a user is typing; the unsent text and photos must not be silently lost and the user is told the conversation has closed.
+- A chat photo upload partially succeeds; a message must not reference a missing file.
+- A conversation link is opened after the account was disabled or by a different account.
 
 ## Requirements
 
@@ -273,6 +298,19 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **FR-051**: Admins MUST be able to broadcast promotional discount announcements and system notices (`promo` / `system`) to customers.
 - **FR-052**: Broadcast notifications MUST be stored as in-app notification records and appear in customer notification inboxes with timestamp, title, body, and type.
 
+#### Order-Issue Chat
+
+- **FR-053**: A Customer MUST be able to start an order-issue conversation from Order Details for their own order while the order is active or within 24 hours after it reaches `Completed`, `Cancelled`, or `Rejected`.
+- **FR-054**: Starting a conversation MUST require choosing one issue type: missing or wrong item, late delivery, food quality, address or contact, COD payment, or other.
+- **FR-055**: The system MUST keep at most one conversation per order; opening chat again for the same order MUST open the existing conversation.
+- **FR-056**: An Admin MUST be able to start or open the conversation for any order from Admin Order Details. The Admin Order List MUST show a "new message" badge on orders with messages unread by Admins and MUST offer a "Has messages" filter; there is no separate support inbox screen.
+- **FR-057**: A message MUST contain text of up to 1,000 characters, up to three images of at most 5 MB each stored in Firebase Storage, or both, and MUST NOT be empty. A message MUST be saved only after all its images are stored. Sent messages and images MUST NOT be editable or deletable by clients.
+- **FR-058**: New messages MUST appear for both participants in real time. Each side MUST see an unread indicator (Customer: on the order and the Orders tab; Admin: on the order in the Admin Order List and Admin Order Details) that clears only for the person who opens the conversation.
+- **FR-059**: Chat push notifications are deferred until the trusted notification backend exists (FR-040); until then the client MUST NOT send FCM messages and new messages are signalled by real-time updates and unread indicators.
+- **FR-060**: A conversation MUST become read-only 24 hours after its order reaches `Completed`, `Cancelled`, or `Rejected`, and MUST remain readable by both participants afterwards. There is no manual resolve or reopen.
+- **FR-061**: Images in a conversation MUST be viewable full screen by both participants.
+- **FR-062**: Firestore and Storage rules MUST allow a conversation, its messages, and its images to be read or written only by the owning Customer and active Admins, MUST bind each message's sender UID and role to the authenticated user, and MUST reject new messages after the 24-hour window.
+
 #### Reporting and Local Configuration
 
 - **FR-041**: Admins MUST be able to view completed-order count, COD revenue, and top-selling items by date range.
@@ -298,6 +336,10 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **BR-015**: Orders beyond 8 km or without a determinable delivery distance are not accepted.
 - **BR-016**: Self-registration always assigns `Customer`; Admin accounts are pre-provisioned and protected from client modification.
 - **BR-017**: Five consecutive failed sign-in attempts trigger a 15-minute lockout enforced by a trusted authentication layer.
+- **BR-018**: Chat exists only as an order-issue conversation attached to one order; there is no general or pre-sale chat and no voice or video calling.
+- **BR-019**: Each order has at most one conversation, whose participants are the order's Customer and the restaurant's Admins acting as one support role.
+- **BR-020**: Messages can be sent only while the order is active or within 24 hours after its terminal status; afterwards the conversation is read-only.
+- **BR-021**: Chat messages and their images are immutable once sent and use server timestamps.
 
 ### Required Technical Constraints
 
@@ -327,7 +369,7 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **NFR-007 Accessibility**: Interactive controls MUST have readable contrast, semantic labels, and touch targets of at least 48 logical pixels where practical.
 - **NFR-008 Consistency**: Colors, typography, spacing, radius, and shared components MUST come from centralized theme and token files.
 - **NFR-009 Visual fidelity**: Customer and Admin screens MUST follow `docs/design_system.md`, including the `#53E88B -> #15BE77` primary gradient, Poppins type scale, 4-point spacing grid, and light-only surfaces.
-- **NFR-010 App shell**: Customer screens MUST share a bottom navigation bar with Home, Cart, Orders, and Profile; the Food Ninja Chat tab is out of scope. Tabs whose feature is not yet delivered MUST show a "feature in development" state rather than an unresponsive control (see `specs/002-browse-menu/spec.md`).
+- **NFR-010 App shell**: Customer screens MUST share a bottom navigation bar with Home, Cart, Orders, and Profile; the Food Ninja Chat tab is out of scope, and order-issue chat is reached from Order Details rather than a bottom tab. Tabs whose feature is not yet delivered MUST show a "feature in development" state rather than an unresponsive control (see `specs/002-browse-menu/spec.md`).
 
 ## Key Entities
 
@@ -343,6 +385,8 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **Review**: Customer UID, order ID, order item ID, menu item ID, rating, comment, media URLs, anonymous flag, edit state, timestamps.
 - **Notification**: Recipient UID, order ID, event type, title, body, read flag, deep-link data, timestamp.
 - **DeviceToken**: UID, token, platform, enabled flag, last-seen timestamp.
+- **SupportConversation**: Order ID (one per order), order code snapshot, Customer UID, issue type, opened-by role, last-message preview and timestamp, Customer and Admin unread state, timestamps. Open or read-only is derived from the order's status and terminal time.
+- **ChatMessage**: Conversation ID, sender UID, sender role (`customer` or `admin`), optional text, zero to three image URLs, client message ID for idempotent retry, server timestamp.
 
 ## Screen Inventory and Team Allocation
 
@@ -373,8 +417,9 @@ Screen complexity is based on meaningful data state, validation, navigation, asy
 | Member 5 | Add or Edit Menu Item | High | Validated form, options, image upload |
 | Member 5 | Category Management | Medium | Ordered CRUD and publication rules |
 | Member 5 | Sales Report | Medium | Date range, metrics, top items, zero state |
+| To be assigned | Order Issue Chat (Customer and Admin) | High | Issue type, real-time text and photo messages, unread state, pending/failed sends, 24-hour read-only rule |
 
-Each member owns at least three Medium-or-higher screens. Shared widgets, Firebase setup, rules, test infrastructure, and integration work remain team responsibilities and do not replace individual screen ownership.
+The owner of the order-issue chat screen is decided during planning; it also adds chat entry points and unread badges to Order Details, Admin Order List, and Admin Order Details. This screen is an addition and does not change the existing per-member minimum. Each member owns at least three Medium-or-higher screens. Shared widgets, Firebase setup, rules, test infrastructure, and integration work remain team responsibilities and do not replace individual screen ownership.
 
 ## Success Criteria
 
@@ -385,8 +430,9 @@ Each member owns at least three Medium-or-higher screens. Shared widgets, Fireba
 - **SC-005**: Duplicate taps on order submission create no more than one order.
 - **SC-006**: Unauthorized Customer reads or writes against another user's protected data fail in Firebase emulator or rules tests.
 - **SC-007**: `flutter analyze` completes without errors and the automated test suite passes before a feature is considered done.
-- **SC-008**: The 23-screen inventory uses the same centralized colors, type scale, spacing, radius, and reusable components.
+- **SC-008**: The full screen inventory (23 core screens plus the order-issue chat screen) uses the same centralized colors, type scale, spacing, radius, and reusable components.
 - **SC-009**: Checkout applies the three SRS delivery-fee bands correctly at 3 km, 5 km, and 8 km boundaries and rejects distances above 8 km.
+- **SC-010**: A chat message sent by either side appears for the other side within five seconds under normal network conditions, and rules tests show that a different Customer or a Guest cannot read or write the conversation.
 
 ## Assumptions
 
@@ -405,7 +451,7 @@ Each member owns at least three Medium-or-higher screens. Shared widgets, Fireba
 - Online payment, QR payment, refunds, and payment gateway callbacks. The Payment Gateway row retained in the source SRS is not active in this COD-only release because it has no corresponding approved payment use case.
 - Driver or shipper accounts, driver assignment, and live GPS tracking. Checkout distance calculation is required, but a customer-facing live map is not required.
 - Multiple restaurants, restaurant onboarding, commissions, or marketplace settlement.
-- Customer-admin chat, voice calls, complex promotions, coupons, loyalty points, and scheduled delivery slots.
+- General or pre-sale Customer-Admin chat, chat not tied to an order, chatbots, voice or video calls, complex promotions, coupons, loyalty points, and scheduled delivery slots. Order-issue chat (User Story 11) is in scope.
 - Web administration portal; Admin uses the role-based Flutter application.
 
 ## Spec Kit Workflow State
@@ -413,7 +459,7 @@ Each member owns at least three Medium-or-higher screens. Shared widgets, Fireba
 This document completes the `specify` stage. Before implementation, the team must run or perform the equivalent of:
 
 1. `constitution` - confirm project principles in `.specify/memory/constitution.md`.
-2. `clarify` - resolve the distance/geocoding implementation, quantity limit, COD cap, review text minimum, registration email type, trusted lockout implementation, Admin confirmation SLA, and merchant-reply authoring flow.
+2. `clarify` - resolve the distance/geocoding implementation, quantity limit, COD cap, review text minimum, registration email type, trusted lockout implementation, Admin confirmation SLA, merchant-reply authoring flow, and the Admin first-response target for order-issue chat (other chat questions were resolved on 2026-11-01 in `specs/008-order-issue-chat/spec.md`).
 3. `plan` - create `specs/001-food-ordering-system/plan.md` with Firebase schema, rules, architecture, navigation, and testing approach.
 4. `checklist` - validate requirement quality.
 5. `tasks` - create dependency-ordered, story-scoped tasks with exact file paths and member ownership.

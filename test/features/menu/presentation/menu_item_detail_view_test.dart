@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ordering_food_system/app/router.dart';
 import 'package:ordering_food_system/core/theme/app_theme.dart';
 import 'package:ordering_food_system/core/utils/vnd_format.dart';
 import 'package:ordering_food_system/core/widgets/app_error_view.dart';
 import 'package:ordering_food_system/core/widgets/offline_banner.dart';
 import 'package:ordering_food_system/core/widgets/rating_stars.dart';
+import 'package:ordering_food_system/features/auth/domain/entities/app_user.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
+import 'package:ordering_food_system/features/auth/presentation/views/login_view.dart';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_failure.dart';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_item.dart';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_option.dart';
@@ -45,11 +49,25 @@ void main() {
     reviews = FakeReviewRepository();
   });
 
+  const customer = AppUser(
+    id: 'customer_1',
+    fullName: 'Khách hàng',
+    email: 'customer@example.com',
+    phone: '0900000002',
+    role: 'customer',
+    status: 'active',
+  );
+
+  /// Routes opened by name, for example Login from "Thêm vào giỏ".
+  late List<RouteSettings> namedRoutes;
+
   Future<void> pumpDetail(
     WidgetTester tester, {
     Size size = const Size(390, 2400),
     double textScale = 1,
+    AppUser? user = customer,
   }) async {
+    namedRoutes = [];
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -60,9 +78,18 @@ void main() {
           menuRepositoryProvider.overrideWithValue(menus),
           reviewRepositoryProvider.overrideWithValue(reviews),
           menuOfflineGraceProvider.overrideWithValue(_grace),
+          authStateProvider.overrideWith((ref) => Stream.value(user)),
         ],
         child: MaterialApp(
           theme: AppTheme.light,
+          onGenerateRoute: (settings) {
+            namedRoutes.add(settings);
+            // Untyped, like AppRoutes.onGenerateRoute in the real app.
+            return MaterialPageRoute<dynamic>(
+              settings: settings,
+              builder: (_) => Text('route ${settings.name}'),
+            );
+          },
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context)
                 .copyWith(textScaler: TextScaler.linear(textScale)),
@@ -199,12 +226,6 @@ void main() {
       expect(find.text('Hết hàng – chưa thể thêm vào giỏ'), findsOneWidget);
       expect(addLabel(tester), 'Hết hàng');
       expect(find.byKey(const ValueKey('detail-quantity')), findsNothing);
-      expect(
-        tester
-            .widget<TextField>(find.byKey(const ValueKey('detail-note')))
-            .enabled,
-        isFalse,
-      );
     });
 
     testWidgets('an unavailable item offers to go back', (tester) async {
@@ -506,21 +527,38 @@ void main() {
       expect(addLabel(tester), 'Thêm vào giỏ · ${formatVnd(75000)}');
     });
 
-    testWidgets('the note stops at 200 characters', (tester) async {
+    testWidgets('a guest tapping add to cart is sent to login', (tester) async {
+      await pumpDetail(tester, user: null);
+      await showItem(tester);
+
+      expect(addLabel(tester), 'Thêm vào giỏ · ${formatVnd(20000)}');
+      await tapKey(tester, 'detail-add-to-cart');
+
+      expect(find.text('route ${AppRoutes.login}'), findsOneWidget);
+      final args = namedRoutes.single.arguments as LoginArgs?;
+      expect(args?.returnToCaller, isTrue);
+    });
+
+    testWidgets('guests do not see the cart shortcut', (tester) async {
+      await pumpDetail(tester, user: null);
+      await showItem(tester);
+
+      expect(find.bySemanticsLabel('Mở giỏ hàng'), findsNothing);
+    });
+
+    testWidgets('signed-in users see the cart shortcut', (tester) async {
       await pumpDetail(tester);
       await showItem(tester);
 
-      await tester.enterText(
-        find.byKey(const ValueKey('detail-note')),
-        'a' * 250,
-      );
-      await tester.pump();
+      expect(find.bySemanticsLabel('Mở giỏ hàng'), findsOneWidget);
+    });
 
-      final field = tester.widget<TextField>(
-        find.byKey(const ValueKey('detail-note')),
-      );
-      expect(field.controller?.text.length, 200);
-      expect(find.text('200/200'), findsOneWidget);
+    testWidgets('there is no note field', (tester) async {
+      await pumpDetail(tester);
+      await showItem(tester);
+
+      expect(find.byKey(const ValueKey('detail-note')), findsNothing);
+      expect(find.text('Ghi chú'), findsNothing);
     });
 
     testWidgets('add to cart reports the feature and keeps choices', (
@@ -529,16 +567,11 @@ void main() {
       await pumpDetail(tester);
       await showItem(tester);
       await tapKey(tester, 'detail-size-l');
-      await tester.enterText(
-        find.byKey(const ValueKey('detail-note')),
-        'ít đá',
-      );
 
       await tapKey(tester, 'detail-add-to-cart');
 
       expect(find.text('Tính năng đang được phát triển'), findsOneWidget);
       expect(addLabel(tester), 'Thêm vào giỏ · ${formatVnd(25000)}');
-      expect(find.text('ít đá'), findsOneWidget);
     });
   });
 

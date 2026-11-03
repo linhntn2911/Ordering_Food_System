@@ -186,28 +186,29 @@ class _AddButton extends StatelessWidget {
                 // heightFactor keeps the bar as tall as its content.
                 child: Center(
                   heightFactor: 1,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.shopping_cart_rounded,
-                          size: 20,
-                          color: AppColors.surface,
-                          semanticLabel: 'Giỏ hàng',
-                        ),
-                        const SizedBox(width: AppSpacing.p8),
-                        Text(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.shopping_cart_rounded,
+                        size: 20,
+                        color: AppColors.surface,
+                        semanticLabel: 'Giỏ hàng',
+                      ),
+                      const SizedBox(width: AppSpacing.p8),
+                      // Flexible lets the label wrap on narrow screens
+                      // instead of overflowing next to the icon.
+                      Flexible(
+                        child: Text(
                           label,
                           style: AppTextStyles.labelLarge.copyWith(
                             color: AppColors.surface,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
