@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:oder_food/core/constants/app_routes.dart';
-import 'package:oder_food/features/notifications/views/screens/notification_detail_screen.dart';
-import 'package:oder_food/features/notifications/views/screens/notification_list_screen.dart';
-import 'package:oder_food/features/order_history/presentation/views/order_history_view.dart';
-import 'package:oder_food/features/order_tracking/views/screens/order_detail_screen.dart';
-import 'package:oder_food/features/order_tracking/views/screens/order_tracking_timeline_screen.dart';
-import 'package:oder_food/features/review/views/screens/my_reviews_screen.dart';
-import 'package:oder_food/features/review/views/screens/write_review_screen.dart';
+import 'package:ordering_food_system/core/constants/app_routes.dart';
+import 'package:ordering_food_system/features/notifications/views/screens/notification_detail_screen.dart';
+import 'package:ordering_food_system/features/notifications/views/screens/notification_list_screen.dart';
+import 'package:ordering_food_system/features/order_history/presentation/views/order_history_view.dart';
+import 'package:ordering_food_system/features/order_tracking/views/screens/order_detail_screen.dart';
+import 'package:ordering_food_system/features/order_tracking/views/screens/order_tracking_timeline_screen.dart';
+import 'package:ordering_food_system/features/review/views/screens/my_reviews_screen.dart';
+import 'package:ordering_food_system/features/review/views/screens/write_review_screen.dart';
 
 class AppRouter {
   static final GoRouter router = GoRouter(

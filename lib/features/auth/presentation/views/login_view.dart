@@ -5,12 +5,15 @@ import 'package:ordering_food_system/core/services/preferences_service.dart';
 import 'package:ordering_food_system/core/theme/app_colors.dart';
 import 'package:ordering_food_system/core/theme/app_spacing.dart';
 import 'package:ordering_food_system/core/theme/app_text_styles.dart';
+import 'package:ordering_food_system/core/widgets/app_back_button.dart';
 import 'package:ordering_food_system/core/widgets/custom_text_field.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_logo.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
 import 'package:ordering_food_system/core/widgets/social_login_button.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/login_view_model.dart';
+import 'package:ordering_food_system/features/profile/presentation/viewmodels/profile_view_model.dart';
 
 class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
@@ -50,14 +53,13 @@ class _LoginViewState extends ConsumerState<LoginView> {
         );
 
     if (user != null && mounted) {
-      if (user.isAdmin) {
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil(AppRoutes.adminDashboard, (route) => false);
-      } else {
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
-      }
+      ref.invalidate(authStateProvider);
+      ref.invalidate(profileViewModelProvider);
+
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        user.isAdmin ? AppRoutes.adminDashboard : AppRoutes.home,
+        (route) => false,
+      );
     }
   }
 
@@ -78,6 +80,14 @@ class _LoginViewState extends ConsumerState<LoginView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  if (Navigator.of(context).canPop())
+                    const Align(
+                      alignment: Alignment.centerLeft,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: AppSpacing.p16),
+                        child: AppBackButton(),
+                      ),
+                    ),
                   const SizedBox(height: AppSpacing.p32),
 
                   // Food Ninja Brand Header
@@ -265,6 +275,9 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                 .signInWithGoogle();
                             if (!context.mounted) return;
                             if (user != null) {
+                              ref.invalidate(authStateProvider);
+                              ref.invalidate(profileViewModelProvider);
+
                               Navigator.of(context).pushNamedAndRemoveUntil(
                                 user.isAdmin
                                     ? AppRoutes.adminDashboard
@@ -277,51 +290,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: AppSpacing.p20,
-                  ), // Guest & Admin quick navigation
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pushNamedAndRemoveUntil(
-                            AppRoutes.home,
-                            (route) => false,
-                          );
-                        },
-                        child: Text(
-                          'Continue as Guest',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        ' • ',
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                      TextButton(
-                        key: const ValueKey('login-admin-portal-button'),
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed(AppRoutes.adminDashboard);
-                        },
-                        child: Text(
-                          'Admin Portal',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.primaryEnd,
-                            fontWeight: FontWeight.w600,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+
                   const SizedBox(height: AppSpacing.p20),
 
                   // Sign Up Link

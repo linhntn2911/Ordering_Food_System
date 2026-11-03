@@ -19,6 +19,7 @@ import '../widgets/admin_order_card.dart';
 import 'admin_order_details_screen.dart';
 import 'admin_order_list_screen.dart';
 import 'sales_report_screen.dart';
+import '../../../notifications/views/screens/admin_broadcast_screen.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
@@ -494,6 +495,23 @@ class _QuickActionGrid extends StatelessWidget {
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
                     builder: (_) => const AdminMenuItemListScreen(),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Row(
+          children: [
+            Expanded(
+              child: _ActionCard(
+                title: 'Broadcasts',
+                subtitle: 'Send promo & system notices',
+                icon: Icons.campaign_rounded,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const AdminBroadcastScreen(),
                   ),
                 ),
               ),

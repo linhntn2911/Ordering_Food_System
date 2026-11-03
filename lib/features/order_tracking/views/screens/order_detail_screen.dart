@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
-import 'package:oder_food/core/constants/app_routes.dart';
-import 'package:oder_food/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/constants/app_routes.dart';
+import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
 
 class OrderDetailScreen extends ConsumerWidget {
   const OrderDetailScreen({super.key, required this.orderId});

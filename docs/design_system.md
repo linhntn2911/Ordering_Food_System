@@ -224,6 +224,64 @@ The large promotional mockup shadows present in the Start Here page are not copi
 - Inactive icon and label: `textMuted`.
 - App bars normally use white/transparent backgrounds, dark icons, and no default Material elevation.
 
+### Search Field (Home)
+
+- Read-only entry point on Home that opens the Search screen; the filter button opens the same screen with the Filter Sheet open. Same height and radius as text fields.
+- Fill: `warningSurface`; search icon: `foodAccentDark`; hint: `textMuted`.
+- Filter button: square, same height and fill, radius `radiusInput`, icon `foodAccentDark`.
+
+### Search Screen
+
+- Full screen above `MainShell` (no bottom navigation); horizontal padding `24` (`16` below 360 dp).
+- Top bar: round white back button with `cardShadow`, editable search field (same style as Home, with a clear button while it has text), and a `48` filter button that shows a small `primaryEnd` dot when filters differ from the defaults.
+- Applied filters appear as removable chips (`primarySoft` fill, `primaryEnd` label and close icon) followed by a "Xóa bộ lọc" text button.
+- Results: a muted "N món" count, then one `FoodCard` per item without category headers. Empty results use `AppEmptyView` with "Xóa từ khóa" and/or "Xóa bộ lọc".
+
+### Filter Sheet
+
+- Modal bottom sheet, white, top radius `radiusDialog`, drag handle, at most 85% of the screen height, scrollable content.
+- Sections "Danh mục" (single-select choice chips, first chip "Tất cả"), "Tình trạng" (switch "Chỉ món còn hàng" with a `primaryEnd` track) and "Sắp xếp" (single-select choice chips).
+- Selected chips: `primarySoft` fill and `primaryEnd` border and label; never color alone.
+- Footer: outlined "Đặt lại" and gradient "Áp dụng", each at least `48` high. Choices apply only with "Áp dụng"; dismissing the sheet discards them.
+
+### Food Details
+
+- Full-width 4:3 food image (at most 45% of the screen height, `FoodImagePlaceholder` when missing) with a round white back button carrying `cardShadow`.
+- White content block with top radius `radiusDialog`, overlapping the image by `24`: sold-out label, name (`headlineMedium`, never clipped), rating summary, price (`price` style at `titleLarge` size), offline banner, description folded at six lines.
+- Options: "Chọn size" rows with radio icons (single choice) and "Topping" rows with checkbox icons (multiple choice); extra price `+x ₫` on the right; disabled rows use `textMuted`/`border` and say "không khả dụng" to screen readers.
+- Note field with `radiusInput`, a `200` character counter and a `primaryEnd` focus border.
+- Reviews: white cards with radius `radiusCard`, author "Khách hàng" or "Khách hàng ẩn danh" (never a name), small stars, `dd/MM/yyyy` date, "Đã chỉnh sửa", comment folded at four lines, `64` image thumbnails opening a full-screen viewer.
+- Fixed bottom bar: white with `cardShadow`; quantity stepper (`48` buttons on `primarySoft`) and a gradient "Thêm vào giỏ · total" button. Sold-out items show a disabled grey "Hết hàng" button instead.
+
+### Rating Stars
+
+- Five `star_rounded` icons in `warning`, with half stars for averages and outlined stars for the rest.
+- One semantic label such as "Đánh giá 4,5 trên 5"; the icons themselves are excluded from semantics.
+
+### Restaurant Banner
+
+- Fill `appPrimaryGradient`, radius `radiusLarge`, internal padding `20`.
+- White title (`titleLarge`) and body (`bodyMedium`), white action button with `primaryEnd` label.
+- Introduces the restaurant; it must not be styled or worded as a promotion.
+
+### Category Cards
+
+- Horizontal list, card width about 96, radius `radiusCard`, white surface with `cardShadow`.
+- Icon in a `primarySoft` circle, name in `labelLarge` (max two lines).
+- Selected: `primarySoft` fill and 1.5-pixel `primaryEnd` border; never color alone.
+
+### Bottom Navigation (MainShell)
+
+- Tabs: Home, Cart, Orders, Profile. The Food Ninja Chat tab is out of scope.
+- Floating white bar with `radiusLarge`, `cardShadow`, and `16` outer margin above the safe area.
+- Active tab: `primarySoft` pill containing a `primaryEnd` icon and `labelLarge` label. Inactive tabs: `textMuted` icon only, with a semantic label.
+
+## Home Composition
+
+Order from top: header (two-line `headlineLarge` title and round bell button), search field with filter button, offline banner when needed, restaurant banner, "Danh mục" category cards, "Phổ biến" list (up to five `FoodCard` rows), then the menu grouped by category. Section titles use `titleLarge`. Vertical gap between sections is `24`.
+
+`FoodCard` follows the Food Ninja "Popular Menu" row: rounded image on the left, name, rating and sold-out label in the middle, and the price right-aligned. The price may wrap but must never be clipped.
+
 ## Imagery and Icons
 
 - Export logos and simple icons from Figma as SVG.

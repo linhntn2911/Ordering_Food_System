@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
-import 'package:oder_food/core/constants/app_routes.dart';
-import 'package:oder_food/core/widgets/app_empty_state.dart';
-import 'package:oder_food/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
-import 'package:oder_food/features/order_history/presentation/widgets/order_history_card.dart';
+import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/constants/app_routes.dart';
+import 'package:ordering_food_system/core/widgets/app_empty_state.dart';
+import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
+import 'package:ordering_food_system/features/order_history/presentation/widgets/order_history_card.dart';
 
 class OrderHistoryView extends ConsumerWidget {
   const OrderHistoryView({super.key});
@@ -50,7 +50,7 @@ class OrderHistoryView extends ConsumerWidget {
                       label: Text(f['label']!),
                       selected: isSelected,
                       onSelected: (_) => ref.read(orderHistoryFilterProvider.notifier).state = f['key']!,
-                      selectedColor: AppColors.primary.withOpacity(0.12),
+                      selectedColor: AppColors.primary.withValues(alpha: 0.12),
                       labelStyle: TextStyle(color: isSelected ? AppColors.primary : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border)),
                       backgroundColor: AppColors.surface,
@@ -78,7 +78,7 @@ class OrderHistoryView extends ConsumerWidget {
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: orders.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final order = orders[index];
                       return OrderHistoryCard(order: order);

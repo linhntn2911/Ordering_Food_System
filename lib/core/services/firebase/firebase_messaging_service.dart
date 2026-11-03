@@ -1,6 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:oder_food/core/services/shared_preferences_service.dart';
+import 'package:ordering_food_system/core/services/shared_preferences_service.dart';
 
 class FirebaseMessagingService {
   FirebaseMessagingService(this._messaging, this._prefsService);
@@ -9,6 +9,7 @@ class FirebaseMessagingService {
 
   Future<void> initialize() async {
     await _messaging.requestPermission(alert: true, badge: true, sound: true);
+    // ignore: deprecated_member_use
     final token = await _messaging.getToken();
     if (token != null) {
       await _prefsService.setFcmToken(token);
@@ -23,6 +24,7 @@ class FirebaseMessagingService {
     });
   }
 
+  // ignore: deprecated_member_use
   Future<String?> getToken() => _messaging.getToken();
 }
 

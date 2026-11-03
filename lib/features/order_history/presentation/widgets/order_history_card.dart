@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
-import 'package:oder_food/core/constants/app_routes.dart';
-import 'package:oder_food/features/order_history/data/models/order_model.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/constants/app_routes.dart';
+import 'package:ordering_food_system/features/order_history/data/models/order_model.dart';
 
 class OrderHistoryCard extends StatelessWidget {
   const OrderHistoryCard({super.key, required this.order});
@@ -44,7 +44,7 @@ class OrderHistoryCard extends StatelessWidget {
                   Expanded(child: Text('Mã đơn: ${order.orderId}', style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary))),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: statusColor.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+                    decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
                     child: Text(order.status.label, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w600)),
                   )
                 ],
@@ -61,7 +61,7 @@ class OrderHistoryCard extends StatelessWidget {
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(width: 56, height: 56, color: AppColors.greyLight, alignment: Alignment.center, child: const Icon(Icons.fastfood, color: AppColors.textSecondary)),
+                      errorBuilder: (context, error, stackTrace) => Container(width: 56, height: 56, color: AppColors.greyLight, alignment: Alignment.center, child: const Icon(Icons.fastfood, color: AppColors.textSecondary)),
                     ),
                   ),
                   const SizedBox(width: 12),

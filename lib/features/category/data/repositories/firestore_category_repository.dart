@@ -10,6 +10,8 @@ class FirestoreCategoryRepository implements CategoryRepository {
   final FirebaseFirestore _firestore;
   CollectionReference<Map<String, dynamic>> get _categories =>
       _firestore.collection(FirestorePaths.categories);
+  CollectionReference<Map<String, dynamic>> get _items =>
+      _firestore.collection(FirestorePaths.menuItems);
 
   @override
   Stream<List<Category>> watchCategories({int limit = 100}) {
@@ -58,21 +60,27 @@ class FirestoreCategoryRepository implements CategoryRepository {
     required String name,
     required String imageUrl,
     required bool isPublished,
-  }) {
-    return _categories.doc(id).update({
+  }) async {
+    final batch = _firestore.batch();
+    batch.update(_categories.doc(id), {
       'name': name,
       'imageUrl': imageUrl,
       'isPublished': isPublished,
       'updatedAt': FieldValue.serverTimestamp(),
     });
+    await _updateItemCopies(batch, id, {'isCategoryPublished': isPublished});
+    await batch.commit();
   }
 
   @override
-  Future<void> setPublished(String id, {required bool isPublished}) {
-    return _categories.doc(id).update({
+  Future<void> setPublished(String id, {required bool isPublished}) async {
+    final batch = _firestore.batch();
+    batch.update(_categories.doc(id), {
       'isPublished': isPublished,
       'updatedAt': FieldValue.serverTimestamp(),
     });
+    await _updateItemCopies(batch, id, {'isCategoryPublished': isPublished});
+    await batch.commit();
   }
 
   @override
@@ -86,6 +94,28 @@ class FirestoreCategoryRepository implements CategoryRepository {
       'sortOrder': first.sortOrder,
       'updatedAt': FieldValue.serverTimestamp(),
     });
+    await _updateItemCopies(batch, first.id, {
+      'categorySortOrder': second.sortOrder,
+    });
+    await _updateItemCopies(batch, second.id, {
+      'categorySortOrder': first.sortOrder,
+    });
     await batch.commit();
+  }
+
+  /// Keeps the denormalized category fields on menu items in the same batch
+  /// as the category change (docs/database_schema.md).
+  Future<void> _updateItemCopies(
+    WriteBatch batch,
+    String categoryId,
+    Map<String, Object> values,
+  ) async {
+    final items = await _items.where('categoryId', isEqualTo: categoryId).get();
+    for (final item in items.docs) {
+      batch.update(item.reference, {
+        ...values,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    }
   }
 }

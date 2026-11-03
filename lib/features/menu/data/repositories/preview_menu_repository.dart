@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import '../../domain/entities/menu_category.dart';
+import '../../domain/entities/menu_feed.dart';
 import '../../domain/entities/menu_item.dart';
 import '../../domain/entities/menu_item_draft.dart';
+import '../../domain/entities/menu_item_feed.dart';
 import '../../domain/repositories/menu_repository.dart';
 
 /// Ngô Chicken sample catalogue for debug Web Preview only.
@@ -25,15 +28,70 @@ class PreviewMenuRepository implements MenuRepository {
   }
 
   @override
-  Stream<List<MenuItem>> watchPublishedItems({
-    String? categoryId,
+  Stream<MenuFeed<MenuCategory>> watchPublishedCategories({
     int limit = 50,
   }) async* {
-    yield _snapshot(categoryId: categoryId, limit: limit, publishedOnly: true);
-    yield* _changes.stream.map(
-      (_) =>
-          _snapshot(categoryId: categoryId, limit: limit, publishedOnly: true),
+    final ids = <String>{for (final item in _items) item.categoryId};
+    var order = 0;
+    yield MenuFeed(
+      items: [
+        for (final id in ids.take(limit))
+          MenuCategory(id: id, name: id, imageUrl: '', sortOrder: order++),
+      ],
+      isFromCache: false,
+      hasMore: false,
     );
+  }
+
+  @override
+  Stream<MenuFeed<MenuItem>> watchBrowsableItems({
+    String? categoryId,
+    required int limit,
+  }) => _watchPublishedFeed(categoryId: categoryId, limit: limit);
+
+  @override
+  Stream<MenuFeed<MenuItem>> watchSearchableItems({int limit = 300}) =>
+      _watchPublishedFeed(limit: limit);
+
+  @override
+  Stream<MenuFeed<MenuItem>> watchPopularItems({int limit = 5}) =>
+      _watchPublishedFeed(limit: limit).map(
+        (feed) => MenuFeed(
+          items: feed.items.where((item) => item.hasRating),
+          isFromCache: false,
+          hasMore: false,
+        ),
+      );
+
+  @override
+  Stream<MenuItemFeed> watchItem(String menuItemId) async* {
+    MenuItemFeed feed() => MenuItemFeed(
+      item: _items.where((item) => item.id == menuItemId).firstOrNull,
+      isFromCache: false,
+    );
+    yield feed();
+    yield* _changes.stream.map((_) => feed());
+  }
+
+  Stream<MenuFeed<MenuItem>> _watchPublishedFeed({
+    String? categoryId,
+    required int limit,
+  }) async* {
+    MenuFeed<MenuItem> feed() {
+      final items = _snapshot(
+        categoryId: categoryId,
+        limit: limit,
+        publishedOnly: true,
+      );
+      return MenuFeed(
+        items: items,
+        isFromCache: false,
+        hasMore: items.length == limit,
+      );
+    }
+
+    yield feed();
+    yield* _changes.stream.map((_) => feed());
   }
 
   @override
@@ -69,7 +127,10 @@ class PreviewMenuRepository implements MenuRepository {
       sortOrder: existing?.sortOrder ?? _items.length,
       ratingAverage: existing?.ratingAverage ?? 0,
       reviewCount: existing?.reviewCount ?? 0,
-      sizes: List.unmodifiable(draft.sizes),
+      sizes: draft.sizes,
+      toppings: existing?.toppings ?? const [],
+      isCategoryPublished: existing?.isCategoryPublished ?? true,
+      categorySortOrder: existing?.categorySortOrder ?? 0,
     );
     if (existingIndex == -1) {
       _items.add(saved);
@@ -98,7 +159,8 @@ class PreviewMenuRepository implements MenuRepository {
           .where(
             (item) =>
                 (categoryId == null || item.categoryId == categoryId) &&
-                (!publishedOnly || (item.isPublished && item.isAvailable)),
+                (!publishedOnly ||
+                    (item.isPublished && item.isCategoryPublished)),
           )
           .take(limit),
     );
@@ -121,6 +183,9 @@ MenuItem _copy(MenuItem item, {bool? isAvailable, bool? isPublished}) {
     ratingAverage: item.ratingAverage,
     reviewCount: item.reviewCount,
     sizes: item.sizes,
+    toppings: item.toppings,
+    isCategoryPublished: item.isCategoryPublished,
+    categorySortOrder: item.categorySortOrder,
   );
 }
 

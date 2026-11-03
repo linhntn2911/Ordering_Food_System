@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 
 import 'app_colors.dart';
 
-/// Centralized Poppins typography tokens defined in docs/design_system.md.
+/// Poppins type scale from `docs/design_system.md`.
 abstract final class AppTextStyles {
-  static const String fontFamily = 'Poppins';
+  static const fontFamily = 'Poppins';
 
-  static const TextStyle displayLarge = TextStyle(
+  static const displayLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 32,
     fontWeight: FontWeight.w700,
@@ -14,7 +14,7 @@ abstract final class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle headlineLarge = TextStyle(
+  static const headlineLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 25,
     fontWeight: FontWeight.w700,
@@ -22,7 +22,7 @@ abstract final class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle headlineMedium = TextStyle(
+  static const headlineMedium = TextStyle(
     fontFamily: fontFamily,
     fontSize: 22,
     fontWeight: FontWeight.w700,
@@ -30,7 +30,7 @@ abstract final class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle titleLarge = TextStyle(
+  static const titleLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 18,
     fontWeight: FontWeight.w600,
@@ -38,7 +38,7 @@ abstract final class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle titleMedium = TextStyle(
+  static const titleMedium = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: FontWeight.w600,
@@ -46,7 +46,7 @@ abstract final class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
-  static const TextStyle bodyLarge = TextStyle(
+  static const bodyLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: FontWeight.w400,
@@ -54,7 +54,7 @@ abstract final class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  static const TextStyle bodyMedium = TextStyle(
+  static const bodyMedium = TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w400,
@@ -62,15 +62,15 @@ abstract final class AppTextStyles {
     color: AppColors.textSecondary,
   );
 
-  static const TextStyle labelLarge = TextStyle(
+  static const labelLarge = TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w600,
     height: 20 / 14,
-    color: Colors.white,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle bodySmall = TextStyle(
+  static const bodySmall = TextStyle(
     fontFamily: fontFamily,
     fontSize: 12,
     fontWeight: FontWeight.w400,
@@ -78,11 +78,21 @@ abstract final class AppTextStyles {
     color: AppColors.textMuted,
   );
 
-  static const TextStyle labelSmall = TextStyle(
+  static const labelSmall = TextStyle(
     fontFamily: fontFamily,
     fontSize: 11,
     fontWeight: FontWeight.w500,
     height: 16 / 11,
     color: AppColors.textMuted,
+  );
+
+  /// Prices and totals: weight 700 with tabular figures.
+  static const price = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w700,
+    height: 20 / 14,
+    color: AppColors.textPrimary,
+    fontFeatures: [FontFeature.tabularFigures()],
   );
 }

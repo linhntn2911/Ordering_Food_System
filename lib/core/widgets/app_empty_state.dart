@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
 
 class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
@@ -23,7 +23,7 @@ class AppEmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 72, color: AppColors.textSecondary.withOpacity(0.6)),
+            Icon(icon, size: 72, color: AppColors.textSecondary.withValues(alpha: 0.6)),
             const SizedBox(height: 16),
             Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppColors.textPrimary), textAlign: TextAlign.center),
             const SizedBox(height: 8),

@@ -20,6 +20,12 @@ service cloud.firestore {
         && currentUser().data.status == 'active';
     }
 
+    // Mirrors the public read rule of menu_items for nested documents.
+    function isPubliclyVisibleItem(menuItemId) {
+      let item = get(/databases/$(database)/documents/menu_items/$(menuItemId)).data;
+      return item.isPublished == true && item.isCategoryPublished == true;
+    }
+
     function validAdminOrderTransition(fromStatus, toStatus) {
       return (fromStatus == 'Pending'
           && (toStatus == 'Confirmed' || toStatus == 'Rejected'))
@@ -89,9 +95,21 @@ service cloud.firestore {
     }
 
     match /menu_items/{menuItemId} {
+      // Unavailable items stay readable so they can show a sold-out label.
+      // isCategoryPublished mirrors the owning category because list queries
+      // cannot read the category document.
       allow get, list: if isAdmin()
-        || (resource.data.isPublished == true && resource.data.isAvailable == true);
+        || (resource.data.isPublished == true
+          && resource.data.isCategoryPublished == true);
       allow create, update, delete: if isAdmin();
+
+      // Public display copy of a review without customer or order
+      // identifiers (specs/004-food-details/contracts/firestore_review_access.md).
+      // Trusted code writes it in the same batch as the private review.
+      match /reviews/{reviewId} {
+        allow get, list: if isAdmin() || isPubliclyVisibleItem(menuItemId);
+        allow create, update, delete: if false;
+      }
     }
 
     match /restaurant_configs/{configId} {
@@ -103,9 +121,29 @@ service cloud.firestore {
       allow read: if signedIn()
         && (resource.data.customerId == request.auth.uid || isAdmin());
 
-      // Creation still requires trusted price/distance/total validation. Admin
-      // may only move an existing order through the approved state machine.
-      allow create, delete: if false;
+      // Customer checkout creates only its own initial COD order. Totals and
+      // delivery values are validated again by the checkout repository before
+      // this write; Admin can only move the order through approved states.
+      allow create: if signedIn()
+        && request.resource.data.customerId == request.auth.uid
+        && request.resource.data.keys().hasAll([
+          'orderCode', 'customerId', 'customerName', 'customerPhone',
+          'deliveryAddress', 'totalAmount', 'subtotal', 'deliveryFee',
+          'deliveryDistanceKm', 'paymentMethod', 'paymentStatus',
+          'orderStatus', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.orderStatus == 'Pending'
+        && request.resource.data.paymentMethod == 'cod'
+        && request.resource.data.paymentStatus == 'unpaid'
+        && request.resource.data.totalAmount is int
+        && request.resource.data.subtotal is int
+        && request.resource.data.deliveryFee is int
+        && request.resource.data.deliveryDistanceKm is number
+        && request.resource.data.deliveryDistanceKm >= 0
+        && request.resource.data.deliveryDistanceKm <= 8
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
       allow update: if isAdmin()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'orderStatus', 'updatedAt', 'rejectionReason', 'completedAt'
@@ -130,20 +168,21 @@ service cloud.firestore {
               == request.auth.uid
             || isAdmin()
           );
-        allow create: if isAdmin()
-          && request.resource.data.keys().hasAll([
-            'fromStatus', 'toStatus', 'actorId', 'actorRole', 'createdAt'
-          ])
-          && request.resource.data.actorId == request.auth.uid
-          && request.resource.data.actorRole == 'admin'
-          && request.resource.data.createdAt == request.time
-          && validAdminOrderTransition(
-            request.resource.data.fromStatus,
-            request.resource.data.toStatus
-          )
+        allow create: if signedIn()
           && getAfter(
             /databases/$(database)/documents/orders/$(orderId)
-          ).data.orderStatus == request.resource.data.toStatus;
+          ).data.customerId == request.auth.uid
+          && request.resource.data.keys().hasAll([
+            'menuItemId', 'name', 'imageUrl', 'basePrice', 'selectedSize',
+            'selectedToppings', 'quantity', 'unitPrice', 'lineTotal',
+            'note', 'reviewed'
+          ])
+          && request.resource.data.name is string
+          && request.resource.data.quantity is int
+          && request.resource.data.quantity > 0
+          && request.resource.data.unitPrice is int
+          && request.resource.data.lineTotal is int
+          && request.resource.data.reviewed == false;
         allow update, delete: if false;
       }
 
@@ -159,10 +198,24 @@ service cloud.firestore {
     }
 
     match /reviews/{reviewId} {
-      allow read: if true;
+      // Private review with customer and order identifiers: owner and Admin.
+      allow read: if signedIn()
+        && (resource.data.customerId == request.auth.uid || isAdmin());
       // Trusted code validates completed-order ownership, time windows,
       // duplicate prevention, and rating aggregate updates atomically.
       allow create, update, delete: if false;
+    }
+
+    match /email_otps/{otpId} {
+      allow read, write: if false;
+    }
+
+    match /user_credentials/{userId} {
+      allow read, write: if false;
+    }
+
+    match /mail/{mailId} {
+      allow create: if true;
     }
 
     match /{document=**} {

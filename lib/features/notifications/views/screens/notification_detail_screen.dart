@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
-import 'package:oder_food/core/constants/app_routes.dart';
-import 'package:oder_food/features/notifications/models/notification_model.dart';
-import 'package:oder_food/features/notifications/providers/notification_provider.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/constants/app_routes.dart';
+import 'package:ordering_food_system/features/notifications/models/notification_model.dart';
+import 'package:ordering_food_system/features/notifications/providers/notification_provider.dart';
 
 class NotificationDetailScreen extends ConsumerWidget {
   const NotificationDetailScreen({super.key, required this.notificationId, this.orderId = ''});
@@ -39,7 +39,7 @@ class NotificationDetailScreen extends ConsumerWidget {
           if (n == null) {
             return const Center(child: Text('Không tìm thấy thông báo'));
           }
-          final notification = n!;
+          final notification = n;
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(

@@ -12,6 +12,15 @@ abstract final class AppSpacing {
   static const double xxl = 32.0;
   static const double xxxl = 40.0;
 
+  // Hong Anh aliases
+  static const double s4 = 4;
+  static const double s8 = 8;
+  static const double s12 = 12;
+  static const double s16 = 16;
+  static const double s20 = 20;
+  static const double s24 = 24;
+  static const double s32 = 32;
+  static const double s40 = 40;
   // 4-point grid
   static const double p4 = 4.0;
   static const double p8 = 8.0;
@@ -22,9 +31,16 @@ abstract final class AppSpacing {
   static const double p32 = 32.0;
   static const double p40 = 40.0;
 
+  /// Minimum touch target for interactive controls.
+  static const double minTouchTarget = 48;
+
   // Screen horizontal padding
   static const double screenHorizontal = 24.0;
   static const double screenHorizontalCompact = 16.0;
+
+  /// Standard screen padding: 24, reduced to 16 below 360 logical pixels.
+  static double screenHorizontalFor(double width) =>
+      width < 360 ? screenHorizontalCompact : screenHorizontal;
 
   // Corner radii
   static const double radiusSmall = 8.0;

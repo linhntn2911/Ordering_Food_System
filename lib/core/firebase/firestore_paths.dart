@@ -13,6 +13,8 @@ abstract final class FirestorePaths {
   static String notifications(String userId) => '${user(userId)}/notifications';
   static String devices(String userId) => '${user(userId)}/devices';
   static String orderItems(String orderId) => '$orders/$orderId/items';
+  static String menuItemReviews(String menuItemId) =>
+      '$menuItems/$menuItemId/reviews';
   static String orderStatusEvents(String orderId) =>
       '$orders/$orderId/status_events';
 }

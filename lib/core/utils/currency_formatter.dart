@@ -1,4 +1,5 @@
 abstract final class CurrencyFormatter {
+  static String formatVND(num amount) => vnd(amount.round());
   static String vnd(int value) {
     final digits = value.abs().toString();
     final buffer = StringBuffer();

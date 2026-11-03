@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:oder_food/features/review/models/review_model.dart';
-import 'package:oder_food/features/review/repositories/review_repository.dart';
+import 'package:ordering_food_system/features/review/models/review_model.dart';
+import 'package:ordering_food_system/features/review/repositories/review_repository.dart';
 
 final reviewRepositoryProvider = Provider<ReviewRepository>((ref) => MockReviewRepository());
 
@@ -9,9 +9,7 @@ final myReviewsProvider = FutureProvider<List<ReviewModel>>((ref) async {
   return repo.getMyReviews();
 });
 
-final reviewFormProvider = StateNotifierProvider<ReviewFormNotifier, ReviewFormState>((ref) {
-  return ReviewFormNotifier(ref);
-});
+final reviewFormProvider = NotifierProvider<ReviewFormNotifier, ReviewFormState>(ReviewFormNotifier.new);
 
 class ReviewFormState {
   ReviewFormState({this.rating = 5, this.comment = '', this.submitting = false, this.images = const []});
@@ -25,9 +23,9 @@ class ReviewFormState {
   }
 }
 
-class ReviewFormNotifier extends StateNotifier<ReviewFormState> {
-  ReviewFormNotifier(this.ref) : super(ReviewFormState());
-  final Ref ref;
+class ReviewFormNotifier extends Notifier<ReviewFormState> {
+  @override
+  ReviewFormState build() => ReviewFormState();
 
   void setRating(int rating) => state = state.copyWith(rating: rating);
   void setComment(String comment) => state = state.copyWith(comment: comment);

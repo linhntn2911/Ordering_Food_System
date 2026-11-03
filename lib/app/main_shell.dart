@@ -1,0 +1,150 @@
+import 'package:flutter/material.dart';
+
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_radii.dart';
+import '../core/theme/app_shadows.dart';
+import '../core/theme/app_spacing.dart';
+import '../core/theme/app_text_styles.dart';
+import '../features/cart/presentation/views/cart_screen.dart';
+import '../features/menu/presentation/views/home_view.dart';
+import '../features/order_history/presentation/views/order_history_view.dart';
+import '../features/profile/presentation/views/profile_view.dart';
+import 'router.dart';
+
+/// Customer app shell with the bottom tabs Home, Cart, Orders and Profile.
+///
+/// Tabs live in an [IndexedStack] so Home keeps its scroll position and
+/// selection while another tab is shown.
+class MainShell extends StatefulWidget {
+  const MainShell({super.key});
+
+  static const tabs = [
+    _ShellTab('Trang chủ', Icons.home_rounded),
+    _ShellTab('Giỏ hàng', Icons.shopping_cart_rounded),
+    _ShellTab('Đơn hàng', Icons.receipt_long_rounded),
+    _ShellTab('Tài khoản', Icons.person_rounded),
+  ];
+
+  @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
+  var _index = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(
+        index: _index,
+        children: [
+          const HomeView(),
+          CartScreen(
+            onNavigateToCheckout: () =>
+                Navigator.of(context).pushNamed(AppRoutes.checkout),
+            onBrowseMenu: () => setState(() => _index = 0),
+          ),
+          const OrderHistoryView(),
+          const ProfileView(),
+        ],
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.p16,
+            0,
+            AppSpacing.p16,
+            AppSpacing.p16,
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppRadii.large),
+              boxShadow: const [AppShadows.card],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.p8),
+              child: Row(
+                children: [
+                  for (var i = 0; i < MainShell.tabs.length; i++)
+                    Expanded(
+                      flex: i == _index ? 2 : 1,
+                      child: _TabButton(
+                        key: ValueKey('shell-tab-$i'),
+                        tab: MainShell.tabs[i],
+                        selected: i == _index,
+                        onTap: () => setState(() => _index = i),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ShellTab {
+  const _ShellTab(this.label, this.icon);
+
+  final String label;
+  final IconData icon;
+}
+
+class _TabButton extends StatelessWidget {
+  const _TabButton({
+    super.key,
+    required this.tab,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _ShellTab tab;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final radius = BorderRadius.circular(AppRadii.medium);
+    final color = selected ? AppColors.primaryEnd : AppColors.textMuted;
+
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: tab.label,
+      excludeSemantics: true,
+      onTap: onTap,
+      child: Material(
+        color: selected ? AppColors.primarySoft : AppColors.surface,
+        borderRadius: radius,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: radius,
+          child: SizedBox(
+            height: AppSpacing.minTouchTarget,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(tab.icon, size: 24, color: color),
+                if (selected) ...[
+                  const SizedBox(width: AppSpacing.p8),
+                  Flexible(
+                    child: Text(
+                      tab.label,
+                      style: AppTextStyles.labelLarge.copyWith(color: color),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

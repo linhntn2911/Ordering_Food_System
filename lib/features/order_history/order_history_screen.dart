@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
-import 'package:oder_food/core/constants/app_routes.dart';
-import 'package:oder_food/core/widgets/app_empty_state.dart';
-import 'package:oder_food/features/order_history/models/order_model.dart';
-import 'package:oder_food/features/order_history/providers/order_history_provider.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/constants/app_routes.dart';
+import 'package:ordering_food_system/core/widgets/app_empty_state.dart';
+import 'package:ordering_food_system/features/order_history/models/order_model.dart';
+import 'package:ordering_food_system/features/order_history/providers/order_history_provider.dart';
 
 class OrderHistoryScreen extends ConsumerWidget {
   const OrderHistoryScreen({super.key});
@@ -51,7 +51,7 @@ class OrderHistoryScreen extends ConsumerWidget {
                       label: Text(f['label']!),
                       selected: isSelected,
                       onSelected: (_) => ref.read(orderHistoryFilterProvider.notifier).state = f['key']!,
-                      selectedColor: AppColors.primary.withOpacity(0.12),
+                      selectedColor: AppColors.primary.withValues(alpha: 0.12),
                       labelStyle: TextStyle(color: isSelected ? AppColors.primary : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border)),
                       backgroundColor: AppColors.surface,
@@ -79,7 +79,7 @@ class OrderHistoryScreen extends ConsumerWidget {
                   child: ListView.separated(
                     padding: const EdgeInsets.all(16),
                     itemCount: orders.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final order = orders[index];
                       return _OrderHistoryCard(order: order);
@@ -134,7 +134,7 @@ class _OrderHistoryCard extends StatelessWidget {
                   Expanded(child: Text('Mã đơn: ${order.orderId}', style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary))),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(color: statusColor.withOpacity(0.12), borderRadius: BorderRadius.circular(999)),
+                    decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(999)),
                     child: Text(order.status.label, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w600)),
                   )
                 ],
@@ -151,7 +151,7 @@ class _OrderHistoryCard extends StatelessWidget {
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(width: 56, height: 56, color: AppColors.greyLight, alignment: Alignment.center, child: const Icon(Icons.fastfood, color: AppColors.textSecondary)),
+                      errorBuilder: (context, error, stackTrace) => Container(width: 56, height: 56, color: AppColors.greyLight, alignment: Alignment.center, child: const Icon(Icons.fastfood, color: AppColors.textSecondary)),
                     ),
                   ),
                   const SizedBox(width: 12),

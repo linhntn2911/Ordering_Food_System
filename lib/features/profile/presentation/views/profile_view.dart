@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/app/router.dart';
 import 'package:ordering_food_system/core/theme/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_radii.dart';
 import 'package:ordering_food_system/core/theme/app_spacing.dart';
 import 'package:ordering_food_system/core/theme/app_text_styles.dart';
 import 'package:ordering_food_system/core/widgets/app_back_button.dart';
 import 'package:ordering_food_system/core/widgets/custom_text_field.dart';
 import 'package:ordering_food_system/core/widgets/food_ninja_background.dart';
 import 'package:ordering_food_system/core/widgets/primary_button.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/profile/presentation/viewmodels/profile_view_model.dart';
 
 class ProfileView extends ConsumerWidget {
@@ -129,50 +131,132 @@ class ProfileView extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (dialogContext) {
-        return AlertDialog(
+        return Dialog(
           backgroundColor: AppColors.surface,
-          shape: const RoundedRectangleBorder(
-            borderRadius: AppSpacing.roundedDialog,
+          elevation: 0,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadii.dialog),
           ),
-          title: const Text('Sign Out', style: AppTextStyles.titleLarge),
-          content: Text(
-            'Are you sure you want to sign out of your account?',
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.p24,
+              AppSpacing.p32,
+              AppSpacing.p24,
+              AppSpacing.p24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Food Ninja soft error icon container
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors.error.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.logout_rounded,
+                      color: AppColors.error,
+                      size: 30,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.p20),
+                const Text(
+                  'Sign Out',
+                  style: AppTextStyles.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.p8),
+                Text(
+                  'Are you sure you want to sign out of your account?',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.4,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.p24),
+                // 2 balanced side-by-side buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(AppRadii.card),
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppRadii.card),
+                            onTap: () => Navigator.of(dialogContext).pop(),
+                            child: Center(
+                              child: Text(
+                                'Cancel',
+                                style: AppTextStyles.labelLarge.copyWith(
+                                  color: AppColors.textSecondary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.p12),
+                    Expanded(
+                      child: Container(
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppColors.error,
+                          borderRadius: BorderRadius.circular(AppRadii.card),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.error.withValues(alpha: 0.3),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(AppRadii.card),
+                            onTap: () async {
+                              Navigator.of(dialogContext).pop();
+                              await ref
+                                  .read(profileViewModelProvider.notifier)
+                                  .signOut();
+                              if (context.mounted) {
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                  AppRoutes.home,
+                                  (route) => false,
+                                );
+                              }
+                            },
+                            child: Center(
+                              child: Text(
+                                'Sign Out',
+                                style: AppTextStyles.labelLarge.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(
-                'Cancel',
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.textMuted,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: AppSpacing.roundedMedium,
-                ),
-              ),
-              onPressed: () async {
-                Navigator.of(dialogContext).pop();
-                await ref.read(profileViewModelProvider.notifier).signOut();
-                if (context.mounted) {
-                  Navigator.of(
-                    context,
-                  ).pushNamedAndRemoveUntil(AppRoutes.login, (route) => false);
-                }
-              },
-              child: const Text(
-                'Sign Out',
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
         );
       },
     );
@@ -210,11 +294,11 @@ class ProfileView extends ConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.p16),
                       ElevatedButton(
-                        onPressed: () => Navigator.of(context)
-                            .pushNamedAndRemoveUntil(
-                              AppRoutes.login,
-                              (route) => false,
-                            ),
+                        onPressed: () async {
+                          await Navigator.of(context).pushNamed(AppRoutes.login);
+                          ref.invalidate(profileViewModelProvider);
+                          ref.invalidate(authStateProvider);
+                        },
                         child: const Text('Go to Login'),
                       ),
                     ],
@@ -231,7 +315,11 @@ class ProfileView extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const AppBackButton(),
+                          // The "Tài khoản" tab has nothing to go back to.
+                          if (Navigator.of(context).canPop())
+                            const AppBackButton()
+                          else
+                            const SizedBox(width: 45),
                           const Text(
                             'Profile',
                             style: AppTextStyles.headlineMedium,
@@ -463,6 +551,87 @@ class ProfileView extends ConsumerWidget {
                               value: user.phone.isNotEmpty
                                   ? user.phone
                                   : 'Not provided',
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.p24),
+                      const SizedBox(height: AppSpacing.p20),
+
+                      // Activity Card (Notifications & Reviews)
+                      Container(
+                        padding: const EdgeInsets.all(AppSpacing.p20),
+                        decoration: const BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: AppSpacing.roundedCard,
+                          boxShadow: AppSpacing.cardShadow,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Activity & Updates',
+                              style: AppTextStyles.titleMedium,
+                            ),
+                            const SizedBox(height: AppSpacing.p12),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primarySoft,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.notifications_outlined,
+                                  color: AppColors.primarySolid,
+                                  size: 20,
+                                ),
+                              ),
+                              title: const Text('Notifications', style: AppTextStyles.bodyMedium),
+                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
+                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
+                            ),
+                            const Divider(height: 1, color: AppColors.borderLight),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.warningSurface,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.rate_review_outlined,
+                                  color: AppColors.foodAccentDark,
+                                  size: 20,
+                                ),
+                              ),
+                              title: const Text('My Reviews', style: AppTextStyles.bodyMedium),
+                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
+                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.myReviews),
+                            ),
+                            const Divider(height: 1, color: AppColors.borderLight),
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: Container(
+                                width: 36,
+                                height: 36,
+                                decoration: const BoxDecoration(
+                                  color: AppColors.primarySoft,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.location_on_outlined,
+                                  color: AppColors.primarySolid,
+                                  size: 20,
+                                ),
+                              ),
+                              title: const Text('Delivery Addresses', style: AppTextStyles.bodyMedium),
+                              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textMuted),
+                              onTap: () => Navigator.of(context).pushNamed(AppRoutes.addresses),
                             ),
                           ],
                         ),

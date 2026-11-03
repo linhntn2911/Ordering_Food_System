@@ -1,7 +1,8 @@
-import 'menu_size_option.dart';
+import 'menu_option.dart';
+import 'price_range.dart';
 
 class MenuItem {
-  const MenuItem({
+  MenuItem({
     required this.id,
     required this.categoryId,
     required this.name,
@@ -13,8 +14,12 @@ class MenuItem {
     required this.sortOrder,
     required this.ratingAverage,
     required this.reviewCount,
-    this.sizes = const [],
-  });
+    List<MenuOption> sizes = const [],
+    List<MenuOption> toppings = const [],
+    this.isCategoryPublished = true,
+    this.categorySortOrder = 0,
+  }) : sizes = List<MenuOption>.unmodifiable(sizes),
+       toppings = List<MenuOption>.unmodifiable(toppings);
 
   final String id;
   final String categoryId;
@@ -27,5 +32,12 @@ class MenuItem {
   final int sortOrder;
   final double ratingAverage;
   final int reviewCount;
-  final List<MenuSizeOption> sizes;
+  final List<MenuOption> sizes;
+  final List<MenuOption> toppings;
+  final bool isCategoryPublished;
+  final int categorySortOrder;
+
+  PriceRange get priceRange => PriceRange.of(basePrice, sizes);
+
+  bool get hasRating => reviewCount > 0;
 }

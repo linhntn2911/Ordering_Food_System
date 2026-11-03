@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'menu_size_option.dart';
+import 'menu_option.dart';
 
 class MenuItemDraft {
   const MenuItemDraft({
@@ -29,5 +29,5 @@ class MenuItemDraft {
   final bool isAvailable;
   final bool isPublished;
   final int sortOrder;
-  final List<MenuSizeOption> sizes;
+  final List<MenuOption> sizes;
 }

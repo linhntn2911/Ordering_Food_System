@@ -3,12 +3,12 @@
 **Feature ID**: `001-food-ordering-system`  
 **Created**: 2026-10-17  
 **Status**: Draft ready for clarification and planning  
-**Product**: Flutter mobile application for one restaurant  
+**Product**: Flutter mobile application for one restaurant (Ngô Chicken)  
 **Input**: Course requirements, the revised `Project_PRM (3).docx` Food Ordering System SRS, and the architecture patterns reviewed in `Example-PRM393`
 
 ## Scope Decision
 
-The application supports food ordering from one restaurant. Guests can browse the menu. Registered customers can manage a cart, delivery addresses, COD orders, reviews, favorites, and notifications. Pre-provisioned administrators manage the menu and process orders from the same mobile application through role-based navigation.
+The application supports food ordering from one restaurant, Ngô Chicken, which sells fried chicken, rice, noodles, snacks, combos, and drinks. Guests can browse the menu. Registered customers can manage a cart, delivery addresses, COD orders, reviews, favorites, and notifications. Pre-provisioned administrators manage the menu and process orders from the same mobile application through role-based navigation.
 
 The first release uses Cash on Delivery only. It does not include an online payment gateway, a driver application, live GPS tracking, chat, multi-restaurant support, or complex voucher rules.
 
@@ -124,6 +124,7 @@ As a Customer or Admin, I want timely push and in-app notifications about releva
 1. **Given** notifications are permitted and a valid token exists, **When** an order event occurs, **Then** the trusted backend sends an FCM message and stores an in-app notification.
 2. **Given** the user taps an order notification, **When** the app opens from foreground, background, or terminated state, **Then** it routes to the authorized Order Details screen.
 3. **Given** push delivery is unavailable, **When** the user reconnects, **Then** Firestore still provides the current order state and notification history.
+4. **Given** an authenticated Admin, **When** the Admin broadcasts a promotional discount or system announcement with valid title and message, **Then** an in-app notification record is created with type `promo` or `system` and delivered to customer notification inboxes.
 
 ### User Story 7 - Manage Menu and Categories (Priority: P2)
 
@@ -212,7 +213,7 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 
 #### Menu Discovery
 
-- **FR-007**: Guests and Customers MUST be able to browse published categories and available menu items.
+- **FR-007**: Guests and Customers MUST be able to browse published categories and published menu items; unavailable items remain visible with a sold-out label (see `specs/002-browse-menu/spec.md`).
 - **FR-008**: Users MUST be able to search menu items by name and filter by category and availability.
 - **FR-009**: Food Details MUST show image, name, description, base price, available options, rating summary, availability, and reviews.
 - **FR-010**: Customers MUST be able to add and remove favorite items.
@@ -269,6 +270,8 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **FR-038**: Each push event MUST also create an in-app notification record.
 - **FR-039**: A notification tap MUST deep-link to an authorized relevant screen.
 - **FR-040**: FCM sends MUST originate from trusted backend code and MUST NOT expose server credentials in the Flutter client.
+- **FR-051**: Admins MUST be able to broadcast promotional discount announcements and system notices (`promo` / `system`) to customers.
+- **FR-052**: Broadcast notifications MUST be stored as in-app notification records and appear in customer notification inboxes with timestamp, title, body, and type.
 
 #### Reporting and Local Configuration
 
@@ -324,6 +327,7 @@ As an Admin, I want a compact sales report so that I can inspect completed-order
 - **NFR-007 Accessibility**: Interactive controls MUST have readable contrast, semantic labels, and touch targets of at least 48 logical pixels where practical.
 - **NFR-008 Consistency**: Colors, typography, spacing, radius, and shared components MUST come from centralized theme and token files.
 - **NFR-009 Visual fidelity**: Customer and Admin screens MUST follow `docs/design_system.md`, including the `#53E88B -> #15BE77` primary gradient, Poppins type scale, 4-point spacing grid, and light-only surfaces.
+- **NFR-010 App shell**: Customer screens MUST share a bottom navigation bar with Home, Cart, Orders, and Profile; the Food Ninja Chat tab is out of scope. Tabs whose feature is not yet delivered MUST show a "feature in development" state rather than an unresponsive control (see `specs/002-browse-menu/spec.md`).
 
 ## Key Entities
 
@@ -386,6 +390,8 @@ Each member owns at least three Medium-or-higher screens. Shared widgets, Fireba
 
 ## Assumptions
 
+- The initial menu is Ngô Chicken's food and drink menu: 6 categories (Gà rán, Cơm, Mỳ, Đồ ăn vặt, Combo, Đồ uống) priced in VND. Each category keeps at most six representative items; drinks are grouped under Đồ uống and offer M and L sizes; the restaurant's "Combo đạt lớp" group is intentionally not offered in the app. Seed data lives in `tools/seed_menu/menu_seed.json`.
+- Home follows the Food Ninja Home frame with single-restaurant substitutions: category cards replace "Nearest Restaurant", a restaurant banner replaces the promotional "Special Deal" banner, and the Chat tab is removed.
 - The application targets Android first; iOS-compatible Flutter code is retained where practical.
 - The restaurant has one delivery operation and Admin users manually set `OutForDelivery`; there is no driver role.
 - COD payment collection occurs outside the app; the app records the selected payment method and completed order state.

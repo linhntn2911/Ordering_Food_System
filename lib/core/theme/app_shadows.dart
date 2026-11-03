@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 
 abstract final class AppShadows {
   static const card = BoxShadow(
@@ -6,6 +6,9 @@ abstract final class AppShadows {
     offset: Offset(0, 4),
     blurRadius: 20,
   );
+
+  static const cardShadow = card;
+  static const primaryShadow = primary;
   static const primary = BoxShadow(
     color: Color(0x2E53E88B),
     offset: Offset(0, 8),

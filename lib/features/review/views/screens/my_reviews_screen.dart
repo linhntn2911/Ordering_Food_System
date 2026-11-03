@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
-import 'package:oder_food/core/widgets/app_empty_state.dart';
-import 'package:oder_food/features/review/providers/review_provider.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/widgets/app_empty_state.dart';
+import 'package:ordering_food_system/features/review/providers/review_provider.dart';
 
 class MyReviewsScreen extends ConsumerWidget {
   const MyReviewsScreen({super.key});
@@ -35,7 +35,7 @@ class MyReviewsScreen extends ConsumerWidget {
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: reviews.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final review = reviews[index];
                 return Container(

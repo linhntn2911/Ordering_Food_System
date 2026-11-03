@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
-import 'package:oder_food/features/review/providers/review_provider.dart';
+import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/features/review/providers/review_provider.dart';
 
 class WriteReviewScreen extends ConsumerWidget {
   const WriteReviewScreen({super.key, required this.orderId});

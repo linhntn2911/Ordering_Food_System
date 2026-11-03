@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/config/restaurant_info.dart';
 import '../core/theme/app_theme.dart';
 import 'router.dart';
 
@@ -18,8 +19,8 @@ class FoodOrderingApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: RestaurantInfo.name,
       debugShowCheckedModeBanner: false,
-      title: 'Ngô Chicken',
       theme: AppTheme.light,
       themeMode: ThemeMode.light,
       builder: (context, child) {
@@ -37,7 +38,7 @@ class FoodOrderingApp extends StatelessWidget {
       },
       home: initialHome,
       initialRoute: initialHome == null
-          ? (initialRoute ?? AppRoutes.login)
+          ? (initialRoute ?? Navigator.defaultRouteName)
           : null,
       onGenerateRoute: AppRoutes.onGenerateRoute,
     );

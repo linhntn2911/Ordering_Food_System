@@ -72,7 +72,7 @@ class MenuItemFormViewModel extends AsyncNotifier<String?> {
     if (draft.existingImageUrl.isEmpty && draft.imageBytes == null) {
       return 'Select an item image.';
     }
-    if (draft.sizes.any((size) => size.additionalPrice < 0)) {
+    if (draft.sizes.any((size) => size.priceDelta < 0)) {
       return 'Size surcharge cannot be negative.';
     }
     return null;

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
+import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:oder_food/core/constants/app_colors.dart';
-import 'package:oder_food/core/constants/app_routes.dart';
-import 'package:oder_food/core/widgets/app_empty_state.dart';
-import 'package:oder_food/features/notifications/models/notification_model.dart';
-import 'package:oder_food/features/notifications/providers/notification_provider.dart';
+import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/constants/app_routes.dart';
+import 'package:ordering_food_system/core/widgets/app_empty_state.dart';
+import 'package:ordering_food_system/features/notifications/models/notification_model.dart';
+import 'package:ordering_food_system/features/notifications/providers/notification_provider.dart';
 
 class NotificationListScreen extends ConsumerWidget {
   const NotificationListScreen({super.key});
@@ -57,13 +57,14 @@ class NotificationListScreen extends ConsumerWidget {
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: notifications.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final n = notifications[index];
                 return InkWell(
                   borderRadius: BorderRadius.circular(16),
                   onTap: () async {
                     await actions.markAsRead(n.id);
+                    if (!context.mounted) return;
                     if (n.orderId != null && n.orderId!.isNotEmpty) {
                       context.push('${AppRoutes.notificationDetail}?notificationId=${n.id}&orderId=${n.orderId}');
                     } else {
@@ -71,7 +72,7 @@ class NotificationListScreen extends ConsumerWidget {
                     }
                   },
                   child: Container(
-                    decoration: BoxDecoration(color: n.isRead ? AppColors.surface : AppColors.primary.withOpacity(0.04), borderRadius: BorderRadius.circular(16), border: Border.all(color: n.isRead ? AppColors.border : AppColors.primary.withOpacity(0.4))),
+                    decoration: BoxDecoration(color: n.isRead ? AppColors.surface : AppColors.primary.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(16), border: Border.all(color: n.isRead ? AppColors.border : AppColors.primary.withValues(alpha: 0.4))),
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +80,7 @@ class NotificationListScreen extends ConsumerWidget {
                         Container(
                           width: 44,
                           height: 44,
-                          decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.12), shape: BoxShape.circle),
+                          decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.12), shape: BoxShape.circle),
                           child: Icon(_icon(n.type), color: AppColors.primary),
                         ),
                         const SizedBox(width: 12),

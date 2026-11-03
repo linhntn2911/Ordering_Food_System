@@ -4,24 +4,17 @@ import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_
 
 class ForgotPasswordState {
   final bool isLoading;
-  final bool isEmailSent;
   final String? errorMessage;
 
-  const ForgotPasswordState({
-    this.isLoading = false,
-    this.isEmailSent = false,
-    this.errorMessage,
-  });
+  const ForgotPasswordState({this.isLoading = false, this.errorMessage});
 
   ForgotPasswordState copyWith({
     bool? isLoading,
-    bool? isEmailSent,
     String? errorMessage,
     bool clearError = false,
   }) {
     return ForgotPasswordState(
       isLoading: isLoading ?? this.isLoading,
-      isEmailSent: isEmailSent ?? this.isEmailSent,
       errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
@@ -37,36 +30,40 @@ class ForgotPasswordViewModel extends Notifier<ForgotPasswordState> {
     state = const ForgotPasswordState();
   }
 
-  Future<bool> sendResetEmail(String email) async {
-    final trimmedEmail = email.trim();
-    if (trimmedEmail.isEmpty) {
-      state = state.copyWith(errorMessage: 'Please enter your email address.');
+  bool validateEmail(String email) {
+    final trimmed = email.trim();
+    if (trimmed.isEmpty) {
+      state = state.copyWith(errorMessage: 'Vui lòng nhập địa chỉ email.');
       return false;
     }
-
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(trimmedEmail)) {
+    if (!emailRegex.hasMatch(trimmed)) {
       state = state.copyWith(
-        errorMessage: 'Please enter a valid email address.',
+        errorMessage: 'Địa chỉ email không đúng định dạng.',
       );
+      return false;
+    }
+    state = state.copyWith(clearError: true);
+    return true;
+  }
+
+  Future<bool> sendResetEmail(String email) async {
+    if (!validateEmail(email)) {
       return false;
     }
 
     state = state.copyWith(isLoading: true, clearError: true);
-
     try {
-      final authRepo = ref.read(authRepositoryProvider);
-      await authRepo.sendPasswordResetEmail(trimmedEmail);
-
-      state = state.copyWith(isLoading: false, isEmailSent: true);
+      await ref.read(authRepositoryProvider).sendPasswordResetEmail(email);
+      state = state.copyWith(isLoading: false, clearError: true);
       return true;
-    } on AppException catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: e.message);
+    } on AppException catch (error) {
+      state = state.copyWith(isLoading: false, errorMessage: error.message);
       return false;
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Unable to send reset email. Please try again later.',
+        errorMessage: 'Không thể gửi email đặt lại mật khẩu. Vui lòng thử lại.',
       );
       return false;
     }

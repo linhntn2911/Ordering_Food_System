@@ -1,0 +1,11 @@
+{
+  "name": "seed-menu",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.0"
+  }
+}
