@@ -39,6 +39,9 @@ abstract final class AppColors {
   static const Color successSoft = Color(0xFFE8F9F0);
   static const Color scrim = Color(0x7309051C);
 
+  // Google logo mark only; not an application palette color.
+  static const Color brandGoogle = Color(0xFFEA4335);
+
   // Gradient
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.centerLeft,

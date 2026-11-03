@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_shadows.dart';
+
 /// Spacing and radius definitions from docs/design_system.md based on a 4-point grid.
 abstract final class AppSpacing {
   // Named aliases
@@ -73,22 +75,8 @@ abstract final class AppSpacing {
     Radius.circular(radiusPill),
   );
 
-  // Elevation shadows
-  static const List<BoxShadow> softShadow = [
-    BoxShadow(
-      color: Color(0x125A6CEA),
-      blurRadius: 50,
-      offset: Offset(12, 26),
-      spreadRadius: 0,
-    ),
-  ];
+  // Elevation shadows (design_system.md: cardShadow and primaryShadow)
+  static const List<BoxShadow> softShadow = [AppShadows.primary];
 
-  static const List<BoxShadow> cardShadow = [
-    BoxShadow(
-      color: Color(0x0F5A6CEA),
-      blurRadius: 20,
-      offset: Offset(0, 7),
-      spreadRadius: 0,
-    ),
-  ];
+  static const List<BoxShadow> cardShadow = [AppShadows.card];
 }

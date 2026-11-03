@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
+import 'package:ordering_food_system/core/widgets/gradient_button.dart';
 import 'package:ordering_food_system/core/constants/app_routes.dart';
 import 'package:ordering_food_system/features/notifications/models/notification_model.dart';
 import 'package:ordering_food_system/features/notifications/providers/notification_provider.dart';
@@ -26,7 +27,7 @@ class NotificationDetailScreen extends ConsumerWidget {
         centerTitle: true,
       ),
       body: notificationsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primarySolid)),
         error: (err, _) => Center(child: Text('Lỗi: $err')),
         data: (notifications) {
           NotificationModel? n;
@@ -63,13 +64,12 @@ class NotificationDetailScreen extends ConsumerWidget {
                 if ((notification.orderId != null && notification.orderId!.isNotEmpty) || orderId.isNotEmpty)
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: GradientButton(
+                      label: 'Xem đơn hàng liên quan',
                       onPressed: () {
                         final id = notification.orderId ?? orderId;
                         context.push('${AppRoutes.orderDetail}?orderId=$id');
                       },
-                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
-                      child: const Text('Xem đơn hàng liên quan'),
                     ),
                   )
               ],

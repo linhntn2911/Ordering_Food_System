@@ -266,7 +266,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                           label: 'Google',
                           icon: const Icon(
                             Icons.g_mobiledata_rounded,
-                            color: Color(0xFFEA4335),
+                            color: AppColors.brandGoogle,
                             size: 32,
                           ),
                           onPressed: () async {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
 import 'package:ordering_food_system/core/constants/app_routes.dart';
 import 'package:ordering_food_system/core/widgets/app_empty_state.dart';
 import 'package:ordering_food_system/features/notifications/models/notification_model.dart';
@@ -40,19 +40,19 @@ class NotificationListScreen extends ConsumerWidget {
           if (unread > 0)
             TextButton(
               onPressed: actions.markAllAsRead,
-              child: const Text('Đánh dấu tất cả đã đọc', style: TextStyle(color: AppColors.primary)),
+              child: const Text('Đánh dấu tất cả đã đọc', style: TextStyle(color: AppColors.primarySolid)),
             )
         ],
       ),
       body: notificationsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primarySolid)),
         error: (err, _) => Center(child: Text('Lỗi: $err')),
         data: (notifications) {
           if (notifications.isEmpty) {
             return const AppEmptyState(icon: Icons.notifications_none, title: 'Chưa có thông báo', message: 'Thông báo về đơn hàng và ưu đãi sẽ hiển thị tại đây');
           }
           return RefreshIndicator(
-            color: AppColors.primary,
+            color: AppColors.primarySolid,
             onRefresh: () async => ref.refresh(notificationsListProvider.future),
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -72,7 +72,7 @@ class NotificationListScreen extends ConsumerWidget {
                     }
                   },
                   child: Container(
-                    decoration: BoxDecoration(color: n.isRead ? AppColors.surface : AppColors.primary.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(16), border: Border.all(color: n.isRead ? AppColors.border : AppColors.primary.withValues(alpha: 0.4))),
+                    decoration: BoxDecoration(color: n.isRead ? AppColors.surface : AppColors.primarySolid.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(16), border: Border.all(color: n.isRead ? AppColors.border : AppColors.primarySolid.withValues(alpha: 0.4))),
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,8 +80,8 @@ class NotificationListScreen extends ConsumerWidget {
                         Container(
                           width: 44,
                           height: 44,
-                          decoration: BoxDecoration(color: AppColors.primary.withValues(alpha: 0.12), shape: BoxShape.circle),
-                          child: Icon(_icon(n.type), color: AppColors.primary),
+                          decoration: BoxDecoration(color: AppColors.primarySolid.withValues(alpha: 0.12), shape: BoxShape.circle),
+                          child: Icon(_icon(n.type), color: AppColors.primarySolid),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -91,7 +91,7 @@ class NotificationListScreen extends ConsumerWidget {
                               Row(
                                 children: [
                                   Expanded(child: Text(n.title, style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary))),
-                                  if (!n.isRead) Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle)),
+                                  if (!n.isRead) Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.primarySolid, shape: BoxShape.circle)),
                                 ],
                               ),
                               const SizedBox(height: 4),

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
 import 'package:ordering_food_system/features/order_history/models/order_model.dart';
 import 'package:ordering_food_system/features/order_history/providers/order_history_provider.dart';
 
@@ -24,7 +24,7 @@ class OrderTrackingTimelineScreen extends ConsumerWidget {
         centerTitle: true,
       ),
       body: orderAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primarySolid)),
         error: (err, _) => Center(child: Text('Lỗi: $err')),
         data: (order) {
           if (order == null) return const Center(child: Text('Không tìm thấy đơn hàng'));
@@ -39,7 +39,7 @@ class OrderTrackingTimelineScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   child: Row(
                     children: [
-                      const Icon(Icons.local_shipping_outlined, color: AppColors.primary),
+                      const Icon(Icons.local_shipping_outlined, color: AppColors.primarySolid),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -71,11 +71,11 @@ class OrderTrackingTimelineScreen extends ConsumerWidget {
                               Container(
                                 width: 28,
                                 height: 28,
-                                decoration: BoxDecoration(color: step.active ? AppColors.primary : AppColors.border, shape: BoxShape.circle),
+                                decoration: BoxDecoration(color: step.active ? AppColors.primarySolid : AppColors.border, shape: BoxShape.circle),
                                 child: Icon(step.active ? Icons.check : Icons.circle, size: 16, color: step.active ? Colors.white : AppColors.textSecondary),
                               ),
                               if (!isLast)
-                                Container(width: 2, height: 56, color: step.active && steps[index + 1].active ? AppColors.primary : AppColors.border),
+                                Container(width: 2, height: 56, color: step.active && steps[index + 1].active ? AppColors.primarySolid : AppColors.border),
                             ],
                           ),
                           const SizedBox(width: 14),

@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:ordering_food_system/core/config/restaurant_config.dart';
 import 'package:ordering_food_system/core/errors/failures.dart';
-import 'package:ordering_food_system/core/firebase/firebase_providers.dart';
 import 'package:ordering_food_system/features/address/data/models/address_model.dart';
 import 'package:ordering_food_system/features/address/presentation/controllers/address_controller.dart';
 import 'package:ordering_food_system/features/cart/data/models/cart_item_model.dart';
@@ -174,11 +172,7 @@ class CheckoutController extends Notifier<CheckoutState> {
     // SC-005: Guard against duplicate taps
     if (state.isSubmitting) return null;
 
-    final firebaseCustomerId = Firebase.apps.isEmpty
-        ? null
-        : ref.read(firebaseAuthProvider).currentUser?.uid;
-    final customerId =
-        firebaseCustomerId ?? ref.read(currentCustomerIdProvider);
+    final customerId = ref.read(activeCustomerIdProvider);
     if (customerId == null || customerId.trim().isEmpty) {
       state = state.copyWith(
         errorMessage: 'Vui lòng đăng nhập để tiến hành đặt hàng.',

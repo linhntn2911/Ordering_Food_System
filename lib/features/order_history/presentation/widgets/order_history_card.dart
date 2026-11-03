@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
+import 'package:ordering_food_system/core/widgets/gradient_button.dart';
 import 'package:ordering_food_system/core/constants/app_routes.dart';
 import 'package:ordering_food_system/features/order_history/data/models/order_model.dart';
 
 class OrderHistoryCard extends StatelessWidget {
-  const OrderHistoryCard({super.key, required this.order});
+  const OrderHistoryCard({super.key, required this.order, this.isReviewed = false});
   final OrderModel order;
+  final bool isReviewed;
 
   Color _statusColor(OrderStatus status) {
     switch (status) {
@@ -16,7 +18,7 @@ class OrderHistoryCard extends StatelessWidget {
       case OrderStatus.preparing:
         return AppColors.info;
       case OrderStatus.delivering:
-        return AppColors.primary;
+        return AppColors.primarySolid;
       case OrderStatus.completed:
         return AppColors.success;
       case OrderStatus.cancelled:
@@ -61,7 +63,7 @@ class OrderHistoryCard extends StatelessWidget {
                       width: 56,
                       height: 56,
                       fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(width: 56, height: 56, color: AppColors.greyLight, alignment: Alignment.center, child: const Icon(Icons.fastfood, color: AppColors.textSecondary)),
+                      errorBuilder: (context, error, stackTrace) => Container(width: 56, height: 56, color: AppColors.surfaceMuted, alignment: Alignment.center, child: const Icon(Icons.fastfood, color: AppColors.textSecondary)),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -75,7 +77,7 @@ class OrderHistoryCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Text(NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(order.totalPrice), style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary))
+                  Text(NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(order.totalPrice), style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primarySolid))
                 ],
               ),
               const SizedBox(height: 16),
@@ -84,9 +86,9 @@ class OrderHistoryCard extends StatelessWidget {
                   Expanded(child: OutlinedButton(onPressed: () => context.push('${AppRoutes.orderDetail}?orderId=${order.orderId}'), style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.border), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Xem chi tiết', style: TextStyle(color: AppColors.textPrimary)))),
                   const SizedBox(width: 10),
                   if (order.status.isCompleted)
-                    Expanded(child: ElevatedButton(onPressed: () => context.push('${AppRoutes.writeReview}?orderId=${order.orderId}'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 0), child: const Text('Đánh giá'))),
+                    Expanded(child: GradientButton(label: isReviewed ? 'Đã đánh giá' : 'Đánh giá', onPressed: isReviewed ? null : () => context.push('${AppRoutes.writeReview}?orderId=${order.orderId}'))),
                   if (order.status.isOngoing)
-                    Expanded(child: ElevatedButton(onPressed: () => context.push('${AppRoutes.orderTracking}?orderId=${order.orderId}'), style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 0), child: const Text('Theo dõi đơn'))),
+                    Expanded(child: GradientButton(label: 'Theo dõi đơn', onPressed: () => context.push('${AppRoutes.orderTracking}?orderId=${order.orderId}'))),
                 ],
               )
             ],

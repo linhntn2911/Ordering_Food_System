@@ -9,6 +9,12 @@ final myReviewsProvider = FutureProvider<List<ReviewModel>>((ref) async {
   return repo.getMyReviews();
 });
 
+/// Order ids that already have an active review (FR-027).
+final reviewedOrderIdsProvider = Provider<Set<String>>((ref) {
+  final reviews = ref.watch(myReviewsProvider).value ?? const [];
+  return reviews.map((review) => review.orderId).toSet();
+});
+
 final reviewFormProvider = NotifierProvider<ReviewFormNotifier, ReviewFormState>(ReviewFormNotifier.new);
 
 class ReviewFormState {

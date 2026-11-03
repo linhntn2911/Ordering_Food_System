@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
+import 'package:ordering_food_system/core/widgets/gradient_button.dart';
 import 'package:ordering_food_system/core/constants/app_routes.dart';
 import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
+import 'package:ordering_food_system/features/review/providers/review_provider.dart';
 
 class OrderDetailScreen extends ConsumerWidget {
   const OrderDetailScreen({super.key, required this.orderId});
@@ -34,6 +36,7 @@ class OrderDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final orderAsync = ref.watch(orderDetailByIdProvider(orderId));
+    final reviewedIds = ref.watch(reviewedOrderIdsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -45,7 +48,7 @@ class OrderDetailScreen extends ConsumerWidget {
         centerTitle: true,
       ),
       body: orderAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primarySolid)),
         error: (err, _) => Center(child: Text('Lỗi: $err')),
         data: (order) {
           if (order == null) {
@@ -65,11 +68,11 @@ class OrderDetailScreen extends ConsumerWidget {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.receipt_long, color: AppColors.primary),
+                          const Icon(Icons.receipt_long, color: AppColors.primarySolid),
                           const SizedBox(width: 8),
                           Text('Mã đơn: ${order.orderId}', style: const TextStyle(fontWeight: FontWeight.w600)),
                           const Spacer(),
-                          Text(_getStatusLabel(order.status), style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600)),
+                          Text(_getStatusLabel(order.status), style: const TextStyle(color: AppColors.primarySolid, fontWeight: FontWeight.w600)),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -155,19 +158,19 @@ class OrderDetailScreen extends ConsumerWidget {
                 if (_isOngoing(order.status))
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: GradientButton(
+                      label: 'Theo dõi đơn hàng',
                       onPressed: () => context.push('${AppRoutes.orderTracking}?orderId=${order.orderId}'),
-                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
-                      child: const Text('Theo dõi đơn hàng'),
                     ),
                   ),
                 if (_isCompleted(order.status))
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => context.push('${AppRoutes.writeReview}?orderId=${order.orderId}'),
-                      style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
-                      child: const Text('Viết đánh giá'),
+                    child: GradientButton(
+                      label: reviewedIds.contains(order.orderId) ? 'Đã đánh giá' : 'Viết đánh giá',
+                      onPressed: reviewedIds.contains(order.orderId)
+                          ? null
+                          : () => context.push('${AppRoutes.writeReview}?orderId=${order.orderId}'),
                     ),
                   ),
               ],

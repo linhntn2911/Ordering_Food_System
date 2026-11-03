@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
 import 'package:ordering_food_system/core/constants/app_routes.dart';
 import 'package:ordering_food_system/core/widgets/app_empty_state.dart';
 import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
 import 'package:ordering_food_system/features/order_history/presentation/widgets/order_history_card.dart';
+import 'package:ordering_food_system/features/review/providers/review_provider.dart';
 
 class OrderHistoryView extends ConsumerWidget {
   const OrderHistoryView({super.key});
@@ -14,6 +15,7 @@ class OrderHistoryView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(orderHistoryFilterProvider);
     final ordersAsync = ref.watch(orderHistoryListProvider);
+    final reviewedIds = ref.watch(reviewedOrderIdsProvider);
 
     final filters = [
       {'key': 'all', 'label': 'Tất cả'},
@@ -50,9 +52,9 @@ class OrderHistoryView extends ConsumerWidget {
                       label: Text(f['label']!),
                       selected: isSelected,
                       onSelected: (_) => ref.read(orderHistoryFilterProvider.notifier).state = f['key']!,
-                      selectedColor: AppColors.primary.withValues(alpha: 0.12),
-                      labelStyle: TextStyle(color: isSelected ? AppColors.primary : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: BorderSide(color: isSelected ? AppColors.primary : AppColors.border)),
+                      selectedColor: AppColors.primarySolid.withValues(alpha: 0.12),
+                      labelStyle: TextStyle(color: isSelected ? AppColors.primarySolid : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999), side: BorderSide(color: isSelected ? AppColors.primarySolid : AppColors.border)),
                       backgroundColor: AppColors.surface,
                     ),
                   );
@@ -63,14 +65,14 @@ class OrderHistoryView extends ConsumerWidget {
           const SizedBox(height: 8),
           Expanded(
             child: ordersAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+              loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primarySolid)),
               error: (err, _) => Center(child: Text('Lỗi: $err')),
               data: (orders) {
                 if (orders.isEmpty) {
                   return const AppEmptyState(icon: Icons.receipt_long_outlined, title: 'Chưa có đơn hàng', message: 'Các đơn hàng của bạn sẽ hiển thị tại đây');
                 }
                 return RefreshIndicator(
-                  color: AppColors.primary,
+                  color: AppColors.primarySolid,
                   onRefresh: () async {
                     ref.invalidate(orderHistoryListProvider);
                     await ref.read(orderHistoryListProvider.future);
@@ -81,7 +83,7 @@ class OrderHistoryView extends ConsumerWidget {
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final order = orders[index];
-                      return OrderHistoryCard(order: order);
+                      return OrderHistoryCard(order: order, isReviewed: reviewedIds.contains(order.orderId));
                     },
                   ),
                 );

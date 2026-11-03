@@ -238,10 +238,89 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
 
   @override
   Future<List<OrderModel>> getCustomerOrders(String customerId) async {
-    final list =
-        _orders.values.where((order) => order.customerId == customerId).toList()
-          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    final database = firestore;
+    final remote = database == null
+        ? const <OrderModel>[]
+        : await _fetchCustomerOrdersFromFirestore(database, customerId);
+    final byId = <String, OrderModel>{
+      for (final order in _orders.values)
+        if (order.customerId == customerId) order.id: order,
+      for (final order in remote) order.id: order,
+    };
+    final list = byId.values.toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return List.unmodifiable(list);
+  }
+
+  Future<List<OrderModel>> _fetchCustomerOrdersFromFirestore(
+    FirebaseFirestore database,
+    String customerId,
+  ) async {
+    final snapshot = await database
+        .collection(FirestorePaths.orders)
+        .where('customerId', isEqualTo: customerId)
+        .get();
+    final orders = <OrderModel>[];
+    for (final doc in snapshot.docs) {
+      final itemsSnapshot = await doc.reference.collection('items').get();
+      orders.add(
+        _orderFromFirestore(
+          doc.id,
+          doc.data(),
+          itemsSnapshot.docs.map((item) => item.data()).toList(),
+        ),
+      );
+    }
+    return orders;
+  }
+
+  OrderModel _orderFromFirestore(
+    String id,
+    Map<String, dynamic> data,
+    List<Map<String, dynamic>> items,
+  ) {
+    return OrderModel(
+      id: id,
+      orderCode: data['orderCode'] as String? ?? id,
+      customerId: data['customerId'] as String? ?? '',
+      items: items.map(_itemFromFirestore).toList(growable: false),
+      addressSnapshot: OrderAddressSnapshot.fromMap(
+        data['addressSnapshot'] as Map<String, dynamic>? ?? const {},
+      ),
+      deliveryDistanceKm:
+          (data['deliveryDistanceKm'] as num?)?.toDouble() ?? 0.0,
+      deliveryFee: (data['deliveryFee'] as num?)?.toDouble() ?? 0.0,
+      subtotal: (data['subtotal'] as num?)?.toDouble() ?? 0.0,
+      total: (data['totalAmount'] as num?)?.toDouble() ?? 0.0,
+      paymentMethod: 'COD',
+      status: OrderStatusExtension.fromDbString(
+        (data['orderStatus'] ?? data['status']) as String?,
+      ),
+      cancellationReason: data['cancellationReason'] as String?,
+      rejectionReason: data['rejectionReason'] as String?,
+      createdAt:
+          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+    );
+  }
+
+  OrderItemSnapshot _itemFromFirestore(Map<String, dynamic> data) {
+    final sizeName = data['selectedSize'] as String? ?? '';
+    final toppingNames = data['selectedToppings'] as List<dynamic>? ?? const [];
+    return OrderItemSnapshot(
+      menuItemId: data['menuItemId'] as String? ?? '',
+      name: data['name'] as String? ?? '',
+      imageUrl: data['imageUrl'] as String? ?? '',
+      basePrice: (data['basePrice'] as num?)?.toDouble() ?? 0.0,
+      selectedSize: CartOptionItem(id: sizeName, name: sizeName),
+      selectedToppings: toppingNames
+          .map((name) => CartOptionItem(id: name as String, name: name))
+          .toList(growable: false),
+      note: data['note'] as String?,
+      unitPrice: (data['unitPrice'] as num?)?.toDouble() ?? 0.0,
+      quantity: (data['quantity'] as num?)?.toInt() ?? 1,
+      subtotal: (data['lineTotal'] as num?)?.toDouble() ?? 0.0,
+    );
   }
 }
 

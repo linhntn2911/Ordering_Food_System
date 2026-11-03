@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
+import 'package:ordering_food_system/core/widgets/gradient_button.dart';
 import 'package:ordering_food_system/features/review/providers/review_provider.dart';
 
 class WriteReviewScreen extends ConsumerWidget {
@@ -12,6 +13,7 @@ class WriteReviewScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final form = ref.watch(reviewFormProvider);
     final notifier = ref.read(reviewFormProvider.notifier);
+    final alreadyReviewed = ref.watch(reviewedOrderIdsProvider).contains(orderId);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -40,7 +42,7 @@ class WriteReviewScreen extends ConsumerWidget {
                       final star = index + 1;
                       return IconButton(
                         onPressed: () => notifier.setRating(star),
-                        icon: Icon(star <= form.rating ? Icons.star : Icons.star_border, color: Colors.amber, size: 36),
+                        icon: Icon(star <= form.rating ? Icons.star : Icons.star_border, color: AppColors.warning, size: 36),
                       );
                     }),
                   ),
@@ -75,8 +77,10 @@ class WriteReviewScreen extends ConsumerWidget {
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: form.submitting
+              child: GradientButton(
+                label: form.submitting ? 'Đang gửi...' : (alreadyReviewed ? 'Đã đánh giá' : 'Gửi đánh giá'),
+                isLoading: form.submitting,
+                onPressed: form.submitting || alreadyReviewed
                     ? null
                     : () async {
                         final ok = await notifier.submit(orderId);
@@ -89,8 +93,6 @@ class WriteReviewScreen extends ConsumerWidget {
                           }
                         }
                       },
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.symmetric(vertical: 14)),
-                child: Text(form.submitting ? 'Đang gửi...' : 'Gửi đánh giá'),
               ),
             )
           ],

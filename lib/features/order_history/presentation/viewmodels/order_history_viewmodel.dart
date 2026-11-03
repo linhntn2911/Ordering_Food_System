@@ -9,7 +9,7 @@ import 'package:ordering_food_system/features/order_history/domain/repositories/
 final orderHistoryRepositoryProvider = Provider<OrderHistoryRepository>((ref) {
   return _CheckoutOrderHistoryRepository(
     checkoutRepository: ref.watch(checkoutRepositoryProvider),
-    customerId: ref.watch(currentCustomerIdProvider),
+    customerId: ref.watch(activeCustomerIdProvider),
   );
 });
 

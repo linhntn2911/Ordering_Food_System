@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:intl/intl.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
 import 'package:ordering_food_system/core/widgets/app_empty_state.dart';
 import 'package:ordering_food_system/features/review/providers/review_provider.dart';
 
@@ -23,14 +23,14 @@ class MyReviewsScreen extends ConsumerWidget {
         centerTitle: true,
       ),
       body: reviewsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primarySolid)),
         error: (err, _) => Center(child: Text('Lỗi: $err')),
         data: (reviews) {
           if (reviews.isEmpty) {
             return const AppEmptyState(icon: Icons.rate_review_outlined, title: 'Chưa có đánh giá', message: 'Đánh giá của bạn sau khi hoàn thành đơn hàng sẽ hiển thị tại đây');
           }
           return RefreshIndicator(
-            color: AppColors.primary,
+            color: AppColors.primarySolid,
             onRefresh: () async => ref.refresh(myReviewsProvider.future),
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -53,7 +53,7 @@ class MyReviewsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 8),
                       Row(
-                        children: List.generate(5, (i) => Icon(i < review.rating ? Icons.star : Icons.star_border, color: Colors.amber, size: 18)),
+                        children: List.generate(5, (i) => Icon(i < review.rating ? Icons.star : Icons.star_border, color: AppColors.warning, size: 18)),
                       ),
                       const SizedBox(height: 10),
                       Text(review.comment, style: const TextStyle(color: AppColors.textPrimary)),

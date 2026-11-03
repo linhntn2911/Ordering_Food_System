@@ -9,7 +9,7 @@ final orderHistoryRepositoryProvider =
     Provider<_CheckoutOrderHistoryRepository>((ref) {
       return _CheckoutOrderHistoryRepository(
         checkoutRepository: ref.watch(checkoutRepositoryProvider),
-        customerId: ref.watch(currentCustomerIdProvider),
+        customerId: ref.watch(activeCustomerIdProvider),
       );
     });
 

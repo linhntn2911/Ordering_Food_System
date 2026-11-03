@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_text_styles.dart';
 
@@ -30,13 +31,10 @@ class PrimaryButton extends StatelessWidget {
       width: width ?? double.infinity,
       height: height,
       decoration: BoxDecoration(
-        gradient: isEnabled
-            ? AppColors.primaryGradient
-            : const LinearGradient(
-                colors: [Color(0xFFB0DEC4), Color(0xFF9DD4B8)],
-              ),
+        gradient: isEnabled ? AppColors.primaryGradient : null,
+        color: isEnabled ? null : AppColors.surfaceMuted,
         borderRadius: AppSpacing.roundedInput,
-        boxShadow: isEnabled ? AppSpacing.softShadow : null,
+        boxShadow: isEnabled ? const [AppShadows.primary] : null,
       ),
       child: Material(
         color: Colors.transparent,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ordering_food_system/core/constants/app_colors.dart';
+import 'package:ordering_food_system/core/theme/app_colors.dart';
 
 class AppEmptyState extends StatelessWidget {
   const AppEmptyState({
