@@ -113,10 +113,11 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
         );
       }
 
-      final distanceKm = RestaurantConfig.calculateDistanceToRestaurant(
-        lat,
-        lng,
-      );
+      // Prefer the driving-route distance resolved while the Customer confirms
+      // the map pin; older addresses fall back to the Haversine calculation.
+      final distanceKm =
+          deliveryAddress.routeDistanceKm ??
+          RestaurantConfig.calculateDistanceToRestaurant(lat, lng);
       if (distanceKm > RestaurantConfig.maxDeliveryDistanceKm) {
         throw CheckoutFailure(
           'Khoảng cách giao hàng là ${distanceKm.toStringAsFixed(1)}km, vượt quá bán kính phục vụ 8km của nhà hàng. Vui lòng chọn địa chỉ khác.',

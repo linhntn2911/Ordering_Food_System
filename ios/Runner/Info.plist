@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Select food photos for the Ngô Chicken menu.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Ngô Chicken uses your location to place the delivery pin and verify the delivery distance.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

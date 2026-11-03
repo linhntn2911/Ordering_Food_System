@@ -16,6 +16,9 @@ class AddressModel {
   final String? city; // Tỉnh / Thành phố
   final double? latitude; // Latitude for distance calculation (FR-046)
   final double? longitude; // Longitude for distance calculation (FR-046)
+  final String? placeId; // Geocoding provider place identifier
+  final String? locationProvider; // e.g. geoapify
+  final double? routeDistanceKm; // Driving-route preview when resolved
   final bool isDefault; // Exactly one default address per customer (FR-018)
   final DateTime createdAt;
   final DateTime? updatedAt;
@@ -32,6 +35,9 @@ class AddressModel {
     this.city,
     this.latitude,
     this.longitude,
+    this.placeId,
+    this.locationProvider,
+    this.routeDistanceKm,
     this.isDefault = false,
     required this.createdAt,
     this.updatedAt,
@@ -48,8 +54,10 @@ class AddressModel {
     return parts.join(', ');
   }
 
-  /// Calculates authoritative distance to the restaurant in kilometers (FR-046)
+  /// Uses the resolved driving distance when present and falls back to the
+  /// great-circle distance for older records.
   double? get distanceToRestaurant {
+    if (routeDistanceKm != null) return routeDistanceKm;
     if (latitude == null || longitude == null) return null;
     return RestaurantConfig.calculateDistanceToRestaurant(
       latitude!,
@@ -122,6 +130,9 @@ class AddressModel {
     String? city,
     double? latitude,
     double? longitude,
+    String? placeId,
+    String? locationProvider,
+    double? routeDistanceKm,
     bool? isDefault,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -138,6 +149,9 @@ class AddressModel {
       city: city ?? this.city,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      placeId: placeId ?? this.placeId,
+      locationProvider: locationProvider ?? this.locationProvider,
+      routeDistanceKm: routeDistanceKm ?? this.routeDistanceKm,
       isDefault: isDefault ?? this.isDefault,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -157,6 +171,9 @@ class AddressModel {
       'city': city,
       'latitude': latitude,
       'longitude': longitude,
+      'placeId': placeId,
+      'locationProvider': locationProvider,
+      'routeDistanceKm': routeDistanceKm,
       'isDefault': isDefault,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
@@ -176,6 +193,9 @@ class AddressModel {
       city: map['city'] as String?,
       latitude: (map['latitude'] as num?)?.toDouble(),
       longitude: (map['longitude'] as num?)?.toDouble(),
+      placeId: map['placeId'] as String?,
+      locationProvider: map['locationProvider'] as String?,
+      routeDistanceKm: (map['routeDistanceKm'] as num?)?.toDouble(),
       isDefault: map['isDefault'] as bool? ?? false,
       createdAt: map['createdAt'] != null
           ? DateTime.tryParse(map['createdAt'] as String) ?? DateTime.now()
@@ -199,7 +219,9 @@ class AddressModel {
           streetAddress == other.streetAddress &&
           isDefault == other.isDefault &&
           latitude == other.latitude &&
-          longitude == other.longitude;
+          longitude == other.longitude &&
+          placeId == other.placeId &&
+          routeDistanceKm == other.routeDistanceKm;
 
   @override
   int get hashCode =>
