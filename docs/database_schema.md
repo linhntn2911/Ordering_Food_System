@@ -99,6 +99,7 @@ Fields: `fromStatus`, `toStatus`, `actorId`, `actorRole`, optional `reason`, `cr
 ### `reviews/{reviewId}`
 
 Fields: `customerId`, `orderId`, `orderItemId`, `menuItemId`, `rating`, `comment`, `imageUrls`, `isAnonymous`, `isEdited`, `createdAt`, `updatedAt`. Trusted code validates order ownership, completion, review windows, duplicate prevention, and rating aggregation. Only the owner Customer and Admin can read it, because it contains customer and order identifiers.
+**Free-tier implementation (no Cloud Functions, Spark plan):** the Customer writes the private review and the public copies directly. Firestore rules enforce owner, `Completed` order status, a 30-day window from `orders.updatedAt`, rating 1-5, comment and image limits, and one review per order through the document id `<uid>_<orderId>`. Deviation from the write invariant: `ratingAverage` and `reviewCount` on `menu_items` are not updated atomically yet, and `orderItemId`/order item `reviewed` are not set. Restore trusted aggregation when a backend is available.
 
 ### `menu_items/{menuItemId}/reviews/{reviewId}`
 

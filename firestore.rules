@@ -75,6 +75,40 @@ service cloud.firestore {
             && request.resource.data.routeDistanceKm >= 0));
     }
 
+    // Customer review on its own completed order. The document id must be
+    // `<uid>_<orderId>`, so one review per order is enforced by existence.
+    // The order must be Completed and updated within the last 30 days.
+    function validCustomerReview(reviewId) {
+      let data = request.resource.data;
+      let order = get(/databases/$(database)/documents/orders/$(data.orderId)).data;
+      return signedIn()
+        && reviewId == request.auth.uid + '_' + data.orderId
+        && data.keys().hasOnly([
+          'customerId', 'orderId', 'menuItemIds', 'rating', 'comment',
+          'imageUrls', 'isAnonymous', 'isEdited', 'createdAt', 'updatedAt'
+        ])
+        && data.customerId == request.auth.uid
+        && data.orderId is string
+        && data.menuItemIds is list
+        && data.menuItemIds.size() > 0
+        && data.rating is int
+        && data.rating >= 1
+        && data.rating <= 5
+        && data.comment is string
+        && data.comment.size() <= 500
+        && (data.rating > 2 || data.comment.size() > 0)
+        && data.imageUrls is list
+        && data.imageUrls.size() <= 3
+        && data.isAnonymous == false
+        && data.isEdited == false
+        && data.createdAt == request.time
+        && data.updatedAt == request.time
+        && order.customerId == request.auth.uid
+        && order.orderStatus == 'Completed'
+        && request.time < order.updatedAt + duration.value(30, 'd')
+        && !exists(/databases/$(database)/documents/reviews/$(reviewId));
+    }
+
     match /users/{userId} {
       allow create: if validCustomerProfile(userId);
       allow read: if true;
@@ -143,10 +177,28 @@ service cloud.firestore {
 
       // Public display copy of a review without customer or order
       // identifiers (specs/004-food-details/contracts/firestore_review_access.md).
-      // Trusted code writes it in the same batch as the private review.
+      // Written by the owner right after the private review with the same id.
       match /reviews/{reviewId} {
         allow get, list: if isAdmin() || isPubliclyVisibleItem(menuItemId);
-        allow create, update, delete: if false;
+        allow create: if signedIn()
+          && exists(/databases/$(database)/documents/reviews/$(reviewId))
+          && get(/databases/$(database)/documents/reviews/$(reviewId)).data.customerId
+            == request.auth.uid
+          && get(/databases/$(database)/documents/reviews/$(reviewId)).data.menuItemIds
+            .hasAny([menuItemId])
+          && request.resource.data.rating
+            == get(/databases/$(database)/documents/reviews/$(reviewId)).data.rating
+          && request.resource.data.comment
+            == get(/databases/$(database)/documents/reviews/$(reviewId)).data.comment
+          && request.resource.data.keys().hasOnly([
+            'rating', 'comment', 'imageUrls', 'isAnonymous', 'isEdited',
+            'createdAt', 'updatedAt'
+          ])
+          && request.resource.data.isAnonymous == false
+          && request.resource.data.isEdited == false
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.updatedAt == request.time;
+        allow update, delete: if false;
       }
     }
 
@@ -266,9 +318,8 @@ service cloud.firestore {
       // Private review with customer and order identifiers: owner and Admin.
       allow read: if signedIn()
         && (resource.data.customerId == request.auth.uid || isAdmin());
-      // Trusted code validates completed-order ownership, time windows,
-      // duplicate prevention, and rating aggregate updates atomically.
-      allow create, update, delete: if false;
+      allow create: if validCustomerReview(reviewId);
+      allow update, delete: if false;
     }
 
     match /email_otps/{otpId} {

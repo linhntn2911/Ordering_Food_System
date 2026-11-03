@@ -1,31 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:ordering_food_system/core/errors/failures.dart';
+import 'package:ordering_food_system/core/firebase/firestore_paths.dart';
 import 'package:ordering_food_system/features/review/models/review_model.dart';
 import 'package:ordering_food_system/features/review/repositories/review_repository.dart';
 
-/// Reviews are written by the `submitReview` Cloud Function, which validates
-/// ownership, completion, the 30-day window and duplicates in a transaction.
+/// Writes a review directly to Firestore. Firestore rules validate ownership,
+/// completion, the 30-day window and one review per order (`<uid>_<orderId>`).
 class FirebaseReviewRepository implements ReviewRepository {
-  FirebaseReviewRepository({
-    required this.auth,
-    required this.firestore,
-    FirebaseFunctions? functions,
-  }) : _functions =
-           functions ??
-           FirebaseFunctions.instanceFor(region: 'asia-southeast1');
+  FirebaseReviewRepository({required this.auth, required this.firestore});
 
   final FirebaseAuth auth;
   final FirebaseFirestore firestore;
-  final FirebaseFunctions _functions;
 
   @override
   Future<List<ReviewModel>> getMyReviews() async {
     final uid = auth.currentUser?.uid;
     if (uid == null) return const [];
     final snapshot = await firestore
-        .collection('reviews')
+        .collection(FirestorePaths.reviews)
         .where('customerId', isEqualTo: uid)
         .get();
     final reviews = snapshot.docs.map(_fromDocument).toList()
@@ -40,15 +33,72 @@ class FirebaseReviewRepository implements ReviewRepository {
     required String comment,
     List<String> images = const [],
   }) async {
+    final uid = auth.currentUser?.uid;
+    if (uid == null) {
+      throw const AuthFailure();
+    }
+    final reviewId = '${uid}_$orderId';
+    final reviewRef = firestore.collection(FirestorePaths.reviews).doc(reviewId);
+
+    final existing = await reviewRef.get();
+    if (existing.exists) {
+      throw const ValidationFailure('Đơn hàng này đã được đánh giá.');
+    }
+
+    final itemsSnapshot = await firestore
+        .collection(FirestorePaths.orders)
+        .doc(orderId)
+        .collection('items')
+        .get();
+    final menuItemIds = {
+      for (final item in itemsSnapshot.docs)
+        if ((item.data()['menuItemId'] as String?)?.isNotEmpty ?? false)
+          item.data()['menuItemId'] as String,
+    }.toList(growable: false);
+    if (menuItemIds.isEmpty) {
+      throw const ValidationFailure('Không tìm thấy món trong đơn hàng.');
+    }
+
+    final trimmedComment = comment.trim();
     try {
-      await _functions.httpsCallable('submitReview').call<Map<String, dynamic>>({
+      await reviewRef.set({
+        'customerId': uid,
         'orderId': orderId,
+        'menuItemIds': menuItemIds,
         'rating': rating,
-        'comment': comment,
+        'comment': trimmedComment,
         'imageUrls': images,
+        'isAnonymous': false,
+        'isEdited': false,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
       });
-    } on FirebaseFunctionsException catch (error) {
-      throw ValidationFailure(error.message ?? 'Không thể gửi đánh giá.');
+
+      final batch = firestore.batch();
+      for (final menuItemId in menuItemIds) {
+        final publicRef = firestore
+            .collection(FirestorePaths.menuItems)
+            .doc(menuItemId)
+            .collection('reviews')
+            .doc(reviewId);
+        batch.set(publicRef, {
+          'rating': rating,
+          'comment': trimmedComment,
+          'imageUrls': images,
+          'isAnonymous': false,
+          'isEdited': false,
+          'createdAt': FieldValue.serverTimestamp(),
+          'updatedAt': FieldValue.serverTimestamp(),
+        });
+      }
+      await batch.commit();
+    } on FirebaseException catch (error) {
+      if (error.code == 'permission-denied') {
+        throw const ValidationFailure(
+          'Chỉ đánh giá được đơn hàng đã hoàn thành trong vòng 30 ngày.',
+        );
+      }
+      throw const ValidationFailure('Không thể gửi đánh giá, vui lòng thử lại.');
     }
   }
 
