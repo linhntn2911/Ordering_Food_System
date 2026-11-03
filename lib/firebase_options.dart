@@ -1,4 +1,4 @@
-// File generated manually based on Firebase project ordering-food-system-65c7f.
+﻿// File generated manually based on Firebase project ordering-food-system-65c7f.
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
