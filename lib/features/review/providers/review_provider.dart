@@ -1,8 +1,15 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ordering_food_system/core/firebase/firebase_providers.dart';
 import 'package:ordering_food_system/features/review/models/review_model.dart';
+import 'package:ordering_food_system/features/review/repositories/firebase_review_repository.dart';
 import 'package:ordering_food_system/features/review/repositories/review_repository.dart';
 
-final reviewRepositoryProvider = Provider<ReviewRepository>((ref) => MockReviewRepository());
+final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {
+  return FirebaseReviewRepository(
+    auth: ref.watch(firebaseAuthProvider),
+    firestore: ref.watch(firebaseFirestoreProvider),
+  );
+});
 
 final myReviewsProvider = FutureProvider<List<ReviewModel>>((ref) async {
   final repo = ref.watch(reviewRepositoryProvider);
