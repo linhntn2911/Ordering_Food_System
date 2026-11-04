@@ -152,7 +152,12 @@ class CartScreen extends ConsumerWidget {
                                   fontSize: 15,
                                 ),
                               ),
-                              onPressed: () {}, // Đứng im, không mở popup
+                              onPressed: () {
+                                if (onBrowseMenu != null) {
+                                  onBrowseMenu!();
+                                }
+                                Navigator.of(context).popUntil((route) => route.isFirst);
+                              },
                             ),
                           );
                         }
@@ -650,9 +655,8 @@ class CartScreen extends ConsumerWidget {
               onPressed: () {
                 if (onBrowseMenu != null) {
                   onBrowseMenu!();
-                } else if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
                 }
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
               child: const Text(
                 'Khám phá thực đơn ngay',
@@ -691,29 +695,53 @@ class CartScreen extends ConsumerWidget {
           'Bạn có chắc chắn muốn xóa toàn bộ món ăn trong giỏ hàng?',
           style: AppTextStyles.bodyMedium,
         ),
+        actionsPadding: const EdgeInsets.fromLTRB(
+          AppSpacing.s20,
+          0,
+          AppSpacing.s20,
+          AppSpacing.s16,
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogCtx).pop(),
-            child: Text(
-              'Hủy',
-              style: AppTextStyles.labelLarge.copyWith(
-                color: AppColors.textMuted,
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(46),
+                    side: const BorderSide(color: AppColors.border),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: AppRadii.radiusMedium,
+                    ),
+                  ),
+                  onPressed: () => Navigator.of(dialogCtx).pop(),
+                  child: Text(
+                    'Hủy',
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
-              shape: const RoundedRectangleBorder(
-                borderRadius: AppRadii.radiusMedium,
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.error,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size.fromHeight(46),
+                    elevation: 0,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: AppRadii.radiusMedium,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(dialogCtx).pop();
+                    ref.read(cartControllerProvider.notifier).clearCart();
+                  },
+                  child: const Text('Xóa tất cả'),
+                ),
               ),
-            ),
-            onPressed: () {
-              Navigator.of(dialogCtx).pop();
-              ref.read(cartControllerProvider.notifier).clearCart();
-            },
-            child: const Text('Xóa tất cả'),
+            ],
           ),
         ],
       ),

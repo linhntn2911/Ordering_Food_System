@@ -335,6 +335,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
               TextFormField(
                 controller: _nameController,
                 focusNode: _nameFocus,
+                keyboardType: TextInputType.name,
                 textCapitalization: TextCapitalization.words,
                 decoration: _inputDecoration(
                   hint: 'Nguyễn Văn A',
@@ -393,6 +394,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
               TextFormField(
                 controller: _streetController,
                 focusNode: _streetFocus,
+                keyboardType: TextInputType.streetAddress,
                 decoration: _inputDecoration(
                   hint: 'Số 45 Lê Duẩn, Tòa nhà Diamond',
                   prefixIcon: Icons.location_on_outlined,
@@ -421,6 +423,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                         TextFormField(
                           controller: _wardController,
                           focusNode: _wardFocus,
+                          keyboardType: TextInputType.text,
                           decoration: _inputDecoration(hint: 'Bến Nghé'),
                         ),
                       ],
@@ -435,6 +438,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
                         TextFormField(
                           controller: _districtController,
                           focusNode: _districtFocus,
+                          keyboardType: TextInputType.text,
                           decoration: _inputDecoration(hint: 'Quận 1'),
                         ),
                       ],
@@ -449,6 +453,7 @@ class _AddEditAddressScreenState extends ConsumerState<AddEditAddressScreen> {
               TextFormField(
                 controller: _cityController,
                 focusNode: _cityFocus,
+                keyboardType: TextInputType.text,
                 decoration: _inputDecoration(hint: 'TP. Hồ Chí Minh'),
               ),
 
