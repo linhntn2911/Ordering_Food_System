@@ -367,13 +367,33 @@ class _AddressCard extends StatelessWidget {
 
                 // Radio indicator if in selection mode
                 if (isSelectionMode)
-                  Icon(
-                    isSelected
-                        ? Icons.radio_button_checked_rounded
-                        : Icons.radio_button_off_rounded,
-                    color: isSelected
-                        ? AppColors.primarySolid
-                        : AppColors.textMuted,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.edit_outlined,
+                          size: 20,
+                          color: AppColors.textMuted,
+                        ),
+                        tooltip: 'Chỉnh sửa',
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 36,
+                          minHeight: 36,
+                        ),
+                        onPressed: onEdit,
+                      ),
+                      const SizedBox(width: AppSpacing.s4),
+                      Icon(
+                        isSelected
+                            ? Icons.radio_button_checked_rounded
+                            : Icons.radio_button_off_rounded,
+                        color: isSelected
+                            ? AppColors.primarySolid
+                            : AppColors.textMuted,
+                      ),
+                    ],
                   )
                 else
                   // Quick Actions Menu
@@ -383,7 +403,7 @@ class _AddressCard extends StatelessWidget {
                         icon: const Icon(
                           Icons.edit_outlined,
                           size: 20,
-                          color: AppColors.primarySolid,
+                          color: AppColors.textMuted,
                         ),
                         tooltip: 'Chỉnh sửa',
                         padding: EdgeInsets.zero,
