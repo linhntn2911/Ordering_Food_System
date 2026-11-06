@@ -40,27 +40,22 @@ class FirebaseReviewRepository implements ReviewRepository {
     final reviewId = '${uid}_$orderId';
     final reviewRef = firestore.collection(FirestorePaths.reviews).doc(reviewId);
 
-    final existing = await reviewRef.get();
-    if (existing.exists) {
-      throw const ValidationFailure('Đơn hàng này đã được đánh giá.');
-    }
-
-    final itemsSnapshot = await firestore
-        .collection(FirestorePaths.orders)
-        .doc(orderId)
-        .collection('items')
-        .get();
-    final menuItemIds = {
-      for (final item in itemsSnapshot.docs)
-        if ((item.data()['menuItemId'] as String?)?.isNotEmpty ?? false)
-          item.data()['menuItemId'] as String,
-    }.toList(growable: false);
-    if (menuItemIds.isEmpty) {
-      throw const ValidationFailure('Không tìm thấy món trong đơn hàng.');
-    }
-
     final trimmedComment = comment.trim();
     try {
+      final itemsSnapshot = await firestore
+          .collection(FirestorePaths.orders)
+          .doc(orderId)
+          .collection('items')
+          .get();
+      final menuItemIds = {
+        for (final item in itemsSnapshot.docs)
+          if ((item.data()['menuItemId'] as String?)?.isNotEmpty ?? false)
+            item.data()['menuItemId'] as String,
+      }.toList(growable: false);
+      if (menuItemIds.isEmpty) {
+        throw const ValidationFailure('Không tìm thấy món trong đơn hàng.');
+      }
+
       await reviewRef.set({
         'customerId': uid,
         'orderId': orderId,
