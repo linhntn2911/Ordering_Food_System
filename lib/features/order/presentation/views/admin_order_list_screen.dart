@@ -25,6 +25,7 @@ class AdminOrderListScreen extends ConsumerWidget {
     final allOrders = ref.watch(adminOrdersProvider);
     final filteredOrders = ref.watch(filteredAdminOrdersProvider);
     final filter = ref.watch(adminOrderListFilterProvider);
+    final chats = ref.watch(adminOrderChatsProvider).value;
 
     ref.listen(adminOrdersProvider, (previous, next) {
       final oldOrders = previous?.value;
@@ -126,6 +127,17 @@ class AdminOrderListScreen extends ConsumerWidget {
                           ],
                         ),
                       ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: FilterChip(
+                          key: const ValueKey('admin-order-filter-has-chat'),
+                          label: const Text('Có tin nhắn'),
+                          selected: filter.hasChat,
+                          onSelected: ref
+                              .read(adminOrderListFilterProvider.notifier)
+                              .setHasChat,
+                        ),
+                      ),
                       if (filter.status != null) ...[
                         const SizedBox(height: AppSpacing.xs),
                         Align(
@@ -168,7 +180,10 @@ class AdminOrderListScreen extends ConsumerWidget {
                           loading: () => const _LoadingState(),
                           error: (error, _) => _ErrorState(
                             message: _friendlyError(error),
-                            onRetry: () => ref.invalidate(adminOrdersProvider),
+                            onRetry: () {
+                              ref.invalidate(adminOrdersProvider);
+                              ref.invalidate(adminOrderChatsProvider);
+                            },
                           ),
                           data: (orders) {
                             final rawOrders = allOrders.value ?? const [];
@@ -202,6 +217,8 @@ class AdminOrderListScreen extends ConsumerWidget {
                                   return AdminOrderCard(
                                     key: ValueKey(order.id),
                                     order: order,
+                                    hasUnreadChat:
+                                        chats?[order.id]?.unreadByAdmin == true,
                                     onTap: () {
                                       if (onOrderSelected != null) {
                                         onOrderSelected!(order);

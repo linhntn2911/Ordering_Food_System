@@ -177,7 +177,7 @@ class CheckoutController extends Notifier<CheckoutState> {
       state = state.copyWith(
         errorMessage: 'Vui lòng đăng nhập để tiến hành đặt hàng.',
       );
-      throw const AuthFailure('Vui lòng đăng nhập để tiến hành đặt hàng.');
+      return null;
     }
 
     // Validate checkout prerequisites (FR-014, FR-048)

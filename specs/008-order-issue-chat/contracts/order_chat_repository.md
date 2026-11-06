@@ -14,16 +14,6 @@ abstract interface class OrderChatRepository {
   /// Generates a message ID once per draft; reused for every retry (R3).
   String newMessageId(String orderId);
 
-  /// Uploads one photo to order_chats/{orderId}/{messageId}/{index}.jpg and
-  /// returns its storage path. Throws ChatFailure on rule, size or network
-  /// errors.
-  Future<String> uploadPhoto({
-    required String orderId,
-    required String messageId,
-    required int index,
-    required XFile photo,
-  });
-
   /// One transaction: creates the conversation if absent (with issueType and
   /// openedByRole), creates the message unless it already exists, and updates
   /// metadata plus the other side's unread flag (R2, R3).
@@ -36,11 +26,11 @@ abstract interface class OrderChatRepository {
     ChatIssueType? issueType,
   });
 
-  /// Sets the viewer's own unread flag to false. No-op if no conversation.
-  Future<void> markRead(String orderId, ChatRole viewerRole);
+  /// Clears the viewer's flag if the conversation still matches the last seen message.
+  Future<void> markRead(String orderId, ChatRole viewerRole, {String? lastSeenMessageId});
 
-  /// Resolves a storage path to a displayable URL (rule-checked).
-  Future<String> photoUrl(String storagePath);
+  /// Reads image bytes through an authenticated Storage request.
+  Future<Uint8List> photoBytes(String storagePath);
 
   /// Admin: conversations ordered by lastMessageAt desc, at most [limit].
   Stream<List<OrderChat>> watchAdminChats({int limit = 100});
@@ -58,7 +48,6 @@ abstract interface class OrderChatRepository {
 |---|---|---|
 | `closed` | Rules reject because the 24-hour window ended | "Cuộc trò chuyện đã đóng" |
 | `permissionDenied` | Not a participant or disabled account | "Bạn không có quyền xem cuộc trò chuyện này" |
-| `photoTooLarge` | Storage rejects size | "Ảnh vượt quá 5 MB" |
 | `unavailable` | Network / offline | "Không gửi được. Kiểm tra kết nối và thử lại" |
 | `unknown` | Anything else | "Đã có lỗi, vui lòng thử lại" |
 

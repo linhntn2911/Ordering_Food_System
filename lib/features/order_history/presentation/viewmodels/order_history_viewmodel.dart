@@ -112,6 +112,7 @@ class _CheckoutOrderHistoryRepository implements OrderHistoryRepository {
   OrderModel _map(checkout.OrderModel order) {
     return OrderModel(
       orderId: order.orderCode,
+      documentId: order.id,
       userId: order.customerId,
       items: order.items
           .map(

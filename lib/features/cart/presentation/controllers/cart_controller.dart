@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/core/errors/failures.dart';
 import 'package:ordering_food_system/core/firebase/firebase_providers.dart';
+import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/cart/data/cart_repository.dart';
 import 'package:ordering_food_system/features/cart/data/models/cart_item_model.dart';
 
@@ -27,12 +28,12 @@ final currentCustomerIdProvider =
     );
 
 /// Customer key shared by cart, checkout and order history: the Firebase UID
-/// when a user is signed in, otherwise the demo customer id.
+/// when Firebase is configured, or the local customer id in offline tests.
 final activeCustomerIdProvider = Provider<String?>((ref) {
-  final firebaseUid = Firebase.apps.isEmpty
-      ? null
-      : ref.watch(firebaseAuthProvider).currentUser?.uid;
-  return firebaseUid ?? ref.watch(currentCustomerIdProvider);
+  if (Firebase.apps.isEmpty) return ref.watch(currentCustomerIdProvider);
+
+  ref.watch(authStateProvider);
+  return ref.watch(firebaseAuthProvider).currentUser?.uid;
 });
 
 /// Immutable UI State for Cart Screen

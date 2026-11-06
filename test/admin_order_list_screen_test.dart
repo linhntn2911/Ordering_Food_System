@@ -7,14 +7,40 @@ import 'package:ordering_food_system/features/order/domain/repositories/order_re
 import 'package:ordering_food_system/features/order/presentation/viewmodels/admin_order_list_view_model.dart';
 import 'package:ordering_food_system/features/order/presentation/views/admin_order_list_screen.dart';
 
+import 'package:ordering_food_system/features/order_chat/presentation/viewmodels/order_chat_providers.dart';
+
+import 'support/fake_order_chat_repository.dart';
+import 'support/order_chat_order_fixture.dart';
+
 void main() {
-  testWidgets('renders the real-time order queue and totals', (tester) async {
+  testWidgets('shows the chat badge and filters orders with conversations', (
+    tester,
+  ) async {
+    final repository = FakeOrderChatRepository()
+      ..adminChats = [chatFixture(orderId: 'order-1', unreadByAdmin: true)];
+    addTearDown(repository.close);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [orderRepositoryProvider.overrideWithValue(_FakeOrders())],
+        overrides: [
+          orderRepositoryProvider.overrideWithValue(_FakeOrders()),
+          orderChatRepositoryProvider.overrideWithValue(repository),
+        ],
         child: const MaterialApp(home: AdminOrderListScreen()),
       ),
     );
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const ValueKey('admin-order-chat-badge-order-1')),
+      findsOneWidget,
+    );
+    await tester.tap(find.byKey(const ValueKey('admin-order-filter-has-chat')));
+    await tester.pumpAndSettle();
+    expect(find.text('ORD-20261019-0001'), findsOneWidget);
+    expect(find.text('ORD-20261019-0002'), findsNothing);
+  });
+
+  testWidgets('renders the real-time order queue and totals', (tester) async {
+    await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
     expect(find.text('Orders'), findsOneWidget);
@@ -25,12 +51,7 @@ void main() {
   });
 
   testWidgets('filters orders by status', (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [orderRepositoryProvider.overrideWithValue(_FakeOrders())],
-        child: const MaterialApp(home: AdminOrderListScreen()),
-      ),
-    );
+    await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
     await tester.tap(find.byKey(const ValueKey('order-status-filters')));
@@ -49,12 +70,7 @@ void main() {
   });
 
   testWidgets('searches by customer name', (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [orderRepositoryProvider.overrideWithValue(_FakeOrders())],
-        child: const MaterialApp(home: AdminOrderListScreen()),
-      ),
-    );
+    await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
     await tester.enterText(
@@ -67,6 +83,18 @@ void main() {
     expect(find.text('ORD-20261019-0001'), findsNothing);
   });
 }
+
+Widget _app() => ProviderScope(
+  overrides: [
+    orderRepositoryProvider.overrideWithValue(_FakeOrders()),
+    orderChatRepositoryProvider.overrideWith((ref) {
+      final repository = FakeOrderChatRepository();
+      ref.onDispose(repository.close);
+      return repository;
+    }),
+  ],
+  child: const MaterialApp(home: AdminOrderListScreen()),
+);
 
 class _FakeOrders implements OrderRepository {
   @override

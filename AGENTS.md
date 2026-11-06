@@ -38,7 +38,7 @@ For additional context about technologies, project structure, commands, and deci
 - One restaurant: **Ngô Chicken** (fried chicken, rice, noodles, snacks, combos, drinks). Menu data comes from Firestore; `tools/seed_menu/menu_seed.json` holds the restaurant's menu for the emulator. Never hard-code menu items in widgets.
 - Human roles: Customer and pre-provisioned Admin. Guest is an unauthenticated state.
 - COD only.
-- No driver application, GPS tracking, online payment, refunds, chat, marketplace behavior, or complex promotions.
+- No driver application, GPS tracking, online payment, refunds, general-purpose chat, marketplace behavior, or complex promotions.
 - The required integrations are Firebase Authentication, Cloud Firestore, Firebase Cloud Messaging, Firebase Storage when images are uploaded, Riverpod, MVVM, and SharedPreferences.
 
 ## Architecture

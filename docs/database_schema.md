@@ -120,3 +120,7 @@ Sales reports are derived from completed orders and order items. No independent 
 ## Required Indexes
 
 `firestore.indexes.json` defines published menu ordering, category menu filtering, Customer order history, Admin status queues, and recent reviews by menu item.
+
+## Order-issue chat
+
+The order_chats collection uses the order ID as its document ID. It stores the order code, customer ID, issue type, opening role, latest message ID, time, preview, sender role and both unread flags. Its messages subcollection stores sender UID and role, trimmed text, attachment references and server time. The client stores up to three HTTPS image URLs in imagePaths. Legacy Storage paths at order_chats/{orderId}/{messageId}/{index}.jpg remain readable. Existing orders need no migration. The rules derive the 24-hour window from completedAt or updatedAt for terminal orders.

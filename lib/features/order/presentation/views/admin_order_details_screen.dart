@@ -12,6 +12,8 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_time_formatter.dart';
 import '../../../../core/widgets/gradient_button.dart';
 import '../../../auth/presentation/viewmodels/auth_providers.dart';
+import '../../../order_chat/domain/entities/chat_role.dart';
+import '../../../order_chat/presentation/widgets/order_chat_entry.dart';
 import '../../domain/entities/food_order.dart';
 import '../../domain/entities/order_item.dart';
 import '../../domain/entities/order_status.dart';
@@ -89,6 +91,7 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                     sliver: SliverList.list(
                       children: [
                         _TopBar(orderCode: order.orderCode),
+                        OrderChatEntry(orderId: order.id, role: ChatRole.admin),
                         const SizedBox(height: AppSpacing.xl),
                         Row(
                           children: [

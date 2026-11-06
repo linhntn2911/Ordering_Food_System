@@ -15,6 +15,7 @@ Document ID equals `orders/{orderId}` (one conversation per order, FR-003).
 | `customerId` | string | Equals `orders/{orderId}.customerId`; immutable |
 | `issueType` | string | One of `missingOrWrongItem`, `lateDelivery`, `foodQuality`, `addressOrContact`, `codPayment`, `other` (FR-002); immutable |
 | `openedByRole` | string | `customer` or `admin`; immutable |
+| `lastMessageId` | string | Links the parent write to its newly created message |
 | `lastMessageAt` | timestamp | Server time of the newest message |
 | `lastMessagePreview` | string | First 80 characters of the newest text, or `"[Ảnh]"` when photo-only |
 | `lastSenderRole` | string | `customer` or `admin` |
@@ -34,7 +35,7 @@ Open or read-only is **not stored**; it is derived from the order (see "Open win
 | `senderId` | string | Must equal `request.auth.uid` (FR-014) |
 | `senderRole` | string | `customer` when sender is the order's Customer, `admin` when sender is an active Admin |
 | `text` | string | 0-1,000 characters after trimming |
-| `imagePaths` | list<string> | 0-3 Storage paths under `order_chats/{orderId}/{messageId}/` |
+| `imagePaths` | list<string> | Up to three direct HTTPS image URLs (2,048 characters each). Existing Storage paths remain readable. |
 | `createdAt` | timestamp | Must equal `request.time` (FR-010) |
 
 Validation: `text.trim().length > 0 || imagePaths.length > 0` (FR-006). Messages are create-only; updates and deletes are rejected (FR-009).
@@ -48,11 +49,11 @@ Validation: `text.trim().length > 0 || imagePaths.length > 0` (FR-006). Messages
 | `order_chats` | `lastMessageAt` DESC (single field, automatic) | Admin "Has messages" filter |
 | `messages` (collection) | `createdAt` DESC (single field, automatic) | Message list paging |
 
-## Firebase Storage
+## Legacy Firebase Storage attachments
 
 Path: `order_chats/{orderId}/{messageId}/{index}.jpg`, `index` in `0..2`.
 
-- Content type `image/*`, size `< 5 MB` (FR-007).
+- Content type `image/*`, size `< 5 MB` for legacy uploads.
 - Create only; no overwrite or delete by clients.
 - Read and create only by the order's Customer or an active Admin, and create only while the conversation is open.
 
@@ -64,7 +65,7 @@ Path: `order_chats/{orderId}/{messageId}/{index}.jpg`, `index` in `0..2`.
 | `ChatRole` (enum) | `customer`, `admin` | |
 | `OrderChat` | `orderId`, `orderCode`, `customerId`, `issueType`, `openedByRole`, `lastMessageAt`, `lastMessagePreview`, `lastSenderRole`, `unreadByAdmin`, `unreadByCustomer` | Immutable, equatable |
 | `ChatMessage` | `id`, `senderId`, `senderRole`, `text`, `imagePaths`, `createdAt?`, `isPending` | `createdAt` null or estimated while pending |
-| `ChatDraft` | `text`, `photos` (local files, max 3), `issueType?` | `validate()` returns the first violation: empty, text too long, too many photos, photo too large, issue type missing on first message |
+| `ChatDraft` | `text`, `imageUrls` (HTTPS URLs, max 3) | `validate()` checks content, text length, photo count, and photo size |
 | `ChatWindow` | pure function `isOpen({orderStatus, completedAt, updatedAt, now})` | Mirrors rules (R5) |
 
 ## Open window (R5)
@@ -79,4 +80,4 @@ open     = !terminal || now < endedAt + 24h
 
 Conversation: `absent -> exists` on the first message from either side (transaction, R2). There is no stored status; `open -> read-only` happens implicitly when the window above ends.
 
-Message (client-side only): `draft -> uploadingPhotos -> sending -> sent`, with `uploadingPhotos | sending -> failed -> (retry) uploadingPhotos | sending`.
+Message (client-side only): `draft -> sending -> sent`, with `sending -> failed -> (retry) sending`.

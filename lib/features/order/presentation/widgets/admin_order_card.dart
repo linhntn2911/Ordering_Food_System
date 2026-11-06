@@ -10,10 +10,16 @@ import '../../domain/entities/food_order.dart';
 import 'order_status_chip.dart';
 
 class AdminOrderCard extends StatelessWidget {
-  const AdminOrderCard({required this.order, this.onTap, super.key});
+  const AdminOrderCard({
+    required this.order,
+    this.onTap,
+    this.hasUnreadChat = false,
+    super.key,
+  });
 
   final FoodOrder order;
   final VoidCallback? onTap;
+  final bool hasUnreadChat;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +45,19 @@ class AdminOrderCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(order.orderCode, style: AppTextStyles.titleMedium),
+                        if (hasUnreadChat)
+                          Semantics(
+                            label: 'Có tin nhắn chưa đọc',
+                            child: Text(
+                              'Tin mới',
+                              key: ValueKey(
+                                'admin-order-chat-badge-${order.id}',
+                              ),
+                              style: AppTextStyles.labelLarge.copyWith(
+                                color: AppColors.foodAccentDark,
+                              ),
+                            ),
+                          ),
                         const SizedBox(height: AppSpacing.xxs),
                         Text(
                           DateTimeFormatter.orderTime(order.createdAt),

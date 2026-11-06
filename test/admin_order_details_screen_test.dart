@@ -7,7 +7,31 @@ import 'package:ordering_food_system/features/order/domain/entities/order_status
 import 'package:ordering_food_system/features/order/presentation/viewmodels/admin_order_list_view_model.dart';
 import 'package:ordering_food_system/features/order/presentation/views/admin_order_details_screen.dart';
 
+import 'package:ordering_food_system/app/router.dart';
+import 'package:ordering_food_system/features/order_chat/presentation/viewmodels/order_chat_providers.dart';
+import 'package:ordering_food_system/features/order_chat/presentation/views/order_chat_screen.dart';
+import 'package:ordering_food_system/features/order_chat/presentation/widgets/chat_unread_dot.dart';
+
+import 'support/fake_order_chat_repository.dart';
+import 'support/order_chat_order_fixture.dart';
+
 void main() {
+  testWidgets('opens chat for the displayed order and shows its unread dot', (
+    tester,
+  ) async {
+    final repository = FakeOrderChatRepository()
+      ..chat = chatFixture(orderId: 'order-1', unreadByAdmin: true);
+    addTearDown(repository.close);
+    await tester.pumpWidget(_app(chatRepository: repository));
+    await tester.pumpAndSettle();
+    final entry = find.byKey(const ValueKey('admin-order-chat-open'));
+    expect(entry, findsOneWidget);
+    expect(find.byType(ChatUnreadDot), findsOneWidget);
+    await tester.tap(entry);
+    await tester.pumpAndSettle();
+    expect(find.text('Chat order-1'), findsOneWidget);
+  });
+
   testWidgets('shows order snapshots, totals, and status history', (
     tester,
   ) async {
@@ -16,7 +40,13 @@ void main() {
 
     expect(find.text('Order details'), findsOneWidget);
     expect(find.text('Nguyễn Minh Anh'), findsOneWidget);
-    expect(find.text('Gà sốt phô mai cay'), findsOneWidget);
+    final item = find.text('Gà sốt phô mai cay');
+    await tester.scrollUntilVisible(
+      item,
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(item, findsOneWidget);
     await tester.scrollUntilVisible(
       find.text('Payment summary'),
       300,
@@ -40,7 +70,7 @@ void main() {
 
     await tester.tap(find.text('Confirm order'));
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(FilledButton, 'Confirm'));
+    await tester.tap(find.widgetWithText(FilledButton, 'Xác nhận'));
     await tester.pumpAndSettle();
 
     expect(find.text('Confirmed'), findsWidgets);
@@ -60,7 +90,7 @@ void main() {
   });
 }
 
-Widget _app() {
+Widget _app({FakeOrderChatRepository? chatRepository}) {
   final now = DateTime.now();
   final order = FoodOrder(
     id: 'order-1',
@@ -82,6 +112,12 @@ Widget _app() {
   );
   return ProviderScope(
     overrides: [
+      orderChatRepositoryProvider.overrideWith((ref) {
+        if (chatRepository != null) return chatRepository;
+        final repository = FakeOrderChatRepository();
+        ref.onDispose(repository.close);
+        return repository;
+      }),
       orderRepositoryProvider.overrideWith((ref) {
         final repository = PreviewOrderRepository();
         ref.onDispose(repository.dispose);
@@ -89,6 +125,13 @@ Widget _app() {
       }),
     ],
     child: MaterialApp(
+      onGenerateRoute: (settings) {
+        if (settings.name != AppRoutes.orderChat) return null;
+        final args = settings.arguments as OrderChatArgs;
+        return MaterialPageRoute<void>(
+          builder: (_) => Scaffold(body: Text('Chat ${args.orderId}')),
+        );
+      },
       home: AdminOrderDetailsScreen(
         initialOrder: order,
         requireAdminSession: false,

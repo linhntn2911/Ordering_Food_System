@@ -7,11 +7,11 @@ Rules live in `firestore.rules` and `storage.rules`. Cases below are implemented
 ```
 function chatOrder(orderId) = get(/orders/$(orderId)).data
 function isChatParticipant(orderId) =
-  signedIn() && (chatOrder(orderId).customerId == request.auth.uid || isAdmin())
+  signedIn() && currentUser().data.status == 'active'\n  && (chatOrder(orderId).customerId == request.auth.uid || isAdmin())
 function chatOpen(orderId) =
   let o = chatOrder(orderId);
   !(o.orderStatus in ['Completed', 'Cancelled', 'Rejected'])
-  || request.time < (o.get('completedAt', o.updatedAt) + duration.value(24, 'h'))
+  || request.time < ((o.get('completedAt', null) != null ? o.completedAt : o.updatedAt) + duration.value(24, 'h'))
 function senderRole(orderId) = isAdmin() ? 'admin' : 'customer'
 ```
 
@@ -40,7 +40,7 @@ function senderRole(orderId) = isAdmin() ? 'admin' : 'customer'
 | C19 | customer-1 | Query `order_chats` where `customerId == customer-1` and `unreadByCustomer == true` | Allow |
 | C20 | customer-1 | Query `order_chats` without the `customerId` filter | Deny |
 
-Metadata updates are allowed only for keys `lastMessageAt`, `lastMessagePreview`, `lastSenderRole`, `unreadByAdmin`, `unreadByCustomer`, `updatedAt`, and only while `chatOpen` except for clearing one's own unread flag (allowed after the window so a read-only conversation can be marked read).
+Metadata updates are allowed only for keys `lastMessageId`, `lastMessageAt`, `lastMessagePreview`, `lastSenderRole`, `unreadByAdmin`, `unreadByCustomer`, `updatedAt`, and only while `chatOpen` except for clearing one's own unread flag (allowed after the window so a read-only conversation can be marked read).
 
 ## Storage cases (`order_chats/{orderId}/{messageId}/{index}.jpg`)
 

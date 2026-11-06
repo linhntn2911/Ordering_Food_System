@@ -182,6 +182,13 @@ class CheckoutRepositoryImpl implements CheckoutRepository {
       // On failure, remove key so user can retry
       _processedIdempotencyKeys.remove(idempotencyKey);
       if (e is Failure) rethrow;
+      if (e is FirebaseException &&
+          e.plugin == 'cloud_firestore' &&
+          e.code == 'permission-denied') {
+        throw const CheckoutFailure(
+          'Không có quyền tạo đơn hàng. Vui lòng đăng nhập lại và thử lại.',
+        );
+      }
       throw CheckoutFailure('Đặt hàng thất bại: ${e.toString()}');
     }
   }

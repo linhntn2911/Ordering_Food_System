@@ -6,15 +6,15 @@
 
 ## Summary
 
-Customers and Admins exchange text and photo messages about one order. Each order has at most one conversation, stored in `order_chats/{orderId}` with a `messages` subcollection; photos go to Firebase Storage. Sends run in a Firestore transaction with device-generated message IDs, so the first message from either side creates the conversation exactly once and retries never duplicate. A conversation becomes read-only 24 hours after the order ends; the rule is derived from the order's status and timestamps and enforced in both Firestore and Storage rules. Admins find conversations through a "Tin mới" badge and a "Có tin nhắn" filter on the existing Admin order list; Customers see unread dots on the order and the Orders tab. Push notifications are deferred until a trusted backend exists. One shared `OrderChatScreen` serves both roles.
+Customers and Admins exchange text and photo messages about one order. Each order has at most one conversation, stored in `order_chats/{orderId}` with a `messages` subcollection; new image attachments are stored as HTTPS URLs, while existing Storage references remain readable. Sends run in a Firestore transaction with device-generated message IDs, so the first message from either side creates the conversation exactly once and retries never duplicate. A conversation becomes read-only 24 hours after the order ends; the rule is derived from the order's status and timestamps and enforced in both Firestore and Storage rules. Admins find conversations through a "Tin mới" badge and a "Có tin nhắn" filter on the existing Admin order list; Customers see unread dots on the order and the Orders tab. Push notifications are deferred until a trusted backend exists. One shared `OrderChatScreen` serves both roles.
 
 ## Technical Context
 
 **Language/Version**: Dart 3 / Flutter (stable channel used by the repo)
 
-**Primary Dependencies**: `flutter_riverpod` ^3.4.3, `cloud_firestore` ^7.0.0, `firebase_storage` ^14.0.0, `firebase_auth` ^7.0.0, `image_picker` ^1.2.4 (all already in `pubspec.yaml`; no new packages)
+**Primary Dependencies**: `flutter_riverpod` ^3.4.3, `cloud_firestore` ^7.0.0, `firebase_storage` ^14.0.0, `firebase_auth` ^7.0.0 (all already in `pubspec.yaml`; no new packages)
 
-**Storage**: Cloud Firestore (`order_chats`, `order_chats/{id}/messages`), Firebase Storage (`order_chats/{orderId}/{messageId}/{index}.jpg`)
+**Storage**: Cloud Firestore (`order_chats`, `order_chats/{id}/messages`), Firebase Storage for legacy attachments (`order_chats/{orderId}/{messageId}/{index}.jpg`)
 
 **Testing**: `flutter_test` unit and widget tests with fake repositories; `@firebase/rules-unit-testing` emulator tests for Firestore and Storage rules in `tests/firestore_rules`
 
@@ -24,7 +24,7 @@ Customers and Admins exchange text and photo messages about one order. Each orde
 
 **Performance Goals**: Text message visible to the other side within 5 s, one-photo message within 10 s (SC-002)
 
-**Constraints**: Photos at most 3 per message, 5 MB each, downscaled on pick; bounded queries (30 messages per page, 100 conversations for Admin); no client-sent FCM; light-only design system
+**Constraints**: At most 3 direct HTTPS links per message, 2,048 characters each; bounded queries (30 messages per page, 100 conversations for Admin); no client-sent FCM; light-only design system
 
 **Scale/Scope**: One restaurant, a handful of Admins, tens of conversations per day; 1 new screen, 4 existing screens touched, 2 rules files, 1 new feature folder
 
@@ -40,9 +40,9 @@ Customers and Admins exchange text and photo messages about one order. Each orde
 | IV. Independently demonstrable stories | Pass | US1+US2 form the MVP; US3 and US4 add on independently (see tasks) |
 | V. Consistent, verifiable quality | Pass | Loading/empty/error/retry states defined; unit, widget, and rules tests planned; `flutter analyze` gate |
 | VI. Light-only Food Ninja design | Pass | Shared tokens and widgets; no new theme |
-| Product and Technology Constraints | **Violation** | Constitution v1.2.0 lists "chat" among excluded features. The product owner approved order-issue chat as a spec change on 2026-11-01. See Complexity Tracking; a constitution amendment is required before implementation. |
+| Product and Technology Constraints | Pass | Constitution v1.3.0 permits order-scoped issue chat. |
 
-**Post-design re-check (after Phase 1)**: unchanged. The design adds no backend, no new dependency, and no new theme; the only open gate is the constitution amendment.
+**Post-design re-check (after Phase 1)**: unchanged. The design adds no backend, no new dependency, and no new theme; the constitution amendment has been applied.
 
 ## Project Structure
 
@@ -93,7 +93,6 @@ lib/features/order_chat/
     └── widgets/
         ├── chat_bubble.dart
         ├── chat_composer.dart
-        ├── chat_issue_picker.dart
         └── chat_unread_dot.dart
 
 # Existing files touched
@@ -124,3 +123,7 @@ tests/firestore_rules/order_chat_storage.test.mjs
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |---|---|---|
 | Constitution v1.2.0 excludes "chat" | Customers had no in-app way to report order problems; the product owner approved order-issue chat (spec change 2026-11-01, baseline User Story 11) | Keeping chat out of scope leaves order problems to phone calls outside the app. **Action**: amend the constitution to v1.3.0 (`/speckit-constitution`) to allow order-scoped chat while still excluding general chat, then proceed to `/speckit-tasks` and implementation. |
+
+## Implementation details
+
+The latest message ID links each message to its parent write in Firestore rules. Firestore validates new HTTPS references and existing-format Storage paths. The UI loads external images when opened and reads legacy images through authenticated Firebase Storage.
