@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +14,7 @@ import 'app.dart';
 const _useFirestoreEmulator = bool.fromEnvironment('USE_FIRESTORE_EMULATOR');
 const _firestoreEmulatorPort = 8080;
 const _authEmulatorPort = 9099;
+const _storageEmulatorPort = 9199;
 
 /// Emulator-only options for web. A `demo-` project ID never reaches real
 /// Firebase services, so no real identifiers are needed.
@@ -37,6 +39,10 @@ Future<void> bootstrap() async {
       await FirebaseAuth.instance.useAuthEmulator(
         _emulatorHost(),
         _authEmulatorPort,
+      );
+      await FirebaseStorage.instance.useStorageEmulator(
+        _emulatorHost(),
+        _storageEmulatorPort,
       );
     }
     // Keep the authenticated Admin session across browser reloads. Without an

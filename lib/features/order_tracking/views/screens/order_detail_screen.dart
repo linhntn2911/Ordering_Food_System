@@ -10,6 +10,8 @@ import 'package:ordering_food_system/core/theme/app_text_styles.dart';
 import 'package:ordering_food_system/core/utils/currency_formatter.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:ordering_food_system/core/widgets/gradient_button.dart';
+import 'package:ordering_food_system/features/order_chat/domain/entities/chat_role.dart';
+import 'package:ordering_food_system/features/order_chat/presentation/widgets/order_chat_entry.dart';
 import 'package:ordering_food_system/features/order_history/data/models/order_model.dart';
 import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
 import 'package:ordering_food_system/features/review/providers/review_provider.dart';
@@ -65,6 +67,11 @@ class OrderDetailScreen extends ConsumerWidget {
                               ),
                               children: [
                                 _OrderSummaryCard(order: order),
+                                const SizedBox(height: AppSpacing.sm),
+                                OrderChatEntry(
+                                  orderId: order.documentId ?? orderId,
+                                  role: ChatRole.customer,
+                                ),
                                 const SizedBox(height: AppSpacing.md),
                                 _SectionCard(
                                   icon: Icons.restaurant_menu_rounded,
@@ -139,8 +146,8 @@ class OrderDetailScreen extends ConsumerWidget {
                                   GradientButton(
                                     label: order.status.isCompleted
                                         ? (reviewedIds.contains(order.orderId)
-                                            ? 'Đã đánh giá'
-                                            : 'Viết đánh giá')
+                                              ? 'Đã đánh giá'
+                                              : 'Viết đánh giá')
                                         : 'Theo dõi đơn hàng',
                                     icon: order.status.isCompleted
                                         ? Icons.star_rounded

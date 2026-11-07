@@ -10,6 +10,8 @@ import '../features/auth/presentation/viewmodels/auth_providers.dart';
 import '../features/cart/presentation/views/cart_screen.dart';
 import '../features/checkout/presentation/views/checkout_screen.dart';
 import '../features/menu/presentation/views/home_view.dart';
+import '../features/order_chat/presentation/viewmodels/order_chat_providers.dart';
+import '../features/order_chat/presentation/widgets/chat_unread_dot.dart';
 import '../features/order_history/presentation/views/order_history_view.dart';
 import '../features/profile/presentation/views/profile_view.dart';
 import 'router.dart';
@@ -40,7 +42,12 @@ class MainShell extends ConsumerStatefulWidget {
 class _MainShellState extends ConsumerState<MainShell> {
   @override
   Widget build(BuildContext context) {
-    final signedIn = ref.watch(authStateProvider).value != null;
+    final account = ref.watch(authStateProvider).value;
+    final signedIn = account != null;
+    final hasUnread =
+        account?.isCustomer == true &&
+        account?.isActive == true &&
+        ref.watch(customerUnreadChatProvider(account!.id)).value == true;
     final index = ref.watch(mainShellTabProvider);
     final visibleTabs = [
       for (var i = 0; i < MainShell.tabs.length; i++)
@@ -89,6 +96,7 @@ class _MainShellState extends ConsumerState<MainShell> {
                         key: ValueKey('shell-tab-$i'),
                         tab: MainShell.tabs[i],
                         selected: i == selected,
+                        hasUnread: i == MainShellTab.orders && hasUnread,
                         onTap: () =>
                             ref.read(mainShellTabProvider.notifier).select(i),
                       ),
@@ -129,11 +137,13 @@ class _TabButton extends StatelessWidget {
     super.key,
     required this.tab,
     required this.selected,
+    required this.hasUnread,
     required this.onTap,
   });
 
   final _ShellTab tab;
   final bool selected;
+  final bool hasUnread;
   final VoidCallback onTap;
 
   @override
@@ -144,7 +154,7 @@ class _TabButton extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
-      label: tab.label,
+      label: hasUnread ? '${tab.label}, Có tin nhắn chưa đọc' : tab.label,
       excludeSemantics: true,
       onTap: onTap,
       child: Material(
@@ -158,7 +168,20 @@ class _TabButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(tab.icon, size: 24, color: color),
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(tab.icon, size: 24, color: color),
+                    if (hasUnread)
+                      const Positioned(
+                        right: 0,
+                        top: 0,
+                        child: ChatUnreadDot(
+                          key: ValueKey('shell-tab-2-badge'),
+                        ),
+                      ),
+                  ],
+                ),
                 if (selected) ...[
                   const SizedBox(width: AppSpacing.p8),
                   Flexible(

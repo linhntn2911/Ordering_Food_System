@@ -17,6 +17,7 @@ class FoodOrderModel {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.completedAt,
     required this.subtotal,
     required this.deliveryFee,
     required this.deliveryDistanceKm,
@@ -37,6 +38,7 @@ class FoodOrderModel {
   final OrderStatus status;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final DateTime? completedAt;
   final int subtotal;
   final int deliveryFee;
   final double deliveryDistanceKm;
@@ -64,6 +66,7 @@ class FoodOrderModel {
       status: OrderStatus.parse(data['orderStatus']),
       createdAt: createdAt,
       updatedAt: _date(data['updatedAt'], fallback: createdAt),
+      completedAt: (data['completedAt'] as Timestamp?)?.toDate(),
       subtotal: _optionalInt(data['subtotal']),
       deliveryFee: _optionalInt(data['deliveryFee']),
       deliveryDistanceKm: _double(data['deliveryDistanceKm']),
@@ -86,6 +89,7 @@ class FoodOrderModel {
     status: status,
     createdAt: createdAt,
     updatedAt: updatedAt,
+    completedAt: completedAt,
     subtotal: subtotal,
     deliveryFee: deliveryFee,
     deliveryDistanceKm: deliveryDistanceKm,

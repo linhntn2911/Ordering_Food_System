@@ -189,11 +189,11 @@ As a Customer, I want to message the restaurant about a problem with one of my o
 
 **Why this priority**: Order problems are time-sensitive and currently have no in-app channel. The ordering lifecycle still works without chat, so it follows the P1 order flow.
 
-**Independent Test**: Place an order as a Customer, open chat from Order Details, choose an issue type and send a message with a photo; as an Admin, see the order's "new message" badge in the Admin Order List without refresh, open the conversation from Admin Order Details and reply; verify both sides see the messages in real time with unread badges, and another Customer cannot read the conversation or its photos. Details: `specs/008-order-issue-chat/spec.md`.
+**Independent Test**: Place an order as a Customer, open chat from Order Details, send a message with a photo; as an Admin, see the order's "new message" badge in the Admin Order List without refresh, open the conversation from Admin Order Details and reply; verify both sides see the messages in real time with unread badges, and another Customer cannot read the conversation or its photos. Details: `specs/008-order-issue-chat/spec.md`.
 
 **Acceptance Scenarios**:
 
-1. **Given** a Customer owns an order that is active or reached a terminal status less than 24 hours ago, **When** the Customer opens chat from Order Details, chooses an issue type, and sends a first message, **Then** one conversation is created for that order and the message appears in it.
+1. **Given** a Customer owns an order that is active or reached a terminal status less than 24 hours ago, **When** the Customer opens chat from Order Details and sends a first message, **Then** one conversation is created for that order and the message appears in it.
 2. **Given** a conversation already exists for the order, **When** the Customer opens chat again, **Then** the existing conversation opens instead of a second one being created.
 3. **Given** an open conversation, **When** either side sends a message with text, photos, or both, **Then** the other side sees it without manual refresh, or sees an unread badge if elsewhere in the app.
 4. **Given** a Customer message is unread by Admins, **When** an Admin views the Admin Order List, **Then** the order shows a "new message" badge and appears under the "Has messages" filter.
@@ -302,10 +302,10 @@ As a Customer, I want to message the restaurant about a problem with one of my o
 #### Order-Issue Chat
 
 - **FR-053**: A Customer MUST be able to start an order-issue conversation from Order Details for their own order while the order is active or within 24 hours after it reaches `Completed`, `Cancelled`, or `Rejected`.
-- **FR-054**: Starting a conversation MUST require choosing one issue type: missing or wrong item, late delivery, food quality, address or contact, COD payment, or other.
+- **FR-054**: New conversations MUST automatically use the default issue type `other`.
 - **FR-055**: The system MUST keep at most one conversation per order; opening chat again for the same order MUST open the existing conversation.
 - **FR-056**: An Admin MUST be able to start or open the conversation for any order from Admin Order Details. The Admin Order List MUST show a "new message" badge on orders with messages unread by Admins and MUST offer a "Has messages" filter; there is no separate support inbox screen.
-- **FR-057**: A message MUST contain text of up to 1,000 characters, up to three images of at most 5 MB each stored in Firebase Storage, or both, and MUST NOT be empty. A message MUST be saved only after all its images are stored. Sent messages and images MUST NOT be editable or deletable by clients.
+- **FR-057**: A message MUST contain text of up to 1,000 characters, up to three direct HTTPS image links, or both, and MUST NOT be empty. Sent messages MUST NOT be editable or deletable by clients.
 - **FR-058**: New messages MUST appear for both participants in real time. Each side MUST see an unread indicator (Customer: on the order and the Orders tab; Admin: on the order in the Admin Order List and Admin Order Details) that clears only for the person who opens the conversation.
 - **FR-059**: Chat push notifications are deferred until the trusted notification backend exists (FR-040); until then the client MUST NOT send FCM messages and new messages are signalled by real-time updates and unread indicators.
 - **FR-060**: A conversation MUST become read-only 24 hours after its order reaches `Completed`, `Cancelled`, or `Rejected`, and MUST remain readable by both participants afterwards. There is no manual resolve or reopen.
@@ -418,7 +418,7 @@ Screen complexity is based on meaningful data state, validation, navigation, asy
 | Member 5 | Add or Edit Menu Item | High | Validated form, options, image upload |
 | Member 5 | Category Management | Medium | Ordered CRUD and publication rules |
 | Member 5 | Sales Report | Medium | Date range, metrics, top items, zero state |
-| To be assigned | Order Issue Chat (Customer and Admin) | High | Issue type, real-time text and photo messages, unread state, pending/failed sends, 24-hour read-only rule |
+| To be assigned | Order Issue Chat (Customer and Admin) | High | Real-time text and photo messages, unread state, pending/failed sends, 24-hour read-only rule |
 
 The owner of the order-issue chat screen is decided during planning; it also adds chat entry points and unread badges to Order Details, Admin Order List, and Admin Order Details. This screen is an addition and does not change the existing per-member minimum. Each member owns at least three Medium-or-higher screens. Shared widgets, Firebase setup, rules, test infrastructure, and integration work remain team responsibilities and do not replace individual screen ownership.
 

@@ -24,8 +24,8 @@ All Technical Context unknowns are resolved below. Each entry records the decisi
 
 ## R4 - Photo upload and storage
 
-- **Decision**: Photos are picked with the existing `image_picker` dependency, downscaled on pick (`maxWidth: 1600`, `imageQuality: 80`), validated client-side (image type, at most 5 MB, at most three), then uploaded to Firebase Storage at `order_chats/{orderId}/{messageId}/{index}.jpg`. The message document stores the **storage paths**, and is written only after every upload succeeds. Uploaded indexes are remembered in ViewModel state so a retry re-uploads only failed photos.
-- **Rationale**: Meets FR-007 (no message with a missing photo). Storing paths instead of download URLs keeps reads behind Storage rules; the app resolves a download URL when displaying, which is itself rule-checked.
+- **Decision**: Photos are picked with the existing `image_picker` dependency, downscaled on pick (`maxWidth: 1600`, `imageQuality: 85`), validated client-side (image type, at most 5 MB, at most three), then uploaded to Firebase Storage at `order_chats/{orderId}/{messageId}/{index}.jpg`. The message document stores the **storage paths**, and is written only after every upload succeeds. Uploaded indexes are remembered in ViewModel state so a retry re-uploads only failed photos.
+- **Rationale**: Meets FR-007 (no message with a missing photo). Storing paths instead of download URLs keeps reads behind Storage rules; the Storage SDK checks authorization and returns bytes to the app.
 - **Alternatives considered**: Storing download URLs (rejected: token URLs bypass rules if leaked); writing the message first and patching photos later (rejected: a message could appear without its photos).
 
 ## R5 - 24-hour closing rule

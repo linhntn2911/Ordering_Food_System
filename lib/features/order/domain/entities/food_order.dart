@@ -14,6 +14,7 @@ class FoodOrder {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    this.completedAt,
     this.subtotal = 0,
     this.deliveryFee = 0,
     this.deliveryDistanceKm = 0,
@@ -34,6 +35,7 @@ class FoodOrder {
   final OrderStatus status;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final DateTime? completedAt;
   final int subtotal;
   final int deliveryFee;
   final double deliveryDistanceKm;
@@ -59,6 +61,7 @@ class FoodOrder {
       status: status ?? this.status,
       createdAt: createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      completedAt: completedAt,
       subtotal: subtotal,
       deliveryFee: deliveryFee,
       deliveryDistanceKm: deliveryDistanceKm,

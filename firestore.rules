@@ -244,6 +244,11 @@ service cloud.firestore {
         )
         && request.resource.data.updatedAt == request.time
         && (
+          request.resource.data.get('completedAt', null) == resource.data.get('completedAt', null)
+          || (request.resource.data.orderStatus == 'Completed'
+            && request.resource.data.completedAt == request.time)
+        )
+        && (
           request.resource.data.orderStatus != 'Rejected'
           || (
             request.resource.data.rejectionReason is string
@@ -336,6 +341,124 @@ service cloud.firestore {
 
     match /mail/{mailId} {
       allow create: if true;
+    }
+
+
+    function chatAccountActive() {
+      return signedIn() && currentUser().data.status == 'active';
+    }
+
+    function chatOrder(orderId) {
+      return get(/databases/$(database)/documents/orders/$(orderId)).data;
+    }
+
+    function chatParticipant(orderId) {
+      return chatAccountActive()
+        && (isAdmin() || chatOrder(orderId).customerId == request.auth.uid);
+    }
+
+    function chatOpen(orderId) {
+      let order = chatOrder(orderId);
+      let completedAt = order.get('completedAt', null);
+      return !(order.orderStatus in ['Completed', 'Cancelled', 'Rejected'])
+        || request.time < (completedAt != null ? completedAt : order.updatedAt)
+          + duration.value(24, 'h');
+    }
+
+    function chatRole() {
+      return isAdmin() ? 'admin' : 'customer';
+    }
+
+    function chatMessagePath(orderId, messageId) {
+      return /databases/$(database)/documents/order_chats/$(orderId)/messages/$(messageId);
+    }
+
+    function validChatAdvance(orderId, chat) {
+      let path = chatMessagePath(orderId, chat.lastMessageId);
+      let message = getAfter(path).data;
+      return !exists(path)
+        && chat.lastMessageAt == request.time
+        && chat.updatedAt == request.time
+        && chat.lastSenderRole == chatRole()
+        && chat.lastMessagePreview is string
+        && chat.lastMessagePreview.size() <= 80
+        && message.createdAt == request.time
+        && message.senderId == request.auth.uid
+        && message.senderRole == chat.lastSenderRole;
+    }
+
+    match /order_chats/{orderId} {
+      allow get: if chatParticipant(orderId);
+      allow list: if chatAccountActive()
+        && (isAdmin() || resource.data.customerId == request.auth.uid);
+      allow create: if chatParticipant(orderId) && chatOpen(orderId)
+        && request.resource.data.keys().hasOnly([
+          'orderId', 'orderCode', 'customerId', 'issueType', 'openedByRole',
+          'lastMessageId', 'lastMessageAt', 'lastMessagePreview', 'lastSenderRole',
+          'unreadByAdmin', 'unreadByCustomer', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.orderId == orderId
+        && request.resource.data.orderCode == chatOrder(orderId).get('orderCode', orderId)
+        && request.resource.data.customerId == chatOrder(orderId).customerId
+        && request.resource.data.issueType in [
+          'missingOrWrongItem', 'lateDelivery', 'foodQuality',
+          'addressOrContact', 'codPayment', 'other'
+        ]
+        && request.resource.data.openedByRole == chatRole()
+        && (chatRole() != 'admin' || request.resource.data.issueType == 'other')
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.unreadByAdmin == (chatRole() == 'customer')
+        && request.resource.data.unreadByCustomer == (chatRole() == 'admin')
+        && validChatAdvance(orderId, request.resource.data);
+      allow update: if chatParticipant(orderId) && (
+        (chatRole() == 'admin'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadByAdmin'])
+          && request.resource.data.unreadByAdmin == false)
+        || (chatRole() == 'customer'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadByCustomer'])
+          && request.resource.data.unreadByCustomer == false)
+        || (chatOpen(orderId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'lastMessageId', 'lastMessageAt', 'lastMessagePreview', 'lastSenderRole',
+            'unreadByAdmin', 'unreadByCustomer', 'updatedAt'
+          ])
+          && (chatRole() == 'admin'
+            ? request.resource.data.unreadByCustomer == true
+              && request.resource.data.unreadByAdmin == resource.data.unreadByAdmin
+            : request.resource.data.unreadByAdmin == true
+              && request.resource.data.unreadByCustomer == resource.data.unreadByCustomer)
+          && validChatAdvance(orderId, request.resource.data))
+      );
+
+      match /messages/{messageId} {
+        function validAttachment(value, prefix) {
+          return value is string && (value in [prefix + '0.jpg', prefix + '1.jpg', prefix + '2.jpg']
+            || (value.size() <= 2048
+              && value.matches('https://[A-Za-z0-9][A-Za-z0-9.-]*(:[0-9]+)?([/?#][^[:space:]]*)?')));
+        }
+
+        function validMessage(message) {
+          let prefix = 'order_chats/' + orderId + '/' + messageId + '/';
+          let parent = getAfter(/databases/$(database)/documents/order_chats/$(orderId)).data;
+          return message.keys().hasOnly(['senderId', 'senderRole', 'text', 'imagePaths', 'createdAt'])
+            && message.senderId == request.auth.uid
+            && message.senderRole == chatRole()
+            && message.createdAt == request.time
+            && message.text is string && message.text.size() <= 1000
+            && message.imagePaths is list && message.imagePaths.size() <= 3
+            && message.imagePaths.toSet().size() == message.imagePaths.size()
+            && (message.imagePaths.size() < 1 || validAttachment(message.imagePaths[0], prefix))
+            && (message.imagePaths.size() < 2 || validAttachment(message.imagePaths[1], prefix))
+            && (message.imagePaths.size() < 3 || validAttachment(message.imagePaths[2], prefix))
+            && (message.text.matches('(?s).*[^[:space:]].*') || message.imagePaths.size() > 0)
+            && parent.lastMessageAt == request.time
+            && parent.lastMessageId == messageId;
+        }
+
+        allow read: if chatParticipant(orderId);
+        allow create: if chatParticipant(orderId) && chatOpen(orderId)
+          && validMessage(request.resource.data);
+      }
     }
 
     match /{document=**} {

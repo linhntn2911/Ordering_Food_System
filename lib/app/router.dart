@@ -21,6 +21,8 @@ import '../features/onboarding/presentation/views/onboarding_view.dart';
 import '../features/order/presentation/views/admin_dashboard_screen.dart';
 import '../features/order/presentation/views/admin_order_list_screen.dart';
 import '../features/order/presentation/views/sales_report_screen.dart';
+import '../features/order_chat/domain/entities/chat_role.dart';
+import '../features/order_chat/presentation/views/order_chat_screen.dart';
 import '../features/order_history/presentation/views/order_history_view.dart';
 import '../features/order_tracking/views/screens/order_detail_screen.dart';
 import '../features/order_tracking/views/screens/order_tracking_timeline_screen.dart';
@@ -56,6 +58,7 @@ abstract final class AppRoutes {
 
   // Customer features from Member 4 (Tienpq)
   static const String orderHistory = '/order-history';
+  static const String orderChat = '/order-chat';
   static const String orderDetail = '/order-detail';
   static const String orderTracking = '/order-tracking';
   static const String writeReview = '/write-review';
@@ -148,6 +151,17 @@ abstract final class AppRoutes {
         }
       case orderHistory:
         return MaterialPageRoute(builder: (_) => const OrderHistoryView());
+      case orderChat:
+        final chatArgs = settings.arguments is OrderChatArgs
+            ? settings.arguments as OrderChatArgs
+            : OrderChatArgs(
+                uri.queryParameters['orderId'] ?? '',
+                ChatRole.customer,
+              );
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => OrderChatScreen(args: chatArgs),
+        );
       case orderDetail:
         {
           final orderId =

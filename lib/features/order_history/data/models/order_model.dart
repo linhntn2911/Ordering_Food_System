@@ -74,9 +74,11 @@ class OrderModel extends Equatable {
     required this.paymentMethod,
     this.note,
     this.estimatedDeliveryTime,
+    this.documentId,
   });
 
   final String orderId;
+  final String? documentId;
   final String userId;
   final List<OrderItem> items;
   final double subtotal;
@@ -95,6 +97,7 @@ class OrderModel extends Equatable {
   @override
   List<Object?> get props => [
     orderId,
+    documentId,
     userId,
     items,
     subtotal,

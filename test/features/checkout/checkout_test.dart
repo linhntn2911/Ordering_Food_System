@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ordering_food_system/features/address/data/address_repository.dart';
 import 'package:ordering_food_system/features/address/data/models/address_model.dart';
 import 'package:ordering_food_system/features/address/presentation/controllers/address_controller.dart';
 import 'package:ordering_food_system/features/cart/data/models/cart_item_model.dart';
@@ -67,7 +68,12 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = ProviderContainer(
+        overrides: [
+          addressRepositoryProvider.overrideWithValue(AddressRepositoryImpl()),
+          addressUserIdProvider.overrideWithValue('customer_honganh_1'),
+        ],
+      );
       container
           .read(currentCustomerIdProvider.notifier)
           .setCustomerId('customer_honganh_1');
@@ -75,6 +81,26 @@ void main() {
 
     tearDown(() {
       container.dispose();
+    });
+
+    test('checkout asks a signed-out customer to sign in', () async {
+      final signedOutContainer = ProviderContainer(
+        overrides: [
+          activeCustomerIdProvider.overrideWithValue(null),
+          addressRepositoryProvider.overrideWithValue(AddressRepositoryImpl()),
+          addressUserIdProvider.overrideWithValue(null),
+        ],
+      );
+      addTearDown(signedOutContainer.dispose);
+
+      final controller = signedOutContainer.read(
+        checkoutControllerProvider.notifier,
+      );
+      expect(await controller.placeOrder(), isNull);
+      expect(
+        signedOutContainer.read(checkoutControllerProvider).errorMessage,
+        'Vui lòng đăng nhập để tiến hành đặt hàng.',
+      );
     });
 
     const sizeM = CartOptionItem(id: 's_m', name: 'Size M', additionalPrice: 0);
