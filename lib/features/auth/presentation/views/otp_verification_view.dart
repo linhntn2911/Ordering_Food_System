@@ -121,7 +121,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
     if (code.length != _codeLength) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter all 6 digits of the verification code.'),
+          content: Text('Vui lòng nhập đủ 6 chữ số của mã xác thực.'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -166,7 +166,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'A new verification code has been sent to ${widget.args.email}',
+            'Mã xác thực mới đã được gửi đến ${widget.args.email}',
           ),
           backgroundColor: AppColors.success,
         ),
@@ -200,7 +200,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
 
                 // Frame 1.12 Headline
                 Text(
-                  'Enter 6-Digit\nVerification Code',
+                  'Nhập mã xác thực\n6 chữ số',
                   style: AppTextStyles.headlineLarge.copyWith(
                     fontSize: 26,
                     height: 1.3,
@@ -223,7 +223,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                         ),
                       ),
                       const TextSpan(
-                        text: '.\nThe code will expire in 5 minutes.',
+                        text: '.\nMã sẽ hết hạn trong 5 phút.',
                       ),
                     ],
                   ),
@@ -339,7 +339,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                 Center(
                   child: PrimaryButton(
                     width: 160,
-                    text: 'Next',
+                    text: 'Tiếp theo',
                     isLoading: state.isLoading,
                     onPressed: _handleVerify,
                   ),

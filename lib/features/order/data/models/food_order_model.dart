@@ -57,7 +57,7 @@ class FoodOrderModel {
       id: document.id,
       orderCode: _string(data, 'orderCode', fallback: document.id),
       customerId: _string(data, 'customerId'),
-      customerName: _string(data, 'customerName', fallback: 'Customer'),
+      customerName: _string(data, 'customerName', fallback: 'Khách hàng'),
       customerPhone: _string(data, 'customerPhone'),
       deliveryAddress: _string(data, 'deliveryAddress'),
       totalAmount: _int(data, 'totalAmount'),

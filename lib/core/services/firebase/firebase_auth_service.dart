@@ -18,7 +18,9 @@ class FirebaseAuthService {
   }
 }
 
-final firebaseAuthProvider = Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
+final firebaseAuthProvider = Provider<FirebaseAuth>(
+  (ref) => FirebaseAuth.instance,
+);
 final firebaseAuthServiceProvider = Provider<FirebaseAuthService>((ref) {
   final auth = ref.watch(firebaseAuthProvider);
   return FirebaseAuthService(auth);

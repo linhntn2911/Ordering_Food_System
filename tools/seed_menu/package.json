@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "seed": "node seed.js"
+    "seed": "node seed.js",
+    "cleanup:mock-reviews": "node cleanup_legacy_mock_reviews.js"
   },
   "dependencies": {
     "firebase-admin": "^13.0.0"

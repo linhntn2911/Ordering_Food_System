@@ -111,7 +111,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                   // Section Title (from Food Ninja Frame 1.4 Sign up)
                   Center(
                     child: Text(
-                      'Sign Up For Free',
+                      'Đăng ký miễn phí',
                       style: AppTextStyles.headlineLarge.copyWith(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
@@ -153,10 +153,10 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                     const SizedBox(height: AppSpacing.p16),
                   ],
 
-                  // Full Name Field
+                  // Họ và tên Field
                   CustomTextField(
                     controller: _fullNameController,
-                    hintText: 'Full Name',
+                    hintText: 'Họ và tên',
                     prefixIcon: const Icon(
                       Icons.person_outline_rounded,
                       color: AppColors.primarySolid,
@@ -188,7 +188,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                   // Phone Field
                   CustomTextField(
                     controller: _phoneController,
-                    hintText: 'Phone Number',
+                    hintText: 'Số điện thoại',
                     keyboardType: TextInputType.phone,
                     onChanged: (_) {
                       if (state.errorMessage != null) {
@@ -207,7 +207,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                   // Password Field
                   CustomTextField(
                     controller: _passwordController,
-                    hintText: 'Password',
+                    hintText: 'Mật khẩu',
                     isPassword: true,
                     prefixIcon: const Icon(
                       Icons.lock_outline_rounded,
@@ -218,10 +218,10 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                   ),
                   const SizedBox(height: AppSpacing.p16),
 
-                  // Confirm Password Field
+                  // Xác nhận mật khẩu Field
                   CustomTextField(
                     controller: _confirmPasswordController,
-                    hintText: 'Confirm Password',
+                    hintText: 'Xác nhận mật khẩu',
                     isPassword: true,
                     textInputAction: TextInputAction.done,
                     onSubmitted: (_) => _handleRegister(),
@@ -237,7 +237,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                   ),
                   const SizedBox(height: AppSpacing.p16),
 
-                  // Food Ninja Checkbox 1: Keep Me Signed In
+                  // Food Ninja Checkbox 1: Duy trì đăng nhập
                   Row(
                     children: [
                       Checkbox(
@@ -253,7 +253,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                         },
                       ),
                       Text(
-                        'Keep Me Signed In',
+                        'Duy trì đăng nhập',
                         style: AppTextStyles.bodySmall.copyWith(
                           color: AppColors.textSecondary,
                         ),
@@ -266,7 +266,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                   Center(
                     child: PrimaryButton(
                       width: 175,
-                      text: 'Create Account',
+                      text: 'Tạo tài khoản',
                       isLoading: state.isLoading,
                       onPressed: _handleRegister,
                     ),
@@ -281,7 +281,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                             .pushReplacementNamed(AppRoutes.login);
                       },
                       child: Text(
-                        'Already have an account?',
+                        'Đã có tài khoản?',
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.primarySolid,
                           fontWeight: FontWeight.w700,

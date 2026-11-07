@@ -44,7 +44,7 @@ class MenuItemModel {
   ) {
     final data = document.data();
     if (data == null) {
-      throw StateError('Menu item ${document.id} has no data.');
+      throw StateError('Món ăn ${document.id} không có dữ liệu.');
     }
     return MenuItemModel.fromMap(document.id, data);
   }

@@ -84,14 +84,14 @@ class AdminOrderCard extends StatelessWidget {
               _InfoLine(
                 icon: Icons.phone_outlined,
                 text: order.customerPhone.isEmpty
-                    ? 'No phone number'
+                    ? 'Chưa có số điện thoại'
                     : order.customerPhone,
               ),
               const SizedBox(height: AppSpacing.xs),
               _InfoLine(
                 icon: Icons.location_on_outlined,
                 text: order.deliveryAddress.isEmpty
-                    ? 'No delivery address'
+                    ? 'Chưa có địa chỉ giao hàng'
                     : order.deliveryAddress,
                 maxLines: 2,
               ),

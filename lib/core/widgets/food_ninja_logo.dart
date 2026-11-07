@@ -65,7 +65,7 @@ class FoodNinjaLogo extends StatelessWidget {
         if (showSubtitle) ...[
           const SizedBox(height: AppSpacing.p4),
           Text(
-            'Deliver Favorite Food',
+            'Món ngon giao tận nơi',
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,

@@ -118,13 +118,13 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                             const SizedBox(height: AppSpacing.xl),
                             Text(
                               widget.isEditing
-                                  ? 'Edit Menu Item'
-                                  : 'Add Menu Item',
+                                  ? 'Chỉnh sửa món ăn'
+                                  : 'Thêm món ăn',
                               style: AppTextStyles.headlineLarge,
                             ),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
-                              'Keep the Ngô Chicken menu clear and up to date.',
+                              'Giữ thực đơn Ngô Chicken rõ ràng và luôn được cập nhật.',
                               style: AppTextStyles.bodyMedium,
                             ),
                             const SizedBox(height: AppSpacing.lg),
@@ -137,7 +137,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                             const SizedBox(height: AppSpacing.lg),
                             _SectionTitle(
                               icon: Icons.restaurant_menu_rounded,
-                              label: 'Item information',
+                              label: 'Thông tin món ăn',
                             ),
                             const SizedBox(height: AppSpacing.sm),
                             TextFormField(
@@ -147,8 +147,8 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                               textInputAction: TextInputAction.next,
                               validator: MenuItemFormViewModel.validateName,
                               decoration: const InputDecoration(
-                                labelText: 'Item name *',
-                                hintText: 'Example: Gà sốt phô mai cay',
+                                labelText: 'Tên món *',
+                                hintText: 'Ví dụ: Gà sốt phô mai cay',
                                 prefixIcon: Icon(Icons.fastfood_rounded),
                               ),
                             ),
@@ -180,9 +180,9 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                               validator:
                                   MenuItemFormViewModel.validateDescription,
                               decoration: const InputDecoration(
-                                labelText: 'Description',
+                                labelText: 'Mô tả',
                                 hintText:
-                                    'Ingredients, flavour, or serving notes',
+                                    'Nguyên liệu, hương vị hoặc cách dùng món',
                                 alignLabelWithHint: true,
                               ),
                             ),
@@ -195,7 +195,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                               textInputAction: TextInputAction.done,
                               validator: MenuItemFormViewModel.validatePrice,
                               decoration: const InputDecoration(
-                                labelText: 'Base price *',
+                                labelText: 'Giá cơ bản *',
                                 hintText: '35000',
                                 prefixIcon: Icon(Icons.payments_outlined),
                                 suffixText: 'VND',
@@ -204,12 +204,12 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                             const SizedBox(height: AppSpacing.lg),
                             _SectionTitle(
                               icon: Icons.tune_rounded,
-                              label: 'Sizes',
+                              label: 'Kích cỡ',
                             ),
                             const SizedBox(height: AppSpacing.sm),
                             _SettingCard(
-                              title: 'Offer M and L sizes',
-                              subtitle: 'M uses the base price; set the extra amount for L.',
+                              title: 'Có kích cỡ M và L',
+                              subtitle: 'M dùng giá cơ bản; nhập phần giá tăng thêm cho L.',
                               value: _hasSizes,
                               enabled: !saveState.isLoading,
                               onChanged: (value) =>
@@ -225,7 +225,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                                 validator:
                                     MenuItemFormViewModel.validateSurcharge,
                                 decoration: const InputDecoration(
-                                  labelText: 'L-size surcharge *',
+                                  labelText: 'Phụ thu cỡ L *',
                                   hintText: '5000',
                                   prefixIcon: Icon(Icons.add_circle_outline),
                                   suffixText: 'VND',
@@ -235,12 +235,12 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                             const SizedBox(height: AppSpacing.lg),
                             _SectionTitle(
                               icon: Icons.visibility_rounded,
-                              label: 'Selling status',
+                              label: 'Trạng thái bán',
                             ),
                             const SizedBox(height: AppSpacing.sm),
                             _SettingCard(
-                              title: _isAvailable ? 'Available' : 'Sold out',
-                              subtitle: 'Customers can order this item while available.',
+                              title: _isAvailable ? 'Còn hàng' : 'Hết hàng',
+                              subtitle: 'Khách có thể đặt món này khi còn hàng.',
                               value: _isAvailable,
                               enabled: !saveState.isLoading,
                               onChanged: (value) =>
@@ -248,8 +248,8 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                             ),
                             const SizedBox(height: AppSpacing.sm),
                             _SettingCard(
-                              title: _isPublished ? 'Published' : 'Hidden',
-                              subtitle: 'Published items can appear in the customer menu.',
+                              title: _isPublished ? 'Đã đăng' : 'Đã ẩn',
+                              subtitle: 'Món đã đăng có thể xuất hiện trong thực đơn khách hàng.',
                               value: _isPublished,
                               enabled: !saveState.isLoading,
                               onChanged: (value) =>
@@ -258,8 +258,8 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                             const SizedBox(height: AppSpacing.xl),
                             GradientButton(
                               label: widget.isEditing
-                                  ? 'Save changes'
-                                  : 'Add menu item',
+                                  ? 'Lưu thay đổi'
+                                  : 'Thêm món ăn',
                               icon: Icons.check_rounded,
                               isLoading: saveState.isLoading,
                               onPressed: categories.hasValue ? _submit : null,
@@ -291,7 +291,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
     if (_categoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Select a category.'),
+          content: Text('Vui lòng chọn danh mục.'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -300,7 +300,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
     if (_imageUrlController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Select an item image.'),
+          content: Text('Vui lòng chọn ảnh món ăn.'),
           backgroundColor: AppColors.error,
         ),
       );
@@ -345,7 +345,7 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
   String _messageFor(Object? error) {
     if (error is ArgumentError) return error.message.toString();
     if (error is MenuImageUploadException) return error.message;
-    return 'The menu item could not be saved. Please try again.';
+    return 'Không thể lưu món ăn. Vui lòng thử lại.';
   }
 }
 
@@ -360,7 +360,7 @@ class _FormTopBar extends StatelessWidget {
     return Row(
       children: [
         IconButton(
-          tooltip: 'Back to menu items',
+          tooltip: 'Quay lại món ăn',
           onPressed: onBack,
           style: IconButton.styleFrom(
             backgroundColor: AppColors.primarySoft,
@@ -379,7 +379,7 @@ class _FormTopBar extends StatelessWidget {
             children: [
               Text('Ngô Chicken', style: AppTextStyles.titleMedium),
               Text(
-                isEditing ? 'Update an existing item' : 'Create a new item',
+                isEditing ? 'Cập nhật món ăn hiện có' : 'Tạo món ăn mới',
                 style: AppTextStyles.bodySmall,
               ),
             ],
@@ -431,7 +431,7 @@ class _ImagePickerCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'Free mode: paste a public image URL. Firebase Storage upload requires Blaze.',
+            'Chế độ miễn phí: dán đường dẫn ảnh công khai. Tải ảnh lên Firebase Storage yêu cầu gói Blaze.',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodySmall,
           ),
@@ -442,7 +442,7 @@ class _ImagePickerCard extends StatelessWidget {
             keyboardType: TextInputType.url,
             onChanged: onUrlChanged,
             decoration: const InputDecoration(
-              labelText: 'Image URL (free)',
+              labelText: 'URL ảnh (miễn phí)',
               hintText: 'https://.../food.jpg',
               prefixIcon: Icon(Icons.link_rounded),
             ),
@@ -512,9 +512,9 @@ class _CategoryDropdown extends StatelessWidget {
           )
           .toList(growable: false),
       onChanged: enabled ? onChanged : null,
-      validator: (selected) => selected == null ? 'Select a category.' : null,
+      validator: (selected) => selected == null ? 'Vui lòng chọn danh mục.' : null,
       decoration: const InputDecoration(
-        labelText: 'Category *',
+        labelText: 'Danh mục *',
         prefixIcon: Icon(Icons.category_outlined),
       ),
     );
@@ -538,8 +538,8 @@ class _CategoryLoadError extends StatelessWidget {
         children: [
           const Icon(Icons.error_outline, color: AppColors.error),
           const SizedBox(width: AppSpacing.xs),
-          const Expanded(child: Text('Categories could not be loaded.')),
-          TextButton(onPressed: onRetry, child: const Text('Retry')),
+          const Expanded(child: Text('Không thể tải danh mục.')),
+          TextButton(onPressed: onRetry, child: const Text('Thử lại')),
         ],
       ),
     );

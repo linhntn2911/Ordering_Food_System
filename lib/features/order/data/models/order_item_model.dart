@@ -23,7 +23,7 @@ class OrderItemModel {
       OrderItem(
         id: document.id,
         menuItemId: string('menuItemId'),
-        name: string('name').isEmpty ? 'Menu item' : string('name'),
+        name: string('name').isEmpty ? 'Món ăn' : string('name'),
         imageUrl: string('imageUrl'),
         basePrice: integer('basePrice'),
         selectedSize: string('selectedSize'),

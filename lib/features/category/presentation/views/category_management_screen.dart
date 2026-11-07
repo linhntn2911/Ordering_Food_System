@@ -51,8 +51,8 @@ class _CategoryManagementScreenState
               const SizedBox(width: AppSpacing.xs),
               Text(
                 category == null
-                    ? 'Category created successfully.'
-                    : 'Category updated successfully.',
+                    ? 'Đã thêm danh mục thành công.'
+                    : 'Đã cập nhật danh mục thành công.',
               ),
             ],
           ),
@@ -106,12 +106,12 @@ class _CategoryManagementScreenState
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
-                        'Category Management',
+                        'Quản lý danh mục',
                         style: AppTextStyles.headlineLarge,
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        'Keep your food menu clear, organized, and easy to explore.',
+                        'Sắp xếp thực đơn rõ ràng, khoa học và dễ khám phá.',
                         style: AppTextStyles.bodyMedium,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -190,7 +190,7 @@ class _TopBar extends StatelessWidget {
         Builder(
           builder: (scaffoldContext) => IconButton(
             key: const ValueKey('admin-drawer-button'),
-            tooltip: 'Open navigation menu',
+            tooltip: 'Mở menu điều hướng',
             onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
             style: IconButton.styleFrom(
               foregroundColor: AppColors.primaryEnd,
@@ -209,12 +209,12 @@ class _TopBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Ngô Chicken', style: AppTextStyles.titleMedium),
-              Text('Admin workspace', style: AppTextStyles.bodySmall),
+              Text('Khu vực quản trị', style: AppTextStyles.bodySmall),
             ],
           ),
         ),
         IconButton(
-          tooltip: 'Refresh categories',
+          tooltip: 'Làm mới danh mục',
           onPressed: onRefresh,
           style: IconButton.styleFrom(
             foregroundColor: AppColors.textPrimary,
@@ -248,11 +248,11 @@ class _CategorySummary extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _Metric(value: '${items.length}', label: 'Categories'),
+            child: _Metric(value: '${items.length}', label: 'Danh mục'),
           ),
           const SizedBox(height: 36, child: VerticalDivider()),
           Expanded(
-            child: _Metric(value: '$published', label: 'Published'),
+            child: _Metric(value: '$published', label: 'Đã đăng'),
           ),
           Container(
             width: 40,
@@ -291,7 +291,7 @@ class _CompactSummary extends StatelessWidget {
         const SizedBox(width: AppSpacing.xs),
         Expanded(
           child: Text(
-            '${items.length} categories · $published published',
+            '${items.length} danh mục · $published đã đăng',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTextStyles.bodySmall.copyWith(
@@ -342,7 +342,7 @@ class _SearchField extends StatelessWidget {
       child: TextField(
         onChanged: onChanged,
         decoration: const InputDecoration(
-          hintText: 'Search categories',
+          hintText: 'Tìm danh mục',
           prefixIcon: Icon(Icons.search_rounded, color: AppColors.primaryEnd),
           suffixIcon: Icon(Icons.tune_rounded, color: AppColors.textMuted),
         ),
@@ -452,7 +452,7 @@ class _BottomAction extends StatelessWidget {
                 AppSpacing.md,
               ),
               child: GradientButton(
-                label: 'Add new category',
+                label: 'Thêm danh mục mới',
                 icon: Icons.add_rounded,
                 onPressed: enabled ? onPressed : null,
               ),
@@ -467,15 +467,15 @@ class _BottomAction extends StatelessWidget {
 String _friendlyError(Object? error) {
   final value = error.toString().toLowerCase();
   if (value.contains('permission-denied')) {
-    return 'Admin sign-in is required to manage categories.';
+    return 'Bạn cần đăng nhập bằng tài khoản quản trị để quản lý danh mục.';
   }
   if (value.contains('network')) {
-    return 'Check your internet connection and try again.';
+    return 'Hãy kiểm tra kết nối Internet và thử lại.';
   }
   if (error is ArgumentError) {
-    return error.message?.toString() ?? 'Please check the entered information.';
+    return error.message?.toString() ?? 'Vui lòng kiểm tra lại thông tin đã nhập.';
   }
-  return 'Categories could not be loaded. Please try again.';
+  return 'Không thể tải danh mục. Vui lòng thử lại.';
 }
 
 class _LoadingState extends StatelessWidget {
@@ -526,10 +526,10 @@ class _EmptyState extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text('No categories yet', style: AppTextStyles.titleLarge),
+            Text('Chưa có danh mục', style: AppTextStyles.titleLarge),
             const SizedBox(height: AppSpacing.xs),
             Text(
-              'Create the first category before adding menu items.',
+              'Hãy tạo danh mục đầu tiên trước khi thêm món ăn.',
               textAlign: TextAlign.center,
               style: AppTextStyles.bodyMedium,
             ),
@@ -537,7 +537,7 @@ class _EmptyState extends StatelessWidget {
             TextButton.icon(
               onPressed: onAdd,
               icon: const Icon(Icons.add_rounded),
-              label: const Text('Create category'),
+              label: const Text('Tạo danh mục'),
             ),
           ],
         ),
@@ -582,7 +582,7 @@ class _ErrorState extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Try again'),
+            label: const Text('Thử lại'),
           ),
         ],
       ),
@@ -607,7 +607,7 @@ class _NoSearchResults extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text(
-            'No categories match your search.',
+            'Không có danh mục phù hợp với từ khóa tìm kiếm.',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMedium,
           ),

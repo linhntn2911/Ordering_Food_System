@@ -45,52 +45,52 @@ class RegisterViewModel extends Notifier<RegisterState> {
 
   String? validateFullName(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter your full name.';
+      return 'Vui lòng nhập họ và tên.';
     }
     if (value.trim().length < 2) {
-      return 'Full name must be at least 2 characters.';
+      return 'Họ và tên phải có ít nhất 2 ký tự.';
     }
     return null;
   }
 
   String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter your email.';
+      return 'Vui lòng nhập email.';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value.trim())) {
-      return 'Please enter a valid email address.';
+      return 'Vui lòng nhập địa chỉ email hợp lệ.';
     }
     return null;
   }
 
   String? validatePhone(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter your phone number.';
+      return 'Vui lòng nhập số điện thoại.';
     }
     final phoneRegex = RegExp(r'^(0|\+84)[0-9]{9,10}$');
     if (!phoneRegex.hasMatch(value.trim())) {
-      return 'Please enter a valid 10-digit phone number.';
+      return 'Vui lòng nhập số điện thoại hợp lệ gồm 10 chữ số.';
     }
     return null;
   }
 
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter a password.';
+      return 'Vui lòng nhập mật khẩu.';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters.';
+      return 'Mật khẩu phải có ít nhất 6 ký tự.';
     }
     return null;
   }
 
   String? validateConfirmPassword(String? value, String password) {
     if (value == null || value.isEmpty) {
-      return 'Please confirm your password.';
+      return 'Vui lòng xác nhận mật khẩu.';
     }
     if (value != password) {
-      return 'Passwords do not match.';
+      return 'Mật khẩu xác nhận không khớp.';
     }
     return null;
   }
@@ -158,7 +158,7 @@ class RegisterViewModel extends Notifier<RegisterState> {
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Registration preparation failed. Please try again.',
+        errorMessage: 'Không thể chuẩn bị đăng ký. Vui lòng thử lại.',
       );
       return null;
     }
@@ -220,7 +220,7 @@ class RegisterViewModel extends Notifier<RegisterState> {
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Registration failed. Please try again.',
+        errorMessage: 'Đăng ký không thành công. Vui lòng thử lại.',
       );
       return null;
     }

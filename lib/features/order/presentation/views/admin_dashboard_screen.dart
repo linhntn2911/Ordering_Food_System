@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/admin_gate.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_gradients.dart';
 import '../../../../core/theme/app_radii.dart';
@@ -65,12 +64,12 @@ class AdminDashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
-                        'Good day, Admin 👋',
+                        'Chào quản trị viên 👋',
                         style: AppTextStyles.headlineLarge,
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        'Here is what\'s happening at Ngô Chicken today.',
+                        'Cùng xem hoạt động của Ngô Chicken hôm nay.',
                         style: AppTextStyles.bodyMedium,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -86,7 +85,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                         data: (orders) => _MetricsOverview(orders: orders),
                       ),
                       const SizedBox(height: AppSpacing.xl),
-                      Text('Quick Actions', style: AppTextStyles.titleLarge),
+                      Text('Thao tác nhanh', style: AppTextStyles.titleLarge),
                       const SizedBox(height: AppSpacing.sm),
                       _QuickActionGrid(
                         pendingCount:
@@ -101,7 +100,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              'Recent Orders',
+                              'Đơn hàng gần đây',
                               style: AppTextStyles.titleLarge,
                             ),
                           ),
@@ -111,7 +110,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                                 builder: (_) => const AdminOrderListScreen(),
                               ),
                             ),
-                            child: const Text('View queue →'),
+                            child: const Text('Xem hàng đợi →'),
                           ),
                         ],
                       ),
@@ -119,7 +118,7 @@ class AdminDashboardScreen extends ConsumerWidget {
                       allOrdersAsync.when(
                         loading: () => const _LoadingRecentOrders(),
                         error: (_, _) => const Center(
-                          child: Text('Unable to load recent orders.'),
+                          child: Text('Không thể tải đơn hàng gần đây.'),
                         ),
                         data: (orders) => _RecentOrdersList(orders: orders),
                       ),
@@ -147,7 +146,7 @@ class _TopBar extends StatelessWidget {
         Builder(
           builder: (scaffoldContext) => IconButton(
             key: const ValueKey('admin-drawer-button'),
-            tooltip: 'Open navigation menu',
+            tooltip: 'Mở menu điều hướng',
             onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
             style: IconButton.styleFrom(
               foregroundColor: AppColors.primaryEnd,
@@ -177,14 +176,17 @@ class _TopBar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.xxs),
-                  Text('Admin Dashboard', style: AppTextStyles.bodySmall),
+                  Text(
+                    'Bảng điều khiển quản trị',
+                    style: AppTextStyles.bodySmall,
+                  ),
                 ],
               ),
             ],
           ),
         ),
         IconButton(
-          tooltip: 'Refresh dashboard',
+          tooltip: 'Làm mới bảng điều khiển',
           onPressed: onRefresh,
           style: IconButton.styleFrom(
             foregroundColor: AppColors.textPrimary,
@@ -232,7 +234,7 @@ class _PendingAlertBanner extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Expanded(
               child: Text(
-                'All orders up to date. Kitchen is clear!',
+                'Tất cả đơn hàng đã được cập nhật. Bếp đang rảnh!',
                 style: AppTextStyles.bodySmall.copyWith(
                   color: AppColors.primaryEnd,
                   fontWeight: FontWeight.w600,
@@ -282,7 +284,7 @@ class _PendingAlertBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${pendingOrders.length} pending order${pendingOrders.length > 1 ? 's' : ''} waiting!',
+                      '${pendingOrders.length} đơn hàng mới đang chờ!',
                       style: AppTextStyles.titleMedium.copyWith(
                         color: AppColors.textPrimary,
                         fontWeight: FontWeight.w700,
@@ -290,7 +292,7 @@ class _PendingAlertBanner extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Tap to review and accept incoming orders',
+                      'Chạm để xem và tiếp nhận đơn hàng mới',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -337,9 +339,9 @@ class _MetricsOverview extends StatelessWidget {
       children: [
         Expanded(
           child: _MetricCard(
-            label: 'Total Revenue',
+            label: 'Tổng doanh thu',
             value: CurrencyFormatter.vnd(totalRevenue),
-            subLabel: '${completedOrders.length} completed',
+            subLabel: '${completedOrders.length} đã hoàn thành',
             icon: Icons.monetization_on_rounded,
             iconColor: AppColors.primaryEnd,
             bgColor: AppColors.primarySoft,
@@ -348,9 +350,9 @@ class _MetricsOverview extends StatelessWidget {
         const SizedBox(width: AppSpacing.sm),
         Expanded(
           child: _MetricCard(
-            label: 'Active Queue',
-            value: '$activeOrders orders',
-            subLabel: 'Needs attention',
+            label: 'Đơn đang xử lý',
+            value: '$activeOrders đơn hàng',
+            subLabel: 'Cần theo dõi',
             icon: Icons.outdoor_grill_rounded,
             iconColor: AppColors.warning,
             bgColor: AppColors.warningSurface,
@@ -445,8 +447,8 @@ class _QuickActionGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _ActionCard(
-                title: 'Live Orders',
-                subtitle: 'Process queue',
+                title: 'Đơn hàng trực tiếp',
+                subtitle: 'Xử lý hàng đợi',
                 icon: Icons.receipt_long_rounded,
                 badgeCount: pendingCount,
                 gradient: AppGradients.primary,
@@ -460,8 +462,8 @@ class _QuickActionGrid extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: _ActionCard(
-                title: 'Sales Report',
-                subtitle: 'Revenue & charts',
+                title: 'Báo cáo doanh thu',
+                subtitle: 'Doanh thu và biểu đồ',
                 icon: Icons.bar_chart_rounded,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -477,8 +479,8 @@ class _QuickActionGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _ActionCard(
-                title: 'Categories',
-                subtitle: 'Food sections',
+                title: 'Danh mục',
+                subtitle: 'Danh mục món ăn',
                 icon: Icons.category_rounded,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -490,8 +492,8 @@ class _QuickActionGrid extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: _ActionCard(
-                title: 'Menu Items',
-                subtitle: 'Prices & availability',
+                title: 'Món ăn',
+                subtitle: 'Giá và trạng thái bán',
                 icon: Icons.restaurant_menu_rounded,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -507,8 +509,8 @@ class _QuickActionGrid extends StatelessWidget {
           children: [
             Expanded(
               child: _ActionCard(
-                title: 'Broadcasts',
-                subtitle: 'Send promo & system notices',
+                title: 'Gửi thông báo',
+                subtitle: 'Gửi khuyến mãi và thông báo hệ thống',
                 icon: Icons.campaign_rounded,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute<void>(
@@ -646,7 +648,7 @@ class _RecentOrdersList extends StatelessWidget {
         ),
         child: Center(
           child: Text(
-            'No orders yet.',
+            'Chưa có đơn hàng.',
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textMuted,
             ),
@@ -664,9 +666,7 @@ class _RecentOrdersList extends StatelessWidget {
             order: order,
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute<void>(
-                builder: (_) => AdminGate(
-                  child: AdminOrderDetailsScreen(initialOrder: order),
-                ),
+                builder: (_) => AdminOrderDetailsScreen(initialOrder: order),
               ),
             ),
           ),

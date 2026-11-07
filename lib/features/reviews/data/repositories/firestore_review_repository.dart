@@ -37,7 +37,7 @@ class FirestoreReviewRepository implements ReviewRepository {
                 ReviewModel.fromMap(document.id, document.data()).toEntity(),
               );
             } on FormatException {
-              // Skip malformed reviews instead of failing the whole list.
+              // Bỏ qua malformed reviews instead of failing the whole list.
             }
           }
           return MenuFeed<Review>(

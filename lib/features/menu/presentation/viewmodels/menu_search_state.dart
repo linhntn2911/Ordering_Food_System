@@ -26,7 +26,7 @@ class MenuSearchState {
   /// Matching items, empty while loading or on error.
   final List<MenuItem> results;
 
-  /// Published categories offered by the filter sheet.
+  /// Đã đăng categories offered by the filter sheet.
   final List<MenuCategory> categories;
   final bool isOffline;
   final MenuFailure? error;

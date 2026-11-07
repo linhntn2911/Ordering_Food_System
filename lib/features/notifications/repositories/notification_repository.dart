@@ -127,7 +127,7 @@ class FirestoreNotificationRepository implements NotificationRepository {
 
     final senderId = _userId;
     if (senderId == null || senderId.trim().isEmpty) {
-      throw const AuthFailure('Admin cần đăng nhập để phát thông báo.');
+      throw const AuthFailure('Quản trị viên cần đăng nhập để phát thông báo.');
     }
 
     try {

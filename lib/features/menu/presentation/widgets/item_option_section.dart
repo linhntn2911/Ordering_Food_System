@@ -9,7 +9,7 @@ import '../../domain/entities/menu_item.dart';
 import '../../domain/entities/menu_option.dart';
 
 /// "Chọn size" (single choice) and "Topping" (multiple choice) with their
-/// extra prices (`contracts/food_details_ui.md`). Hidden when the item has
+/// extra prices (`contracts/food_details_ui.md`). Đã ẩn when the item has
 /// neither.
 class ItemOptionSection extends StatelessWidget {
   const ItemOptionSection({

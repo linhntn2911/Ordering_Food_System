@@ -63,8 +63,7 @@ class ForgotPasswordViewModel extends Notifier<ForgotPasswordState> {
       if (!exists) {
         state = state.copyWith(
           isLoading: false,
-          errorMessage:
-              'Email này chưa được đăng ký trong hệ thống. Vui lòng kiểm tra lại.',
+          errorMessage: 'Email này chưa được đăng ký trong hệ thống. Vui lòng kiểm tra lại.',
         );
         return false;
       }

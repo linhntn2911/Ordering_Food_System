@@ -86,7 +86,7 @@ class CategoryCard extends StatelessWidget {
                 key: ValueKey('manage-items-${category.id}'),
                 onPressed: actionsEnabled ? onViewItems : null,
                 icon: const Icon(Icons.fastfood_rounded),
-                label: const Text('Manage items & prices'),
+                label: const Text('Quản lý món và giá'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primaryEnd,
                   backgroundColor: AppColors.primarySoft,
@@ -105,13 +105,13 @@ class CategoryCard extends StatelessWidget {
                 const Spacer(),
                 const SizedBox(width: AppSpacing.xs),
                 _CompactIconButton(
-                  tooltip: 'Move ${category.name} up',
+                  tooltip: 'Đưa ${category.name} lên',
                   icon: Icons.keyboard_arrow_up_rounded,
                   onPressed: actionsEnabled && canMoveUp ? onMoveUp : null,
                 ),
                 const SizedBox(width: AppSpacing.xs),
                 _CompactIconButton(
-                  tooltip: 'Move ${category.name} down',
+                  tooltip: 'Đưa ${category.name} xuống',
                   icon: Icons.keyboard_arrow_down_rounded,
                   onPressed: actionsEnabled && canMoveDown ? onMoveDown : null,
                 ),
@@ -124,7 +124,7 @@ class CategoryCard extends StatelessWidget {
                 key: ValueKey('edit-category-${category.id}'),
                 onPressed: actionsEnabled ? onEdit : null,
                 icon: const Icon(Icons.edit_rounded, size: 19),
-                label: const Text('Edit category'),
+                label: const Text('Chỉnh sửa danh mục'),
               ),
             ),
           ],
@@ -169,7 +169,7 @@ class _PublicationChip extends StatelessWidget {
                 child: Text(
                   compact
                       ? (isPublished ? 'On' : 'Off')
-                      : (isPublished ? 'Published' : 'Hidden'),
+                      : (isPublished ? 'Đã đăng' : 'Đã ẩn'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextStyles.labelSmall.copyWith(color: color),

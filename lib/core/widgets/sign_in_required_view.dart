@@ -27,7 +27,10 @@ class SignInRequiredView extends StatelessWidget {
         children: [
           Icon(icon, size: 64, color: AppColors.textMuted),
           const SizedBox(height: AppSpacing.p16),
-          const Text('No active session', style: AppTextStyles.titleMedium),
+          const Text(
+            'Không có phiên đăng nhập',
+            style: AppTextStyles.titleMedium,
+          ),
           const SizedBox(height: AppSpacing.p16),
           ElevatedButton(
             key: const ValueKey('sign-in-required-login'),
@@ -35,7 +38,7 @@ class SignInRequiredView extends StatelessWidget {
               await Navigator.of(context).pushNamed(AppRoutes.login);
               onLoginClosed?.call();
             },
-            child: const Text('Go to Login'),
+            child: const Text('Đi đến Đăng nhập'),
           ),
         ],
       ),

@@ -22,4 +22,14 @@ void main() {
 
     expect(container.read(mainShellTabProvider), MainShellTab.home);
   });
+
+  test('reset returns a previous selection to Home', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    container.read(mainShellTabProvider.notifier).select(MainShellTab.profile);
+    container.read(mainShellTabProvider.notifier).reset();
+
+    expect(container.read(mainShellTabProvider), MainShellTab.home);
+  });
 }

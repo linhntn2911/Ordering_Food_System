@@ -22,17 +22,35 @@ final reviewedOrderIdsProvider = Provider<Set<String>>((ref) {
   return reviews.map((review) => review.orderId).toSet();
 });
 
-final reviewFormProvider = NotifierProvider<ReviewFormNotifier, ReviewFormState>(ReviewFormNotifier.new);
+final reviewFormProvider =
+    NotifierProvider<ReviewFormNotifier, ReviewFormState>(
+      ReviewFormNotifier.new,
+    );
 
 class ReviewFormState {
-  ReviewFormState({this.rating = 5, this.comment = '', this.submitting = false, this.images = const []});
+  ReviewFormState({
+    this.rating = 5,
+    this.comment = '',
+    this.submitting = false,
+    this.images = const [],
+  });
   final int rating;
   final String comment;
   final bool submitting;
   final List<String> images;
 
-  ReviewFormState copyWith({int? rating, String? comment, bool? submitting, List<String>? images}) {
-    return ReviewFormState(rating: rating ?? this.rating, comment: comment ?? this.comment, submitting: submitting ?? this.submitting, images: images ?? this.images);
+  ReviewFormState copyWith({
+    int? rating,
+    String? comment,
+    bool? submitting,
+    List<String>? images,
+  }) {
+    return ReviewFormState(
+      rating: rating ?? this.rating,
+      comment: comment ?? this.comment,
+      submitting: submitting ?? this.submitting,
+      images: images ?? this.images,
+    );
   }
 }
 
@@ -42,15 +60,23 @@ class ReviewFormNotifier extends Notifier<ReviewFormState> {
 
   void setRating(int rating) => state = state.copyWith(rating: rating);
   void setComment(String comment) => state = state.copyWith(comment: comment);
-  void addImage(String image) => state = state.copyWith(images: [...state.images, image]);
-  void removeImage(String image) => state = state.copyWith(images: state.images.where((e) => e != image).toList());
+  void addImage(String image) =>
+      state = state.copyWith(images: [...state.images, image]);
+  void removeImage(String image) => state = state.copyWith(
+    images: state.images.where((e) => e != image).toList(),
+  );
 
   Future<bool> submit(String orderId) async {
     if (state.submitting) return false;
     state = state.copyWith(submitting: true);
     try {
       final repo = ref.read(reviewRepositoryProvider);
-      await repo.submitReview(orderId: orderId, rating: state.rating, comment: state.comment, images: state.images);
+      await repo.submitReview(
+        orderId: orderId,
+        rating: state.rating,
+        comment: state.comment,
+        images: state.images,
+      );
       ref.invalidate(myReviewsProvider);
       state = ReviewFormState();
       return true;

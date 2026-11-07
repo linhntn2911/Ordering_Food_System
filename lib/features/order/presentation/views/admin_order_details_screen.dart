@@ -97,7 +97,7 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                'Order details',
+                                'Chi tiết đơn hàng',
                                 style: AppTextStyles.headlineLarge,
                               ),
                             ),
@@ -106,7 +106,7 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.xs),
                         Text(
-                          'Placed ${DateTimeFormatter.orderTime(order.createdAt)}',
+                          'Đặt lúc ${DateTimeFormatter.orderTime(order.createdAt)}',
                           style: AppTextStyles.bodySmall,
                         ),
                         if (orderAsync.hasError) ...[
@@ -120,11 +120,11 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                         _CustomerCard(order: order),
                         const SizedBox(height: AppSpacing.md),
                         _SectionCard(
-                          title: 'Customer note',
+                          title: 'Ghi chú của khách',
                           icon: Icons.sticky_note_2_rounded,
                           child: Text(
                             order.customerNote.isEmpty
-                                ? 'No note was provided for this order.'
+                                ? 'Khách hàng chưa để lại ghi chú cho đơn này.'
                                 : order.customerNote,
                             style: AppTextStyles.bodyMedium.copyWith(
                               color: order.customerNote.isEmpty
@@ -138,7 +138,7 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         _SectionCard(
-                          title: 'Order items',
+                          title: 'Món đã đặt',
                           icon: Icons.fastfood_rounded,
                           child: ref
                               .watch(adminOrderItemsProvider(order.id))
@@ -151,7 +151,7 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                                 ),
                                 data: (items) => items.isEmpty
                                     ? const Text(
-                                        'No item snapshots were found.',
+                                        'Không tìm thấy thông tin món ăn đã đặt.',
                                       )
                                     : Column(
                                         children: [
@@ -172,7 +172,7 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                         _PaymentCard(order: order),
                         const SizedBox(height: AppSpacing.md),
                         _SectionCard(
-                          title: 'Status timeline',
+                          title: 'Lịch sử trạng thái',
                           icon: Icons.timeline_rounded,
                           child: ref
                               .watch(adminOrderEventsProvider(order.id))
@@ -184,7 +184,7 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 data: (events) => events.isEmpty
-                                    ? const Text('No status history yet.')
+                                    ? const Text('Chưa có lịch sử trạng thái.')
                                     : _StatusTimeline(events: events),
                               ),
                         ),
@@ -193,8 +193,8 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
                           const SizedBox(height: AppSpacing.md),
                           _ReasonCard(
                             label: order.status == OrderStatus.rejected
-                                ? 'Rejection reason'
-                                : 'Cancellation reason',
+                                ? 'Lý do từ chối'
+                                : 'Lý do hủy đơn',
                             reason: order.rejectionReason.isNotEmpty
                                 ? order.rejectionReason
                                 : order.cancellationReason,
@@ -236,7 +236,7 @@ class AdminOrderDetailsScreen extends ConsumerWidget {
     if (success && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Order moved to ${target.label}.'),
+          content: Text('Đơn hàng đã chuyển sang trạng thái ${target.label}.'),
           backgroundColor: AppColors.primaryEnd,
         ),
       );
@@ -252,7 +252,7 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     children: [
       IconButton(
-        tooltip: 'Back to orders',
+        tooltip: 'Quay lại đơn hàng',
         onPressed: () => Navigator.of(context).pop(),
         style: IconButton.styleFrom(
           foregroundColor: AppColors.primaryEnd,
@@ -326,7 +326,7 @@ class _CustomerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _SectionCard(
-    title: 'Customer & delivery',
+    title: 'Khách hàng và giao hàng',
     icon: Icons.location_on_rounded,
     child: Column(
       children: [
@@ -340,8 +340,8 @@ class _CustomerCard extends StatelessWidget {
           icon: Icons.home_rounded,
           title: order.deliveryAddress,
           subtitle: order.deliveryDistanceKm > 0
-              ? '${order.deliveryDistanceKm.toStringAsFixed(1)} km from restaurant'
-              : 'Delivery address',
+              ? 'Cách quán ${order.deliveryDistanceKm.toStringAsFixed(1)} km'
+              : 'Địa chỉ giao hàng',
         ),
       ],
     ),
@@ -397,9 +397,9 @@ class _OrderItemRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final options = [
-      if (item.selectedSize.isNotEmpty) 'Size ${item.selectedSize}',
+      if (item.selectedSize.isNotEmpty) 'Cỡ ${item.selectedSize}',
       ...item.selectedToppings,
-      if (item.note.isNotEmpty) 'Note: ${item.note}',
+      if (item.note.isNotEmpty) 'Ghi chú: ${item.note}',
     ].join(' · ');
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,7 +426,7 @@ class _OrderItemRow extends StatelessWidget {
               if (options.isNotEmpty)
                 Text(options, style: AppTextStyles.bodySmall),
               Text(
-                '${CurrencyFormatter.vnd(item.unitPrice)} each',
+                '${CurrencyFormatter.vnd(item.unitPrice)} / món',
                 style: AppTextStyles.bodySmall,
               ),
             ],
@@ -448,20 +448,24 @@ class _PaymentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _SectionCard(
-    title: 'Payment summary',
+    title: 'Tóm tắt thanh toán',
     icon: Icons.payments_rounded,
     child: Column(
       children: [
         _MoneyRow(
-          label: 'Subtotal',
+          label: 'Tạm tính',
           value: order.subtotal > 0
               ? order.subtotal
               : order.totalAmount - order.deliveryFee,
         ),
         const SizedBox(height: AppSpacing.xs),
-        _MoneyRow(label: 'Delivery fee', value: order.deliveryFee),
+        _MoneyRow(label: 'Phí giao hàng', value: order.deliveryFee),
         const Divider(height: 24),
-        _MoneyRow(label: 'Total', value: order.totalAmount, emphasized: true),
+        _MoneyRow(
+          label: 'Tổng tiền',
+          value: order.totalAmount,
+          emphasized: true,
+        ),
         const SizedBox(height: AppSpacing.sm),
         Row(
           children: [
@@ -473,7 +477,7 @@ class _PaymentCard extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Expanded(
               child: Text(
-                'Cash on delivery · ${order.paymentStatus}',
+                "Thanh toán khi nhận hàng · ${order.paymentStatus == 'unpaid' ? 'chưa thanh toán' : order.paymentStatus}",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.bodySmall,
@@ -622,7 +626,7 @@ class _ReasonCard extends StatelessWidget {
   );
 }
 
-class _OrderActions extends StatelessWidget {
+class _OrderActions extends StatefulWidget {
   const _OrderActions({
     required this.order,
     required this.loading,
@@ -630,17 +634,25 @@ class _OrderActions extends StatelessWidget {
   });
   final FoodOrder order;
   final bool loading;
-  final void Function(OrderStatus, String) onTransition;
+  final Future<void> Function(OrderStatus, String) onTransition;
+
+  @override
+  State<_OrderActions> createState() => _OrderActionsState();
+}
+
+class _OrderActionsState extends State<_OrderActions> {
+  bool _submitting = false;
 
   @override
   Widget build(BuildContext context) {
-    final next = order.status.nextFulfillmentStatus;
+    final next = widget.order.status.nextFulfillmentStatus;
+    final busy = widget.loading || _submitting;
     final label = switch (next) {
-      OrderStatus.confirmed => 'Confirm order',
-      OrderStatus.preparing => 'Start preparing',
-      OrderStatus.outForDelivery => 'Send for delivery',
-      OrderStatus.completed => 'Mark completed',
-      _ => 'Update order',
+      OrderStatus.confirmed => 'Xác nhận đơn hàng',
+      OrderStatus.preparing => 'Bắt đầu chuẩn bị',
+      OrderStatus.outForDelivery => 'Chuyển sang giao hàng',
+      OrderStatus.completed => 'Đánh dấu hoàn thành',
+      _ => 'Cập nhật đơn hàng',
     };
     return DecoratedBox(
       decoration: const BoxDecoration(
@@ -662,14 +674,14 @@ class _OrderActions extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  if (order.status == OrderStatus.pending) ...[
+                  if (widget.order.status == OrderStatus.pending) ...[
                     Expanded(
                       child: OutlinedButton.icon(
                         key: const ValueKey('reject-order-button'),
-                        onPressed: loading ? null : () => _showReject(context),
+                        onPressed: busy ? null : () => _showReject(context),
                         icon: const Icon(Icons.close_rounded),
                         label: const Text(
-                          'Reject',
+                          'Từ chối',
                           maxLines: 1,
                           softWrap: false,
                           overflow: TextOverflow.clip,
@@ -687,9 +699,9 @@ class _OrderActions extends StatelessWidget {
                     flex: 2,
                     child: GradientButton(
                       label: label,
-                      isLoading: loading,
+                      isLoading: busy,
                       icon: Icons.arrow_forward_rounded,
-                      onPressed: next == null || loading
+                      onPressed: next == null || busy
                           ? null
                           : () => _confirm(context, next),
                     ),
@@ -728,7 +740,13 @@ class _OrderActions extends StatelessWidget {
         ],
       ),
     );
-    if (approved == true) onTransition(target, '');
+    if (approved != true || !mounted) return;
+    setState(() => _submitting = true);
+    try {
+      await widget.onTransition(target, '');
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   Future<void> _showReject(BuildContext context) async {
@@ -736,7 +754,7 @@ class _OrderActions extends StatelessWidget {
     final reason = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Reject order'),
+        title: const Text('Từ chối đơn hàng'),
         content: TextField(
           key: const ValueKey('rejection-reason-field'),
           controller: controller,
@@ -744,28 +762,34 @@ class _OrderActions extends StatelessWidget {
           maxLines: 3,
           autofocus: true,
           decoration: const InputDecoration(
-            labelText: 'Reason',
-            hintText: 'Example: Item is sold out',
+            labelText: 'Lý do',
+            hintText: 'Ví dụ: Món đã hết hàng',
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text('Hủy'),
           ),
           FilledButton(
             onPressed: () {
               if (controller.text.trim().isEmpty) return;
               Navigator.pop(context, controller.text.trim());
             },
-            child: const Text('Reject order'),
+            child: const Text('Từ chối đơn hàng'),
           ),
         ],
       ),
     );
     controller.dispose();
     if (reason != null && reason.isNotEmpty) {
-      onTransition(OrderStatus.rejected, reason);
+      if (!mounted) return;
+      setState(() => _submitting = true);
+      try {
+        await widget.onTransition(OrderStatus.rejected, reason);
+      } finally {
+        if (mounted) setState(() => _submitting = false);
+      }
     }
   }
 }
@@ -785,8 +809,8 @@ class _InlineError extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Row(
     children: [
-      const Expanded(child: Text('This information could not be loaded.')),
-      TextButton(onPressed: onRetry, child: const Text('Retry')),
+      const Expanded(child: Text('Không thể tải thông tin này.')),
+      TextButton(onPressed: onRetry, child: const Text('Thử lại')),
     ],
   );
 }
@@ -794,7 +818,7 @@ class _InlineError extends StatelessWidget {
 String _friendlyError(Object error) {
   final value = error.toString().toLowerCase();
   if (value.contains('sign-in')) {
-    return 'Bạn cần đăng nhập bằng tài khoản Admin để cập nhật đơn hàng.';
+    return 'Bạn cần đăng nhập bằng tài khoản quản trị để cập nhật đơn hàng.';
   }
   if (value.contains('permission-denied')) {
     return 'Tài khoản hiện tại không có quyền cập nhật đơn hàng này.';
@@ -804,7 +828,8 @@ String _friendlyError(Object error) {
     return 'Đơn hàng đã thay đổi. Hãy tải lại trước khi thử lại.';
   }
   if (error is ArgumentError) {
-    return error.message?.toString() ?? 'Check the order update.';
+    return error.message?.toString() ??
+        'Vui lòng kiểm tra lại thao tác cập nhật đơn hàng.';
   }
   return 'Không thể cập nhật đơn hàng. Vui lòng thử lại.';
 }

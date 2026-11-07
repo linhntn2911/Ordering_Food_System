@@ -35,13 +35,13 @@ class AuthSuccessView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isRegistration = args.type == AuthSuccessType.registration;
-    final headline = args.title ?? 'Congrats!';
+    final headline = args.title ?? 'Thành công!';
     final message =
         args.subtitle ??
         (isRegistration
-            ? 'Your Profile Is Ready To Use'
-            : 'Password reset successful');
-    final buttonText = isRegistration ? 'Bắt đầu' : 'Back to Login';
+            ? 'Tài khoản của bạn đã sẵn sàng để sử dụng'
+            : 'Đặt lại mật khẩu thành công');
+    final buttonText = isRegistration ? 'Bắt đầu' : 'Quay lại đăng nhập';
 
     return PopScope(
       canPop: false,

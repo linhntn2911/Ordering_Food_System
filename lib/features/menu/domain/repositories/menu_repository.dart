@@ -29,10 +29,10 @@ class MenuImageUploadException implements Exception {
 ///   emitted as `MenuFailure`.
 /// - Missing optional fields fall back to defaults (no sizes, zero rating).
 abstract interface class MenuRepository {
-  /// Published categories ordered by `sortOrder` then name.
+  /// Đã đăng categories ordered by `sortOrder` then name.
   Stream<MenuFeed<MenuCategory>> watchPublishedCategories({int limit = 50});
 
-  /// Published items of published categories, including sold-out items.
+  /// Đã đăng items of published categories, including sold-out items.
   ///
   /// Without [categoryId] items are ordered by category order, category,
   /// item order and name. With [categoryId] only that category is returned,

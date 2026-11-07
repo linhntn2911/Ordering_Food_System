@@ -113,19 +113,19 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
                             children: [
                               Text(
                                 widget.category == null
-                                    ? 'Add category'
-                                    : 'Edit category',
+                                    ? 'Thêm danh mục'
+                                    : 'Chỉnh sửa danh mục',
                                 style: AppTextStyles.headlineMedium,
                               ),
                               Text(
-                                'Complete the information below.',
+                                'Điền thông tin bên dưới.',
                                 style: AppTextStyles.bodySmall,
                               ),
                             ],
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Close',
+                          tooltip: 'Đóng',
                           onPressed: action.isLoading
                               ? null
                               : () => Navigator.of(context).pop(),
@@ -139,12 +139,12 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
                       textInputAction: TextInputAction.next,
                       maxLength: 50,
                       decoration: const InputDecoration(
-                        labelText: 'Category name',
-                        hintText: 'For example: Main dishes',
+                        labelText: 'Tên danh mục',
+                        hintText: 'Ví dụ: Món chính',
                         prefixIcon: Icon(Icons.restaurant_menu_rounded),
                       ),
                       validator: (value) => (value?.trim().length ?? 0) < 2
-                          ? 'Enter at least 2 characters.'
+                          ? 'Vui lòng nhập ít nhất 2 ký tự.'
                           : null,
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -154,7 +154,7 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _submit(),
                       decoration: const InputDecoration(
-                        labelText: 'Image URL (optional)',
+                        labelText: 'URL ảnh (không bắt buộc)',
                         hintText: 'https://example.com/category.jpg',
                         prefixIcon: Icon(Icons.image_outlined),
                       ),
@@ -184,11 +184,11 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
                             color: AppColors.primaryEnd,
                           ),
                           title: Text(
-                            'Published',
+                            'Đã đăng',
                             style: AppTextStyles.titleMedium,
                           ),
                           subtitle: Text(
-                            'Customers can see this category.',
+                            'Khách hàng có thể thấy danh mục này.',
                             style: AppTextStyles.bodySmall,
                           ),
                           value: _isPublished,
@@ -201,8 +201,8 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
                     const SizedBox(height: AppSpacing.xl),
                     GradientButton(
                       label: widget.category == null
-                          ? 'Create category'
-                          : 'Save changes',
+                          ? 'Tạo danh mục'
+                          : 'Lưu thay đổi',
                       isLoading: action.isLoading,
                       onPressed: _submit,
                     ),

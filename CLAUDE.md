@@ -24,7 +24,7 @@ For additional context about technologies, project structure, shell commands, an
 - Send FCM messages from a trusted backend; never place server credentials in the client.
 - Never edit generated `.g.dart` files manually.
 - Follow Dart naming and formatting conventions even when the sample project does not.
-- Read and enforce `docs/design_system.md`: Poppins, the Food Ninja green gradient, shared tokens, and light mode only.
+- Read and enforce `docs/design_system.md`: Poppins, the Food Ninja green gradient, shared tokens, and light mode only. All user-facing UI text must be Vietnamese (`vi-VN`) with proper diacritics; Poppins is the approved Vietnamese-readable font. Do not introduce English UI copy except brand names, COD, URLs, email addresses, and unavoidable third-party technical names.
 - Reject new dark-theme branches, theme toggles, screen-local brand colors, and flattened screenshots used as UI controls.
 - The restaurant is Ngô Chicken. Home follows the Food Ninja Home frame with the single-restaurant substitutions in `specs/002-browse-menu/spec.md`; customer screens share `MainShell` with Home, Cart, Orders, and Profile tabs (no Chat).
 - Run the app locally against the Firestore emulator with `--dart-define=USE_FIRESTORE_EMULATOR=true`; on web this uses the `demo-ordering` project, so seed data with `GCLOUD_PROJECT=demo-ordering`.

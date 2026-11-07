@@ -40,29 +40,36 @@ class AdminOrderActionViewModel extends AsyncNotifier<void> {
   }) async {
     if (!order.status.canTransitionTo(target)) {
       state = AsyncError(
-        ArgumentError('This order status transition is not allowed.'),
+        ArgumentError('Không thể chuyển đơn hàng sang trạng thái này.'),
         StackTrace.current,
       );
       return false;
     }
     if (target == OrderStatus.rejected && reason.trim().isEmpty) {
       state = AsyncError(
-        ArgumentError('Enter a reason before rejecting this order.'),
+        ArgumentError('Vui lòng nhập lý do trước khi từ chối đơn hàng.'),
         StackTrace.current,
       );
       return false;
     }
     state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref
+    state = await AsyncValue.guard(() async {
+      await ref
           .read(orderRepositoryProvider)
           .transitionStatus(
             orderId: order.id,
             expectedStatus: order.status,
             targetStatus: target,
             reason: reason,
-          ),
-    );
+          );
+
+      // Recreate the detail streams after the transaction. Keeping the action
+      // loading until the updated order arrives prevents a second tap from
+      // submitting the same transition with a stale expected status.
+      ref.invalidate(adminOrderProvider(order.id));
+      ref.invalidate(adminOrderEventsProvider(order.id));
+      await ref.read(adminOrderProvider(order.id).future);
+    });
     return !state.hasError;
   }
 }

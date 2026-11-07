@@ -20,48 +20,48 @@ class AuthException extends AppException {
     switch (code) {
       case 'user-not-found':
         return const AuthException(
-          'No account found with this email.',
+          'Không tìm thấy tài khoản với email này.',
           code: 'user-not-found',
         );
       case 'wrong-password':
       case 'invalid-credential':
         return const AuthException(
-          'Incorrect email or password.',
+          'Email hoặc mật khẩu không đúng.',
           code: 'invalid-credential',
         );
       case 'email-already-in-use':
         return const AuthException(
-          'An account already exists with this email address.',
+          'Đã có tài khoản sử dụng địa chỉ email này.',
           code: 'email-already-in-use',
         );
       case 'invalid-email':
         return const AuthException(
-          'Please enter a valid email address.',
+          'Vui lòng nhập địa chỉ email hợp lệ.',
           code: 'invalid-email',
         );
       case 'weak-password':
         return const AuthException(
-          'Password must be at least 6 characters.',
+          'Mật khẩu phải có ít nhất 6 ký tự.',
           code: 'weak-password',
         );
       case 'user-disabled':
         return const AuthException(
-          'This account has been disabled. Please contact support.',
+          'Tài khoản này đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.',
           code: 'user-disabled',
         );
       case 'too-many-requests':
         return const AuthException(
-          'Too many failed attempts. Your account is temporarily locked for 15 minutes.',
+          'Bạn đã thử quá nhiều lần. Tài khoản tạm khóa trong 15 phút.',
           code: 'too-many-requests',
         );
       case 'network-request-failed':
         return const AuthException(
-          'Network connection failed. Please check your internet.',
+          'Kết nối mạng thất bại. Vui lòng kiểm tra Internet.',
           code: 'network-request-failed',
         );
       default:
         return AuthException(
-          originalMessage ?? 'Authentication error occurred ($code).',
+          originalMessage ?? 'Đã xảy ra lỗi xác thực ($code).',
           code: code,
         );
     }

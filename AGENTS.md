@@ -118,7 +118,8 @@ The reviewed `Example-PRM393` project is a learning reference for `ProviderScope
 `docs/design_system.md` is the implementation authority for visual work. Read it before creating or reviewing any screen.
 
 - Implement light mode only. Set `themeMode: ThemeMode.light`; do not add `darkTheme`, dark tokens, theme switching, or a theme preference in SharedPreferences.
-- Use Poppins for all in-app text. Keep logo lettering as an exported asset.
+- **Ngôn ngữ giao diện là tiếng Việt (vi-VN)**. Mọi chuỗi người dùng nhìn thấy — tiêu đề, nút, nhãn trường, placeholder, tooltip, thông báo lỗi/thành công, trạng thái trống/tải và nội dung Admin/Customer — phải dùng tiếng Việt có dấu. Không thêm chuỗi UI tiếng Anh, trừ tên thương hiệu, thuật ngữ kỹ thuật cần thiết như `COD`, URL, email và tên dịch vụ bên thứ ba.
+- Use **Poppins** for all in-app text. The bundled Poppins font supports Vietnamese diacritics and is the approved readable font for this app; keep logo lettering as an exported asset. Configure the application locale as `vi-VN` and include Flutter Vietnamese Material localizations.
 - Use the Figma-derived primary gradient `#53E88B -> #15BE77`, primary text `#09051C`, and the semantic palette defined in the design-system document.
 - Centralize colors, gradients, text styles, spacing, radii, shadows, and `ThemeData` under `lib/core/theme/`.
 - Feature widgets must not hard-code brand hex values or create local copies of global visual tokens.

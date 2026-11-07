@@ -15,6 +15,9 @@ class MainShellTabController extends Notifier<int> {
     if (tab < MainShellTab.home || tab > MainShellTab.profile) return;
     state = tab;
   }
+
+  /// Starts a new authentication/navigation session from Home.
+  void reset() => state = MainShellTab.home;
 }
 
 final mainShellTabProvider = NotifierProvider<MainShellTabController, int>(

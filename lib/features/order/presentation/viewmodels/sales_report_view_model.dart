@@ -6,7 +6,7 @@ import 'admin_order_list_view_model.dart';
 enum SalesReportPeriod {
   last7Days('Last 7 days'),
   last30Days('Last 30 days'),
-  thisMonth('This month');
+  thisMonth('Tháng này');
 
   const SalesReportPeriod(this.label);
   final String label;

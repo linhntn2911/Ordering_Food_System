@@ -21,8 +21,13 @@ class FirestoreService {
     return ordersCollection().doc(orderId).get();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> getOrdersStream({String? userId}) {
-    Query<Map<String, dynamic>> query = ordersCollection().orderBy('createdAt', descending: true);
+  Stream<QuerySnapshot<Map<String, dynamic>>> getOrdersStream({
+    String? userId,
+  }) {
+    Query<Map<String, dynamic>> query = ordersCollection().orderBy(
+      'createdAt',
+      descending: true,
+    );
     if (userId != null && userId.isNotEmpty) {
       query = query.where('userId', isEqualTo: userId);
     }
@@ -30,7 +35,9 @@ class FirestoreService {
   }
 }
 
-final firebaseFirestoreProvider = Provider<FirebaseFirestore>((ref) => FirebaseFirestore.instance);
+final firebaseFirestoreProvider = Provider<FirebaseFirestore>(
+  (ref) => FirebaseFirestore.instance,
+);
 final firestoreServiceProvider = Provider<FirestoreService>((ref) {
   final firestore = ref.watch(firebaseFirestoreProvider);
   return FirestoreService(firestore);

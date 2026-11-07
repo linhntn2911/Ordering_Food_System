@@ -55,7 +55,7 @@ class FirestoreOtpRepository implements OtpRepository {
   Future<String> sendOtp({required String email, required OtpType type}) async {
     final normalizedEmail = email.trim().toLowerCase();
     if (normalizedEmail.isEmpty) {
-      throw const ValidationException('Please enter a valid email address.');
+      throw const ValidationException('Vui lòng nhập địa chỉ email hợp lệ.');
     }
 
     // Generate a cryptographically random 6-digit OTP.
@@ -96,16 +96,16 @@ class FirestoreOtpRepository implements OtpRepository {
 
       if (response.statusCode != 200) {
         throw AuthException(
-          'Failed to send verification email (error ${response.statusCode}). '
-          'Please try again.',
+          'Không thể gửi email xác thực (lỗi ${response.statusCode}). '
+          'Vui lòng thử lại.',
         );
       }
     } on AppException {
       rethrow;
     } catch (_) {
       throw const AuthException(
-        'Could not send verification code to your email. '
-        'Please check your network connection and try again.',
+        'Không thể gửi mã xác thực đến email của bạn. '
+        'Vui lòng kiểm tra kết nối mạng và thử lại.',
       );
     }
   }
@@ -121,7 +121,7 @@ class FirestoreOtpRepository implements OtpRepository {
     final cleanCode = code.trim();
 
     if (cleanCode.length != 6) {
-      throw const ValidationException('Verification code must be 6 digits.');
+      throw const ValidationException('Mã xác thực phải gồm 6 chữ số.');
     }
 
     final docId = '${normalizedEmail}_${type.name}';
@@ -131,13 +131,13 @@ class FirestoreOtpRepository implements OtpRepository {
     if (local != null) {
       if (local.isUsed) {
         throw const AuthException(
-          'This verification code has already been used. Please request a new code.',
+          'Mã xác thực này đã được sử dụng. Vui lòng yêu cầu mã mới.',
           code: 'otp-already-used',
         );
       }
       if (DateTime.now().isAfter(local.expiresAt)) {
         throw const AuthException(
-          'Verification code has expired (5 minutes). Please request a new code.',
+          'Mã xác thực đã hết hạn (5 phút). Vui lòng yêu cầu mã mới.',
           code: 'otp-expired',
         );
       }
@@ -162,7 +162,7 @@ class FirestoreOtpRepository implements OtpRepository {
     }
 
     throw const AuthException(
-      'Invalid verification code. Please check and try again.',
+      'Mã xác thực không hợp lệ. Vui lòng kiểm tra và thử lại.',
       code: 'otp-mismatch',
     );
   }
@@ -175,7 +175,7 @@ class FirestoreOtpRepository implements OtpRepository {
   }) async {
     if (newPassword.length < 6) {
       throw const ValidationException(
-        'New password must be at least 6 characters.',
+        'Mật khẩu mới phải có ít nhất 6 ký tự.',
       );
     }
 

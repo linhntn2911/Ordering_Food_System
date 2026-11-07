@@ -80,14 +80,14 @@ class CategoryManagementViewModel extends AsyncNotifier<void> {
   }
 
   static String? validate({required String name, required String imageUrl}) {
-    if (name.length < 2) return 'Name must contain at least 2 characters.';
-    if (name.length > 50) return 'Name cannot exceed 50 characters.';
+    if (name.length < 2) return 'Tên phải có ít nhất 2 ký tự.';
+    if (name.length > 50) return 'Tên không được vượt quá 50 ký tự.';
     if (imageUrl.isNotEmpty) {
       final uri = Uri.tryParse(imageUrl);
       if (uri == null ||
           !uri.hasAbsolutePath ||
           (uri.scheme != 'http' && uri.scheme != 'https')) {
-        return 'Image URL must start with http:// or https://.';
+        return 'Đường dẫn ảnh phải bắt đầu bằng http:// hoặc https://.';
       }
     }
     return null;

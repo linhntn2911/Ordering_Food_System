@@ -8,13 +8,13 @@ enum OrderStatus {
   rejected;
 
   String get label => switch (this) {
-    OrderStatus.pending => 'Pending',
-    OrderStatus.confirmed => 'Confirmed',
-    OrderStatus.preparing => 'Preparing',
-    OrderStatus.outForDelivery => 'Out for delivery',
-    OrderStatus.completed => 'Completed',
-    OrderStatus.cancelled => 'Cancelled',
-    OrderStatus.rejected => 'Rejected',
+    OrderStatus.pending => 'Chờ xác nhận',
+    OrderStatus.confirmed => 'Đã xác nhận',
+    OrderStatus.preparing => 'Đang chuẩn bị',
+    OrderStatus.outForDelivery => 'Đang giao hàng',
+    OrderStatus.completed => 'Hoàn thành',
+    OrderStatus.cancelled => 'Đã hủy',
+    OrderStatus.rejected => 'Từ chối',
   };
 
   String get wireValue => switch (this) {
@@ -40,7 +40,7 @@ enum OrderStatus {
       'completed' => OrderStatus.completed,
       'cancelled' || 'canceled' => OrderStatus.cancelled,
       'rejected' => OrderStatus.rejected,
-      _ => throw FormatException('Unknown order status: $value'),
+      _ => throw FormatException('Trạng thái đơn hàng không xác định: $value'),
     };
   }
 

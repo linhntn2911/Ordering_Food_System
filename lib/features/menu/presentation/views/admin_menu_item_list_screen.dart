@@ -45,7 +45,7 @@ class _AdminMenuItemListScreenState
       if (next.hasError && previous?.error != next.error) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('The menu item could not be updated.'),
+            content: Text('Không thể cập nhật món ăn.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -81,10 +81,10 @@ class _AdminMenuItemListScreenState
                         },
                       ),
                       const SizedBox(height: AppSpacing.xl),
-                      Text('Menu Items', style: AppTextStyles.headlineLarge),
+                      Text('Món ăn', style: AppTextStyles.headlineLarge),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        'Manage food, drinks, visibility, and daily availability.',
+                        'Quản lý món ăn, đồ uống, trạng thái hiển thị và tình trạng bán mỗi ngày.',
                         style: AppTextStyles.bodyMedium,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -92,7 +92,7 @@ class _AdminMenuItemListScreenState
                         key: const ValueKey('add-menu-item'),
                         onPressed: () => _openForm(),
                         icon: const Icon(Icons.add_rounded),
-                        label: const Text('Add new menu item'),
+                        label: const Text('Thêm món ăn mới'),
                       ),
                       const SizedBox(height: AppSpacing.md),
                       items.maybeWhen(
@@ -130,7 +130,7 @@ class _AdminMenuItemListScreenState
                                   (c) => c.id == _categoryId,
                                   orElse: () => Category(
                                     id: _categoryId!,
-                                    name: 'Category',
+                                    name: 'Danh mục',
                                     imageUrl: '',
                                     sortOrder: 0,
                                     isPublished: true,
@@ -147,7 +147,7 @@ class _AdminMenuItemListScreenState
                                   color: AppColors.primaryEnd,
                                 ),
                                 label: Text(
-                                  'Category: ${currentCategoryName ?? ''}',
+                                  'Danh mục: ${currentCategoryName ?? ''}',
                                   style: AppTextStyles.labelSmall.copyWith(
                                     color: AppColors.primaryEnd,
                                     fontWeight: FontWeight.w600,
@@ -235,7 +235,7 @@ class _TopBar extends StatelessWidget {
       children: [
         if (Navigator.canPop(context)) ...[
           IconButton(
-            tooltip: 'Back to categories',
+            tooltip: 'Quay lại danh mục',
             onPressed: onBack,
             style: IconButton.styleFrom(
               backgroundColor: AppColors.surfaceMuted,
@@ -251,7 +251,7 @@ class _TopBar extends StatelessWidget {
         Builder(
           builder: (scaffoldContext) => IconButton(
             key: const ValueKey('admin-drawer-button'),
-            tooltip: 'Open navigation menu',
+            tooltip: 'Mở menu điều hướng',
             onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
             style: IconButton.styleFrom(
               backgroundColor: AppColors.primarySoft,
@@ -270,12 +270,12 @@ class _TopBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Ngô Chicken', style: AppTextStyles.titleMedium),
-              Text('Menu catalogue', style: AppTextStyles.bodySmall),
+              Text('Danh mục thực đơn', style: AppTextStyles.bodySmall),
             ],
           ),
         ),
         IconButton(
-          tooltip: 'Refresh menu items',
+          tooltip: 'Làm mới món ăn',
           onPressed: onRefresh,
           style: IconButton.styleFrom(
             backgroundColor: AppColors.surfaceMuted,
@@ -309,7 +309,7 @@ class _MenuSummary extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadii.card),
       ),
       child: Text(
-        '${items.length} items · $available available',
+        '${items.length} món · $available còn hàng',
         style: AppTextStyles.bodySmall.copyWith(
           color: AppColors.primaryEnd,
           fontWeight: FontWeight.w600,
@@ -335,7 +335,7 @@ class _SearchField extends StatelessWidget {
       child: TextField(
         onChanged: onChanged,
         decoration: const InputDecoration(
-          hintText: 'Search food or drinks',
+          hintText: 'Tìm món ăn hoặc đồ uống',
           prefixIcon: Icon(Icons.search_rounded, color: AppColors.primaryEnd),
         ),
       ),
@@ -379,7 +379,7 @@ class _CategoryFilterMenu extends StatelessWidget {
           ),
           child: PopupMenuButton<String?>(
             key: const ValueKey('category-filter-button'),
-            tooltip: 'Filter by category',
+            tooltip: 'Lọc theo danh mục',
             enabled: !isLoading,
             initialValue: selectedId,
             onSelected: onSelected,
@@ -407,7 +407,7 @@ class _CategoryFilterMenu extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        'All',
+                        'Tất cả',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: selectedId == null
@@ -497,8 +497,8 @@ class _MenuList extends StatelessWidget {
       return Center(
         child: Text(
           items.isEmpty
-              ? 'No menu items in this category.'
-              : 'No matching menu items.',
+              ? 'Danh mục này chưa có món.'
+              : 'Không có món ăn phù hợp.',
           textAlign: TextAlign.center,
           style: AppTextStyles.bodyMedium,
         ),
@@ -518,7 +518,7 @@ class _MenuList extends StatelessWidget {
         return AdminMenuItemCard(
           key: ValueKey(item.id),
           item: item,
-          categoryName: names[item.categoryId] ?? 'Unknown category',
+          categoryName: names[item.categoryId] ?? 'Danh mục không xác định',
           actionsEnabled: actionsEnabled,
           onAvailabilityChanged: (value) => onAvailabilityChanged(item, value),
           onPublishedChanged: (value) => onPublishedChanged(item, value),
@@ -542,15 +542,12 @@ class _ErrorState extends StatelessWidget {
         children: [
           const Icon(Icons.cloud_off_rounded, size: 56, color: AppColors.error),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'Menu items could not be loaded.',
-            style: AppTextStyles.bodyMedium,
-          ),
+          Text('Không thể tải món ăn.', style: AppTextStyles.bodyMedium),
           const SizedBox(height: AppSpacing.md),
           OutlinedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Try again'),
+            label: const Text('Thử lại'),
           ),
         ],
       ),

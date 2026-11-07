@@ -75,10 +75,7 @@ class _AdminBroadcastScreenState extends ConsumerState<AdminBroadcastScreen> {
     final notificationsAsync = ref.watch(notificationsListProvider);
 
     // Listen for error feedback
-    ref.listen<AdminBroadcastState>(adminBroadcastViewModelProvider, (
-      _,
-      next,
-    ) {
+    ref.listen<AdminBroadcastState>(adminBroadcastViewModelProvider, (_, next) {
       if (next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -235,8 +232,7 @@ class _AdminBroadcastScreenState extends ConsumerState<AdminBroadcastScreen> {
                         style: AppTextStyles.bodyMedium,
                         decoration: InputDecoration(
                           labelText: 'Nội dung chi tiết *',
-                          hintText:
-                              'Ví dụ: Nhập mã NGO30 để được giảm 30% tối đa 50.000đ khi đặt món hôm nay.',
+                          hintText: 'Ví dụ: Nhập mã NGO30 để được giảm 30% tối đa 50.000đ khi đặt món hôm nay.',
                           hintStyle: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textMuted,
                           ),
@@ -274,7 +270,9 @@ class _AdminBroadcastScreenState extends ConsumerState<AdminBroadcastScreen> {
                           child: InkWell(
                             key: const ValueKey('broadcast-send-button'),
                             borderRadius: BorderRadius.circular(AppRadii.large),
-                            onTap: broadcastState.isLoading ? null : _handleSend,
+                            onTap: broadcastState.isLoading
+                                ? null
+                                : _handleSend,
                             child: Center(
                               child: broadcastState.isLoading
                                   ? const SizedBox(
@@ -401,22 +399,18 @@ class _AdminBroadcastScreenState extends ConsumerState<AdminBroadcastScreen> {
                       final isPromo =
                           notification.type == NotificationType.promo;
                       final typeLabel = isPromo ? 'ƯU ĐÃI' : 'HỆ THỐNG';
-                      final typeColor =
-                          isPromo
-                              ? AppColors.foodAccentDark
-                              : AppColors.primarySolid;
-                      final typeBg =
-                          isPromo
-                              ? AppColors.warningSurface
-                              : AppColors.primarySoft;
-                      final icon =
-                          isPromo
-                              ? Icons.local_offer_rounded
-                              : Icons.info_rounded;
+                      final typeColor = isPromo
+                          ? AppColors.foodAccentDark
+                          : AppColors.primarySolid;
+                      final typeBg = isPromo
+                          ? AppColors.warningSurface
+                          : AppColors.primarySoft;
+                      final icon = isPromo
+                          ? Icons.local_offer_rounded
+                          : Icons.info_rounded;
 
-                      final timeString = DateFormat(
-                        'dd/MM/yyyy HH:mm',
-                      ).format(notification.createdAt);
+                      final timeString = DateFormat('dd/MM/yyyy HH:mm')
+                          .format(notification.createdAt);
 
                       return Container(
                         margin: const EdgeInsets.only(bottom: AppSpacing.sm),

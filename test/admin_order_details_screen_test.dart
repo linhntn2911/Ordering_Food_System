@@ -38,7 +38,7 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    expect(find.text('Order details'), findsOneWidget);
+    expect(find.text('Chi tiết đơn hàng'), findsOneWidget);
     expect(find.text('Nguyễn Minh Anh'), findsOneWidget);
     final item = find.text('Gà sốt phô mai cay');
     await tester.scrollUntilVisible(
@@ -48,18 +48,18 @@ void main() {
     );
     expect(item, findsOneWidget);
     await tester.scrollUntilVisible(
-      find.text('Payment summary'),
+      find.text('Tóm tắt thanh toán'),
       300,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(find.text('Payment summary'), findsOneWidget);
+    expect(find.text('Tóm tắt thanh toán'), findsOneWidget);
     await tester.scrollUntilVisible(
-      find.text('Status timeline'),
+      find.text('Lịch sử trạng thái'),
       300,
       scrollable: find.byType(Scrollable).first,
     );
-    expect(find.text('Status timeline'), findsOneWidget);
-    expect(find.text('Confirm order'), findsOneWidget);
+    expect(find.text('Lịch sử trạng thái'), findsOneWidget);
+    expect(find.text('Xác nhận đơn hàng'), findsOneWidget);
   });
 
   testWidgets('confirms a pending order and appends its new status', (
@@ -68,13 +68,13 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Confirm order'));
+    await tester.tap(find.text('Xác nhận đơn hàng'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(FilledButton, 'Xác nhận'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Confirmed'), findsWidgets);
-    expect(find.text('Start preparing'), findsOneWidget);
+    expect(find.text('Đã xác nhận'), findsWidgets);
+    expect(find.text('Bắt đầu chuẩn bị'), findsOneWidget);
   });
 
   testWidgets('fits a phone-sized viewport', (tester) async {

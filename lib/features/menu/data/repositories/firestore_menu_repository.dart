@@ -209,7 +209,7 @@ class FirestoreMenuRepository implements MenuRepository {
         );
       } on TimeoutException {
         throw const MenuImageUploadException(
-          'Image upload timed out. Firebase Storage may be unavailable.',
+          'Tải ảnh lên quá thời gian chờ. Firebase Storage có thể đang không khả dụng.',
           code: 'upload-timeout',
         );
       } on FirebaseException catch (error) {
@@ -277,7 +277,7 @@ class FirestoreMenuRepository implements MenuRepository {
             try {
               items.add(map(document));
             } on FormatException {
-              // Skip malformed documents instead of failing the whole feed.
+              // Bỏ qua malformed documents instead of failing the whole feed.
             }
           }
           return MenuFeed<T>(
@@ -330,7 +330,7 @@ class FirestoreMenuRepository implements MenuRepository {
       );
     }
     return MenuImageUploadException(
-      error.message ?? 'The image could not be uploaded to Firebase Storage.',
+      error.message ?? 'Không thể tải ảnh lên Firebase Storage.',
       code: error.code,
     );
   }

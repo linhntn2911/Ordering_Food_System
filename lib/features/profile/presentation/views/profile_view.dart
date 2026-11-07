@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ordering_food_system/app/main_shell_controller.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ordering_food_system/app/router.dart';
 import 'package:ordering_food_system/core/theme/app_colors.dart';
@@ -57,7 +58,7 @@ class ProfileView extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Edit Profile', style: AppTextStyles.titleLarge),
+                    const Text('Chỉnh sửa hồ sơ', style: AppTextStyles.titleLarge),
                     IconButton(
                       icon: const Icon(Icons.close_rounded),
                       onPressed: () => Navigator.of(modalContext).pop(),
@@ -67,14 +68,14 @@ class ProfileView extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.p16),
                 CustomTextField(
                   controller: nameController,
-                  labelText: 'Full Name',
+                  labelText: 'Họ và tên',
                   prefixIcon: const Icon(
                     Icons.person_outline,
                     color: AppColors.primarySolid,
                   ),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
-                      return 'Full name cannot be empty.';
+                      return 'Họ và tên không được để trống.';
                     }
                     return null;
                   },
@@ -82,7 +83,7 @@ class ProfileView extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.p16),
                 CustomTextField(
                   controller: phoneController,
-                  labelText: 'Phone Number',
+                  labelText: 'Số điện thoại',
                   keyboardType: TextInputType.phone,
                   prefixIcon: const Icon(
                     Icons.phone_outlined,
@@ -90,11 +91,11 @@ class ProfileView extends ConsumerWidget {
                   ),
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) {
-                      return 'Phone number cannot be empty.';
+                      return 'Số điện thoại không được để trống.';
                     }
                     final phoneRegex = RegExp(r'^(0|\+84)[0-9]{9,10}$');
                     if (!phoneRegex.hasMatch(val.trim())) {
-                      return 'Please enter a valid 10-digit phone number.';
+                      return 'Vui lòng nhập số điện thoại hợp lệ gồm 10 chữ số.';
                     }
                     return null;
                   },
@@ -131,7 +132,7 @@ class ProfileView extends ConsumerWidget {
                   builder: (context, ref, _) {
                     final state = ref.watch(profileViewModelProvider);
                     return PrimaryButton(
-                      text: 'Save Changes',
+                      text: 'Lưu thay đổi',
                       isLoading: state.isUpdating,
                       onPressed: () async {
                         if (!formKey.currentState!.validate()) return;
@@ -145,7 +146,7 @@ class ProfileView extends ConsumerWidget {
                           Navigator.of(modalContext).pop();
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Profile updated successfully!'),
+                              content: Text('Đã cập nhật hồ sơ thành công!'),
                               backgroundColor: AppColors.success,
                             ),
                           );
@@ -204,13 +205,13 @@ class ProfileView extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.p20),
                 const Text(
-                  'Sign Out',
+                  'Đăng xuất',
                   style: AppTextStyles.headlineMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.p8),
                 Text(
-                  'Are you sure you want to sign out of your account?',
+                  'Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.4,
@@ -235,7 +236,7 @@ class ProfileView extends ConsumerWidget {
                             onTap: () => Navigator.of(dialogContext).pop(),
                             child: Center(
                               child: Text(
-                                'Cancel',
+                                'Hủy',
                                 style: AppTextStyles.labelLarge.copyWith(
                                   color: AppColors.textSecondary,
                                   fontWeight: FontWeight.w600,
@@ -267,6 +268,7 @@ class ProfileView extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(AppRadii.card),
                             onTap: () async {
                               Navigator.of(dialogContext).pop();
+                              ref.read(mainShellTabProvider.notifier).reset();
                               await ref
                                   .read(profileViewModelProvider.notifier)
                                   .signOut();
@@ -279,7 +281,7 @@ class ProfileView extends ConsumerWidget {
                             },
                             child: Center(
                               child: Text(
-                                'Sign Out',
+                                'Đăng xuất',
                                 style: AppTextStyles.labelLarge.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
@@ -367,7 +369,7 @@ class ProfileView extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Change Profile Photo',
+                'Đổi ảnh đại diện',
                 style: AppTextStyles.titleMedium.copyWith(
                   fontWeight: FontWeight.w700,
                 ),
@@ -379,7 +381,7 @@ class ProfileView extends ConsumerWidget {
                   color: AppColors.primarySolid,
                 ),
                 title: const Text(
-                  'Choose from Gallery',
+                  'Chọn từ thư viện ảnh',
                   style: AppTextStyles.bodyMedium,
                 ),
                 onTap: () => Navigator.of(modalCtx).pop(ImageSource.gallery),
@@ -390,7 +392,7 @@ class ProfileView extends ConsumerWidget {
                   color: AppColors.primarySolid,
                 ),
                 title: const Text(
-                  'Take a Photo',
+                  'Chụp ảnh',
                   style: AppTextStyles.bodyMedium,
                 ),
                 onTap: () => Navigator.of(modalCtx).pop(ImageSource.camera),
@@ -421,14 +423,14 @@ class ProfileView extends ConsumerWidget {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Profile picture updated successfully!'),
+            content: Text('Đã cập nhật ảnh đại diện thành công!'),
             backgroundColor: AppColors.success,
           ),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Failed to upload profile picture.'),
+            content: Text('Không thể tải ảnh đại diện lên.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -475,7 +477,7 @@ class ProfileView extends ConsumerWidget {
                           else
                             const SizedBox(width: 45),
                           const Text(
-                            'Profile',
+                            'Tài khoản',
                             style: AppTextStyles.headlineMedium,
                           ),
                           IconButton(
@@ -621,8 +623,8 @@ class ProfileView extends ConsumerWidget {
                                 children: [
                                   Text(
                                     user.isAdmin
-                                        ? 'Administrator'
-                                        : 'Member Gold',
+                                        ? 'Quản trị viên'
+                                        : 'Thành viên Gold',
                                     style: AppTextStyles.titleMedium.copyWith(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,
@@ -630,8 +632,8 @@ class ProfileView extends ConsumerWidget {
                                   ),
                                   Text(
                                     user.isAdmin
-                                        ? 'Full System Authority'
-                                        : 'Ngô Chicken Customer',
+                                        ? 'Quyền quản trị toàn hệ thống'
+                                        : 'Khách hàng Ngô Chicken',
                                     style: AppTextStyles.bodySmall.copyWith(
                                       color: AppColors.textMuted,
                                     ),
@@ -661,7 +663,7 @@ class ProfileView extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'Active',
+                                    'Đang hoạt động',
                                     style: AppTextStyles.labelSmall.copyWith(
                                       color: AppColors.success,
                                       fontWeight: FontWeight.w600,
@@ -687,13 +689,13 @@ class ProfileView extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Personal Info',
+                              'Thông tin cá nhân',
                               style: AppTextStyles.titleMedium,
                             ),
                             const SizedBox(height: AppSpacing.p16),
                             _ProfileDetailRow(
                               icon: Icons.person_outline_rounded,
-                              label: 'Full Name',
+                              label: 'Họ và tên',
                               value: user.fullName,
                             ),
                             const Divider(
@@ -711,10 +713,10 @@ class ProfileView extends ConsumerWidget {
                             ),
                             _ProfileDetailRow(
                               icon: Icons.phone_outlined,
-                              label: 'Phone',
+                              label: 'Số điện thoại',
                               value: user.phone.isNotEmpty
                                   ? user.phone
-                                  : 'Not provided',
+                                  : 'Chưa cung cấp',
                             ),
                           ],
                         ),
@@ -738,7 +740,7 @@ class ProfileView extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Activity & Updates',
+                                'Hoạt động và cập nhật',
                                 style: AppTextStyles.titleMedium,
                               ),
                               const SizedBox(height: AppSpacing.p12),
@@ -758,7 +760,7 @@ class ProfileView extends ConsumerWidget {
                                   ),
                                 ),
                                 title: const Text(
-                                  'Notifications',
+                                  'Thông báo',
                                   style: AppTextStyles.bodyMedium,
                                 ),
                                 trailing: const Icon(
@@ -790,7 +792,7 @@ class ProfileView extends ConsumerWidget {
                                   ),
                                 ),
                                 title: const Text(
-                                  'My Reviews',
+                                  'Đánh giá của tôi',
                                   style: AppTextStyles.bodyMedium,
                                 ),
                                 trailing: const Icon(
@@ -822,7 +824,7 @@ class ProfileView extends ConsumerWidget {
                                   ),
                                 ),
                                 title: const Text(
-                                  'Delivery Addresses',
+                                  'Địa chỉ giao hàng',
                                   style: AppTextStyles.bodyMedium,
                                 ),
                                 trailing: const Icon(
@@ -868,7 +870,7 @@ class ProfileView extends ConsumerWidget {
                                     ),
                                     const SizedBox(width: AppSpacing.p8),
                                     Text(
-                                      'Admin Dashboard',
+                                      'Bảng điều khiển quản trị',
                                       style: AppTextStyles.labelLarge.copyWith(
                                         color: Colors.white,
                                         fontWeight: FontWeight.w700,
@@ -883,7 +885,7 @@ class ProfileView extends ConsumerWidget {
                         const SizedBox(height: AppSpacing.p16),
                       ],
 
-                      // Sign Out Button (Food Ninja Soft Error Card)
+                      // Đăng xuất Button (Food Ninja Soft Error Card)
                       Container(
                         width: double.infinity,
                         height: 54,
@@ -907,7 +909,7 @@ class ProfileView extends ConsumerWidget {
                                   ),
                                   const SizedBox(width: AppSpacing.p8),
                                   Text(
-                                    'Sign Out',
+                                    'Đăng xuất',
                                     style: AppTextStyles.labelLarge.copyWith(
                                       color: AppColors.error,
                                       fontWeight: FontWeight.w700,

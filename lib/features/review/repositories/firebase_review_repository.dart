@@ -38,7 +38,9 @@ class FirebaseReviewRepository implements ReviewRepository {
       throw const AuthFailure();
     }
     final reviewId = '${uid}_$orderId';
-    final reviewRef = firestore.collection(FirestorePaths.reviews).doc(reviewId);
+    final reviewRef = firestore
+        .collection(FirestorePaths.reviews)
+        .doc(reviewId);
 
     final trimmedComment = comment.trim();
     try {
@@ -93,7 +95,9 @@ class FirebaseReviewRepository implements ReviewRepository {
           'Chỉ đánh giá được đơn hàng đã hoàn thành trong vòng 30 ngày.',
         );
       }
-      throw const ValidationFailure('Không thể gửi đánh giá, vui lòng thử lại.');
+      throw const ValidationFailure(
+        'Không thể gửi đánh giá, vui lòng thử lại.',
+      );
     }
   }
 

@@ -223,6 +223,11 @@ Task: "T036 ReviewCard và trình xem ảnh trong lib/features/menu/presentation
 
 ## Kết quả kiểm tra
 
+### 2026-11-07
+
+- Theo yêu cầu sản phẩm mới, đã bỏ toàn bộ 18 đánh giá demo khỏi `menu_seed.json`; ứng dụng chỉ hiển thị đánh giá Firestore do Customer gửi sau đơn hoàn thành.
+- Thêm migration `tools/seed_menu/cleanup_legacy_mock_reviews.js` để xóa đúng các ID review demo cũ và tính lại tóm tắt điểm từ review thật, không ghi đè dữ liệu menu khác.
+
 ### 2026-10-20
 
 - **T001 (mốc trước khi sửa)**: `flutter analyze` sạch; `flutter test` 138/138 đạt.

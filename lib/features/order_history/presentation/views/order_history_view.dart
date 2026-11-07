@@ -109,11 +109,10 @@ class OrderHistoryView extends ConsumerWidget {
                     itemCount: orders.length,
                     separatorBuilder: (_, _) =>
                         const SizedBox(height: AppSpacing.s12),
-                    itemBuilder: (context, index) =>
-                        OrderHistoryCard(
-                          order: orders[index],
-                          isReviewed: reviewedIds.contains(orders[index].orderId),
-                        ),
+                    itemBuilder: (context, index) => OrderHistoryCard(
+                      order: orders[index],
+                      isReviewed: reviewedIds.contains(orders[index].orderId),
+                    ),
                   ),
                 );
               },

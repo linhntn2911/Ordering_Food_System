@@ -85,12 +85,12 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
 
                 // Frame 1.11 Forgot Password (Food Ninja)
                 Text(
-                  'Forgot password?',
+                  'Quên mật khẩu?',
                   style: AppTextStyles.headlineLarge.copyWith(fontSize: 26),
                 ),
                 const SizedBox(height: AppSpacing.p8),
                 Text(
-                  'Select which contact details should we use to reset your password',
+                  'Nhập email đã đăng ký để xác minh và đặt lại mật khẩu.',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.5,
@@ -132,7 +132,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Via email:',
+                              'Qua email:',
                               style: AppTextStyles.bodySmall.copyWith(
                                 color: AppColors.textMuted,
                               ),
@@ -141,7 +141,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                             Text(
                               _emailController.text.isNotEmpty
                                   ? _emailController.text
-                                  : 'Enter your registered email below',
+                                  : 'Nhập email đã đăng ký ở bên dưới',
                               style: AppTextStyles.titleMedium.copyWith(
                                 fontSize: 15,
                                 color: AppColors.textPrimary,
@@ -192,7 +192,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                   key: _formKey,
                   child: CustomTextField(
                     controller: _emailController,
-                    hintText: 'Enter your email',
+                    hintText: 'Nhập email của bạn',
                     keyboardType: TextInputType.emailAddress,
                     textInputAction: TextInputAction.done,
                     onChanged: (_) {
@@ -211,13 +211,13 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email.';
+                        return 'Vui lòng nhập email.';
                       }
                       final emailRegex = RegExp(
                         r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
                       );
                       if (!emailRegex.hasMatch(value.trim())) {
-                        return 'Please enter a valid email address.';
+                        return 'Vui lòng nhập địa chỉ email hợp lệ.';
                       }
                       return null;
                     },
@@ -228,7 +228,7 @@ class _ForgotPasswordViewState extends ConsumerState<ForgotPasswordView> {
                 Center(
                   child: PrimaryButton(
                     width: 160,
-                    text: 'Next',
+                    text: 'Tiếp theo',
                     isLoading: state.isLoading,
                     onPressed: state.isLoading ? null : _handleNext,
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ordering_food_system/app/main_shell_controller.dart';
 import 'package:ordering_food_system/app/router.dart';
 import 'package:ordering_food_system/core/services/preferences_service.dart';
 import 'package:ordering_food_system/core/theme/app_colors.dart';
@@ -38,6 +39,8 @@ class _LoginViewState extends ConsumerState<LoginView> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
+  late final FocusNode _emailFocusNode;
+  late final FocusNode _passwordFocusNode;
 
   @override
   void initState() {
@@ -45,16 +48,21 @@ class _LoginViewState extends ConsumerState<LoginView> {
     final prefs = ref.read(preferencesServiceProvider);
     _emailController = TextEditingController(text: prefs.savedLoginEmail ?? '');
     _passwordController = TextEditingController();
+    _emailFocusNode = FocusNode(debugLabel: 'login-email');
+    _passwordFocusNode = FocusNode(debugLabel: 'login-password');
   }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
   Future<void> _handleLogin() async {
+    if (ref.read(loginViewModelProvider).isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
     final user = await ref
@@ -72,6 +80,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
   void _onSignedIn(AppUser user) {
     ref.invalidate(authStateProvider);
     ref.invalidate(profileViewModelProvider);
+    ref.read(mainShellTabProvider.notifier).reset();
 
     final navigator = Navigator.of(context);
     if (widget.args.returnToCaller && !user.isAdmin && navigator.canPop()) {
@@ -90,267 +99,288 @@ class _LoginViewState extends ConsumerState<LoginView> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
+      resizeToAvoidBottomInset: true,
       body: FoodNinjaBackground(
         child: SafeArea(
           child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.screenHorizontal,
             ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  if (Navigator.of(context).canPop())
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: EdgeInsets.only(top: AppSpacing.p16),
-                        child: AppBackButton(),
+            child: AutofillGroup(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (Navigator.of(context).canPop())
+                      const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: AppSpacing.p16),
+                          child: AppBackButton(),
+                        ),
+                      ),
+                    const SizedBox(height: AppSpacing.p32),
+
+                    // Food Ninja Brand Header
+                    const FoodNinjaLogo(iconSize: 76, titleFontSize: 30),
+                    const SizedBox(height: AppSpacing.p32),
+
+                    // Title (from Frame 1.5 Sign in)
+                    Text(
+                      'Đăng nhập tài khoản',
+                      style: AppTextStyles.titleLarge.copyWith(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  const SizedBox(height: AppSpacing.p32),
+                    const SizedBox(height: AppSpacing.p20),
 
-                  // Food Ninja Brand Header
-                  const FoodNinjaLogo(iconSize: 76, titleFontSize: 30),
-                  const SizedBox(height: AppSpacing.p32),
-
-                  // Title (from Frame 1.5 Sign in)
-                  Text(
-                    'Login To Your Account',
-                    style: AppTextStyles.titleLarge.copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.p20),
-
-                  // Error message banner
-                  if (state.errorMessage != null) ...[
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(AppSpacing.p12),
-                      decoration: BoxDecoration(
-                        color: AppColors.errorSoft,
-                        borderRadius: AppSpacing.roundedSmall,
-                        border: Border.all(color: AppColors.error, width: 1),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.error_outline,
-                            color: AppColors.error,
-                            size: 20,
-                          ),
-                          const SizedBox(width: AppSpacing.p8),
-                          Expanded(
-                            child: Text(
-                              state.errorMessage!,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: AppColors.error,
-                                fontWeight: FontWeight.w500,
+                    // Error message banner
+                    if (state.errorMessage != null) ...[
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(AppSpacing.p12),
+                        decoration: BoxDecoration(
+                          color: AppColors.errorSoft,
+                          borderRadius: AppSpacing.roundedSmall,
+                          border: Border.all(color: AppColors.error, width: 1),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: AppColors.error,
+                              size: 20,
+                            ),
+                            const SizedBox(width: AppSpacing.p8),
+                            Expanded(
+                              child: Text(
+                                state.errorMessage!,
+                                style: AppTextStyles.bodySmall.copyWith(
+                                  color: AppColors.error,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
+                      const SizedBox(height: AppSpacing.p16),
+                    ],
+
+                    // Email field (Food Ninja style: 15px radius, soft shadow, icon)
+                    CustomTextField(
+                      controller: _emailController,
+                      focusNode: _emailFocusNode,
+                      hintText: 'Email',
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      autofillHints: const [
+                        AutofillHints.username,
+                        AutofillHints.email,
+                      ],
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      onSubmitted: (_) => _passwordFocusNode.requestFocus(),
+                      onChanged: (_) {
+                        if (state.errorMessage != null) {
+                          ref
+                              .read(loginViewModelProvider.notifier)
+                              .clearError();
+                        }
+                      },
+                      prefixIcon: const Icon(
+                        Icons.mail_outline_rounded,
+                        color: AppColors.primarySolid,
+                        size: 20,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Vui lòng nhập email.';
+                        }
+                        final emailRegex = RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        );
+                        if (!emailRegex.hasMatch(value.trim())) {
+                          return 'Vui lòng nhập địa chỉ email hợp lệ.';
+                        }
+                        return null;
+                      },
                     ),
                     const SizedBox(height: AppSpacing.p16),
-                  ],
 
-                  // Email field (Food Ninja style: 15px radius, soft shadow, icon)
-                  CustomTextField(
-                    controller: _emailController,
-                    hintText: 'Email',
-                    keyboardType: TextInputType.emailAddress,
-                    onChanged: (_) {
-                      if (state.errorMessage != null) {
-                        ref.read(loginViewModelProvider.notifier).clearError();
-                      }
-                    },
-                    prefixIcon: const Icon(
-                      Icons.mail_outline_rounded,
-                      color: AppColors.primarySolid,
-                      size: 20,
+                    // Password field
+                    CustomTextField(
+                      controller: _passwordController,
+                      focusNode: _passwordFocusNode,
+                      hintText: 'Mật khẩu',
+                      isPassword: true,
+                      autofillHints: const [AutofillHints.password],
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      onChanged: (_) {
+                        if (state.errorMessage != null) {
+                          ref
+                              .read(loginViewModelProvider.notifier)
+                              .clearError();
+                        }
+                      },
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _handleLogin(),
+                      prefixIcon: const Icon(
+                        Icons.lock_outline_rounded,
+                        color: AppColors.primarySolid,
+                        size: 20,
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Vui lòng nhập mật khẩu.';
+                        }
+                        if (value.length < 6) {
+                          return 'Mật khẩu phải có ít nhất 6 ký tự.';
+                        }
+                        return null;
+                      },
                     ),
-                    validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Please enter your email.';
-                      }
-                      final emailRegex = RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      );
-                      if (!emailRegex.hasMatch(value.trim())) {
-                        return 'Please enter a valid email address.';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.p16),
+                    const SizedBox(height: AppSpacing.p12),
 
-                  // Password field
-                  CustomTextField(
-                    controller: _passwordController,
-                    hintText: 'Password',
-                    isPassword: true,
-                    onChanged: (_) {
-                      if (state.errorMessage != null) {
-                        ref.read(loginViewModelProvider.notifier).clearError();
-                      }
-                    },
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _handleLogin(),
-                    prefixIcon: const Icon(
-                      Icons.lock_outline_rounded,
-                      color: AppColors.primarySolid,
-                      size: 20,
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your password.';
-                      }
-                      if (value.length < 6) {
-                        return 'Password must be at least 6 characters.';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.p12),
-
-                  // Options Row: Keep Me Signed In & Forgot Password
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: state.rememberMe,
-                            activeColor: AppColors.primarySolid,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4),
+                    // Options Row: Duy trì đăng nhập & Forgot Password
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: state.rememberMe,
+                              activeColor: AppColors.primarySolid,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              onChanged: (val) {
+                                if (val != null) {
+                                  ref
+                                      .read(loginViewModelProvider.notifier)
+                                      .toggleRememberMe(val);
+                                }
+                              },
                             ),
-                            onChanged: (val) {
-                              if (val != null) {
-                                ref
-                                    .read(loginViewModelProvider.notifier)
-                                    .toggleRememberMe(val);
+                            Text(
+                              'Duy trì đăng nhập',
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pushNamed(AppRoutes.forgotPassword);
+                          },
+                          child: Text(
+                            'Quên mật khẩu?',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.primarySolid,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.p20),
+
+                    // Primary Button (Food Ninja centered pill width 160 or full)
+                    Center(
+                      child: PrimaryButton(
+                        width: 160,
+                        text: 'Đăng nhập',
+                        isLoading: state.isLoading,
+                        onPressed: _handleLogin,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.p24),
+
+                    // "Hoặc tiếp tục với" Divider (from Food Ninja Frame 1.5)
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Divider(color: AppColors.borderLight),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.p16,
+                          ),
+                          child: Text(
+                            'Hoặc tiếp tục với',
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textMuted,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const Expanded(
+                          child: Divider(color: AppColors.borderLight),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.p20),
+
+                    // Social Login Buttons: Facebook & Google (from Food Ninja Frame 1.5)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: SocialLoginButton(
+                            label: 'Google',
+                            icon: const Icon(
+                              Icons.g_mobiledata_rounded,
+                              color: AppColors.brandGoogle,
+                              size: 32,
+                            ),
+                            onPressed: () async {
+                              final user = await ref
+                                  .read(loginViewModelProvider.notifier)
+                                  .signInWithGoogle();
+                              if (!context.mounted) return;
+                              if (user != null) {
+                                _onSignedIn(user);
                               }
                             },
                           ),
-                          Text(
-                            'Keep Me Signed In',
-                            style: AppTextStyles.bodySmall.copyWith(
-                              color: AppColors.textSecondary,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: AppSpacing.p20),
+
+                    // Sign Up Link
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Chưa có tài khoản? ",
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pushNamed(AppRoutes.register);
+                          },
+                          child: Text(
+                            'Đăng ký',
+                            style: AppTextStyles.bodyMedium.copyWith(
+                              color: AppColors.primarySolid,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
-                        ],
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed(AppRoutes.forgotPassword);
-                        },
-                        child: Text(
-                          'Forgot Your Password?',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.primarySolid,
-                            fontWeight: FontWeight.w600,
-                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.p20),
-
-                  // Primary Button (Food Ninja centered pill width 160 or full)
-                  Center(
-                    child: PrimaryButton(
-                      width: 160,
-                      text: 'Login',
-                      isLoading: state.isLoading,
-                      onPressed: _handleLogin,
+                      ],
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.p24),
-
-                  // "Or Continue With" Divider (from Food Ninja Frame 1.5)
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Divider(color: AppColors.borderLight),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.p16,
-                        ),
-                        child: Text(
-                          'Or Continue With',
-                          style: AppTextStyles.bodySmall.copyWith(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      const Expanded(
-                        child: Divider(color: AppColors.borderLight),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.p20),
-
-                  // Social Login Buttons: Facebook & Google (from Food Ninja Frame 1.5)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: SocialLoginButton(
-                          label: 'Google',
-                          icon: const Icon(
-                            Icons.g_mobiledata_rounded,
-                            color: AppColors.brandGoogle,
-                            size: 32,
-                          ),
-                          onPressed: () async {
-                            final user = await ref
-                                .read(loginViewModelProvider.notifier)
-                                .signInWithGoogle();
-                            if (!context.mounted) return;
-                            if (user != null) {
-                              _onSignedIn(user);
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: AppSpacing.p20),
-
-                  // Sign Up Link
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account? ",
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pushNamed(AppRoutes.register);
-                        },
-                        child: Text(
-                          'Sign Up',
-                          style: AppTextStyles.bodyMedium.copyWith(
-                            color: AppColors.primarySolid,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.p32),
-                ],
+                    const SizedBox(height: AppSpacing.p32),
+                  ],
+                ),
               ),
             ),
           ),

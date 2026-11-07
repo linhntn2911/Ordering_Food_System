@@ -40,10 +40,10 @@ class SalesReportScreen extends ConsumerWidget {
                 children: [
                   _TopBar(onRefresh: () => ref.invalidate(salesReportProvider)),
                   const SizedBox(height: AppSpacing.xl),
-                  Text('Sales report', style: AppTextStyles.headlineLarge),
+                  Text('Báo cáo doanh thu', style: AppTextStyles.headlineLarge),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    'Completed COD orders · ${_date(range.start)} – ${_date(range.end.subtract(const Duration(days: 1)))}',
+                    'Đơn COD hoàn thành · ${_date(range.start)} – ${_date(range.end.subtract(const Duration(days: 1)))}',
                     style: AppTextStyles.bodyMedium,
                   ),
                   const SizedBox(height: AppSpacing.lg),
@@ -82,7 +82,7 @@ class SalesReportScreen extends ConsumerWidget {
                                   child: _MetricCard(
                                     icon: Icons.receipt_long_rounded,
                                     value: '${data.completedOrderCount}',
-                                    label: 'Completed orders',
+                                    label: 'Đơn đã hoàn thành',
                                   ),
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
@@ -92,7 +92,7 @@ class SalesReportScreen extends ConsumerWidget {
                                     value: CurrencyFormatter.vnd(
                                       data.averageOrderValue,
                                     ),
-                                    label: 'Average order',
+                                    label: 'Đơn trung bình',
                                   ),
                                 ),
                               ],
@@ -141,7 +141,7 @@ class _TopBar extends StatelessWidget {
     children: [
       if (Navigator.canPop(context)) ...[
         IconButton(
-          tooltip: 'Back',
+          tooltip: 'Quay lại',
           onPressed: () => Navigator.of(context).pop(),
           style: IconButton.styleFrom(
             backgroundColor: AppColors.surfaceMuted,
@@ -157,7 +157,7 @@ class _TopBar extends StatelessWidget {
       Builder(
         builder: (scaffoldContext) => IconButton(
           key: const ValueKey('admin-drawer-button'),
-          tooltip: 'Open navigation menu',
+          tooltip: 'Mở menu điều hướng',
           onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
           style: IconButton.styleFrom(
             foregroundColor: AppColors.primaryEnd,
@@ -176,12 +176,12 @@ class _TopBar extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Ngô Chicken', style: AppTextStyles.titleMedium),
-            Text('Business overview', style: AppTextStyles.bodySmall),
+            Text('Tổng quan kinh doanh', style: AppTextStyles.bodySmall),
           ],
         ),
       ),
       IconButton(
-        tooltip: 'Refresh report',
+        tooltip: 'Làm mới báo cáo',
         onPressed: onRefresh,
         style: IconButton.styleFrom(
           backgroundColor: AppColors.surfaceMuted,
@@ -251,7 +251,7 @@ class _RevenueHero extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Total revenue',
+                      'Tổng doanh thu',
                       style: AppTextStyles.bodySmall.copyWith(
                         color: AppColors.textMuted,
                       ),
@@ -267,7 +267,7 @@ class _RevenueHero extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Cash on delivery · completed',
+                      'Thanh toán khi nhận hàng · đã hoàn thành',
                       style: AppTextStyles.labelSmall.copyWith(
                         color: AppColors.textMuted,
                       ),
@@ -593,7 +593,7 @@ class _TopItemRow extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.titleMedium,
               ),
-              Text('${item.quantity} sold', style: AppTextStyles.bodySmall),
+              Text('Đã bán ${item.quantity}', style: AppTextStyles.bodySmall),
             ],
           ),
         ),
@@ -624,7 +624,7 @@ class _EmptyReport extends StatelessWidget {
           color: AppColors.textMuted,
         ),
         const SizedBox(height: AppSpacing.sm),
-        Text('No completed orders', style: AppTextStyles.titleMedium),
+        Text('Chưa có đơn hoàn thành', style: AppTextStyles.titleMedium),
         Text(
           'Choose another period or check again later.',
           textAlign: TextAlign.center,
@@ -672,7 +672,7 @@ class _ErrorState extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: onRetry,
           icon: const Icon(Icons.refresh_rounded),
-          label: const Text('Try again'),
+          label: const Text('Thử lại'),
         ),
       ],
     ),
@@ -685,13 +685,13 @@ String _date(DateTime value) =>
 String _friendlyError(Object error) {
   final value = error.toString().toLowerCase();
   if (value.contains('permission-denied')) {
-    return 'Admin sign-in is required to view sales.';
+    return 'Cần đăng nhập tài khoản quản trị để xem doanh thu.';
   }
   if (value.contains('index')) {
-    return 'The sales report index is still being prepared.';
+    return 'Dữ liệu báo cáo doanh thu đang được chuẩn bị.';
   }
   if (value.contains('network')) {
-    return 'Check your internet connection and try again.';
+    return 'Hãy kiểm tra kết nối Internet và thử lại.';
   }
-  return 'Sales data could not be loaded. Please try again.';
+  return 'Không thể tải dữ liệu doanh thu. Vui lòng thử lại.';
 }

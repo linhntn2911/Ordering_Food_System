@@ -89,70 +89,32 @@ const toppingsFor = (item) => {
   return [];
 };
 
-// Demo public reviews (menu_items/{id}/reviews). Rating summaries are
-// computed from them so Food Details and the summary always agree.
-const day = 24 * 60 * 60 * 1000;
-const baseTime = Date.UTC(2026, 9, 19, 12);
-const photo = (seed) => `https://picsum.photos/seed/${seed}/600/600`;
-const reviewSeeds = {
-  'ga-ran-ga-sot-cay-ngot-han-quoc': [
-    [5, 'Sốt cay ngọt rất vừa, gà giòn lâu.', [photo('ga1'), photo('ga2')], false, false],
-    [4, 'Ngon nhưng hơi ngọt với mình.', [], true, false],
-    [5, 'Đặt lần thứ ba rồi, vẫn ngon như cũ.', [], false, true],
-    [5, '', [], false, false],
-    [4, 'Phần ăn vừa đủ, giao nhanh.', [photo('ga3')], false, false],
-    [5, 'Gà nóng hổi, sốt sánh, rất đáng tiền. Lần sau sẽ thử thêm vị phô mai cay và gọi thêm khoai tây chiên để ăn kèm cho đủ bữa.', [], false, false],
-    [3, 'Hôm nay gà hơi nguội khi tới nơi.', [], true, false],
-    [5, 'Ngon!', [], false, false],
-    [4, 'Ổn, sẽ quay lại.', [], false, false],
-    [5, 'Sốt Hàn Quốc chuẩn vị.', [photo('ga4'), photo('ga5'), photo('ga6')], false, false],
-    [4, '', [], true, false],
-    [5, 'Bạn bè đều khen.', [], false, false],
-  ],
-  'do-uong-tra-sua-tran-chau-duong-den': [
-    [5, 'Trân châu dẻo, đường đen thơm.', [photo('ts1')], false, false],
-    [4, 'Hơi ngọt, lần sau sẽ ghi chú ít đường.', [], true, false],
-    [5, 'Size L uống đã.', [], false, true],
-  ],
-  'com-com-ga-chien-mam-toi': [
-    [5, 'Mắm tỏi thơm, cơm dẻo.', [], false, false],
-    [4, 'Gà hơi nhỏ nhưng ngon.', [photo('com1')], false, false],
-    [5, '', [], true, false],
-  ],
-};
+// Reviews are intentionally not seeded. Food Details reads the public review
+// subcollection from Firestore, and only reviews submitted by real customers
+// after a completed order may appear there.
 const reviews = [];
-for (const [menuItemId, list] of Object.entries(reviewSeeds)) {
-  list.forEach(([rating, comment, imageUrls, isAnonymous, isEdited], index) => {
-    const createdAt = baseTime - index * day;
-    reviews.push({
-      id: `${menuItemId}-r${String(index + 1).padStart(2, '0')}`,
-      menuItemId, rating, comment, imageUrls, isAnonymous, isEdited,
-      createdAt, updatedAt: isEdited ? createdAt + day / 2 : createdAt,
-    });
-  });
-}
-const reviewSummary = {};
-for (const review of reviews) {
-  const summary = (reviewSummary[review.menuItemId] ??= { total: 0, count: 0 });
-  summary.total += review.rating;
-  summary.count += 1;
-}
-
-for (const id of Object.keys(reviewSeeds)) {
-  if (!items.some((item) => item.id === id)) throw new Error(`Unknown review item ${id}`);
-}
 for (const item of items) {
-  const summary = reviewSummary[item.id];
-  const [ratingAverage, reviewCount] = summary
-    ? [Math.round((summary.total / summary.count) * 10) / 10, summary.count]
-    : [0, 0];
   Object.assign(item, {
     description: `${item.name}. ${categoryBlurb[item.categoryId] ?? ''}`.trim(),
     imageUrl: '', toppings: toppingsFor(item), isPublished: true,
-    isAvailable: !soldOut.has(item.id), ratingAverage, reviewCount,
+    isAvailable: !soldOut.has(item.id), ratingAverage: 0, reviewCount: 0,
   });
 }
 
 const out = path.resolve(process.argv[2]);
-fs.writeFileSync(out, JSON.stringify({ restaurantName: 'Ngô Chicken', categories, items, reviews }, null, 2) + '\n');
+fs.writeFileSync(out, JSON.stringify({
+  restaurantName: 'Ngô Chicken',
+  restaurantAddress: '123 Nguyễn Huệ, phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
+  restaurantLatitude: 10.7769,
+  restaurantLongitude: 106.7009,
+  maxDeliveryDistanceKm: 8,
+  deliveryRules: [
+    { maxDistanceKm: 3, fee: 15000 },
+    { maxDistanceKm: 5, fee: 20000 },
+    { maxDistanceKm: 8, fee: 30000 },
+  ],
+  categories,
+  items,
+  reviews,
+}, null, 2) + '\n');
 console.log(`${categories.length} categories, ${items.length} items, ${reviews.length} reviews -> ${out}`);

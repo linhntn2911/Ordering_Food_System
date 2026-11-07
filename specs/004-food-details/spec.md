@@ -80,7 +80,7 @@ Người dùng đọc các đánh giá gần nhất của món (số sao, nội 
 
 **Lý do ưu tiên**: Đánh giá giúp quyết định mua nhưng màn hình vẫn dùng được khi chưa có đánh giá; việc viết đánh giá thuộc màn hình "Review Purchased Item" của Member 4.
 
-**Kiểm thử độc lập**: Nạp vài đánh giá mẫu cho "Gà sốt cay ngọt Hàn Quốc", mở chi tiết và xác nhận các đánh giá hiển thị theo thứ tự mới nhất trước, có số sao, nội dung, ngày và tên người đánh giá theo quy tắc hiển thị.
+**Kiểm thử độc lập**: Hoàn thành một đơn hàng, gửi đánh giá bằng luồng Customer, mở chi tiết món đã mua và xác nhận đánh giá Firestore thật hiển thị theo thứ tự mới nhất trước, có số sao, nội dung, ngày và tên người đánh giá theo quy tắc hiển thị.
 
 **Kịch bản chấp nhận**:
 
@@ -175,5 +175,5 @@ Từ chi tiết món, người dùng chọn số lượng, nhập ghi chú và t
 - Đánh giá chỉ hiển thị khi món còn xem được; đánh giá của món chưa đăng bán không được hiển thị ở đâu trong tính năng này.
 - Size mặc định là size có giá thấp nhất, cùng quy tắc "giá thấp nhất" dùng cho thẻ món và sắp xếp theo giá ở tính năng 003.
 - Giới hạn số lượng 1–99 và ghi chú 200 ký tự là giá trị mặc định hợp lý cho đến khi đặc tả gốc chốt giới hạn số lượng giỏ hàng (đang là mục cần làm rõ của đặc tả gốc).
-- Dữ liệu mẫu hiện chưa có đánh giá và mô tả món; kiểm thử dùng đánh giá và mô tả mẫu bổ sung.
+- Seed thực đơn không tạo đánh giá giả. Kiểm thử giao diện dùng repository giả trong test; khi chạy ứng dụng, đánh giá chỉ xuất hiện sau khi Customer gửi đánh giá cho đơn đã hoàn thành.
 - Màn hình "Food Details" thuộc Member 2 theo bảng phân công gốc.

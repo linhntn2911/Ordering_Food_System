@@ -73,7 +73,7 @@ class AdminMenuItemCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  tooltip: 'Edit ${item.name}',
+                  tooltip: 'Chỉnh sửa ${item.name}',
                   onPressed: actionsEnabled ? onEdit : null,
                   style: IconButton.styleFrom(
                     backgroundColor: AppColors.primarySoft,
@@ -90,7 +90,7 @@ class AdminMenuItemCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _StatusButton(
-                    label: item.isAvailable ? 'Available' : 'Sold out',
+                    label: item.isAvailable ? 'Còn hàng' : 'Hết hàng',
                     icon: item.isAvailable
                         ? Icons.check_circle_rounded
                         : Icons.cancel_rounded,
@@ -102,7 +102,7 @@ class AdminMenuItemCard extends StatelessWidget {
                 const SizedBox(width: AppSpacing.xs),
                 Expanded(
                   child: _StatusButton(
-                    label: item.isPublished ? 'Published' : 'Hidden',
+                    label: item.isPublished ? 'Đã đăng' : 'Đã ẩn',
                     icon: item.isPublished
                         ? Icons.visibility_rounded
                         : Icons.visibility_off_rounded,

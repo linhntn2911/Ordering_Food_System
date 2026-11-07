@@ -23,7 +23,7 @@ class MenuCategoryModel {
   ) {
     final data = document.data();
     if (data == null) {
-      throw StateError('Category ${document.id} has no data.');
+      throw StateError('Danh mục ${document.id} không có dữ liệu.');
     }
     return MenuCategoryModel.fromMap(document.id, data);
   }

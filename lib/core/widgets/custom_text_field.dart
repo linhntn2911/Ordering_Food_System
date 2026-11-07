@@ -20,6 +20,9 @@ class CustomTextField extends StatefulWidget {
   final bool enabled;
   final int maxLines;
   final FocusNode? focusNode;
+  final Iterable<String>? autofillHints;
+  final bool autocorrect;
+  final bool enableSuggestions;
 
   const CustomTextField({
     super.key,
@@ -38,6 +41,9 @@ class CustomTextField extends StatefulWidget {
     this.enabled = true,
     this.maxLines = 1,
     this.focusNode,
+    this.autofillHints,
+    this.autocorrect = true,
+    this.enableSuggestions = true,
   });
 
   @override
@@ -76,13 +82,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
             controller: widget.controller,
             initialValue: widget.initialValue,
             focusNode: widget.focusNode,
+            autofillHints: widget.autofillHints,
             obscureText: _obscureText,
+            autocorrect: widget.autocorrect,
+            enableSuggestions: widget.enableSuggestions,
             keyboardType: widget.keyboardType,
             textInputAction: widget.textInputAction,
             enabled: widget.enabled,
             maxLines: widget.isPassword ? 1 : widget.maxLines,
             onChanged: widget.onChanged,
             onFieldSubmitted: widget.onSubmitted,
+            onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
             validator: widget.validator,
             style: AppTextStyles.bodyLarge.copyWith(
               color: widget.enabled

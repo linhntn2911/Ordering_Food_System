@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../app/admin_gate.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_shadows.dart';
@@ -46,8 +45,8 @@ class AdminOrderListScreen extends ConsumerWidget {
           SnackBar(
             content: Text(
               arrived.length == 1
-                  ? 'New order ${arrived.first.orderCode} received.'
-                  : '${arrived.length} new orders received.',
+                  ? 'Đã nhận đơn hàng mới ${arrived.first.orderCode}.'
+                  : 'Đã nhận ${arrived.length} đơn hàng mới.',
             ),
             backgroundColor: AppColors.primaryEnd,
           ),
@@ -86,10 +85,10 @@ class AdminOrderListScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xl),
-                      Text('Orders', style: AppTextStyles.headlineLarge),
+                      Text('Đơn hàng', style: AppTextStyles.headlineLarge),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
-                        'Monitor incoming orders and kitchen progress in real time.',
+                        'Theo dõi đơn hàng mới và tiến độ chuẩn bị theo thời gian thực.',
                         style: AppTextStyles.bodyMedium,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -150,7 +149,7 @@ class AdminOrderListScreen extends ConsumerWidget {
                               color: AppColors.primaryEnd,
                             ),
                             label: Text(
-                              'Status: ${filter.status!.label}',
+                              'Trạng thái: ${filter.status!.label}',
                               style: AppTextStyles.labelSmall.copyWith(
                                 color: AppColors.primaryEnd,
                                 fontWeight: FontWeight.w600,
@@ -226,11 +225,10 @@ class AdminOrderListScreen extends ConsumerWidget {
                                       }
                                       Navigator.of(context).push(
                                         MaterialPageRoute<void>(
-                                          builder: (_) => AdminGate(
-                                            child: AdminOrderDetailsScreen(
-                                              initialOrder: order,
-                                            ),
-                                          ),
+                                          builder: (_) =>
+                                              AdminOrderDetailsScreen(
+                                                initialOrder: order,
+                                              ),
                                         ),
                                       );
                                     },
@@ -270,7 +268,7 @@ class _TopBar extends StatelessWidget {
       children: [
         if (Navigator.canPop(context)) ...[
           IconButton(
-            tooltip: 'Back to admin workspace',
+            tooltip: 'Quay lại khu vực quản trị',
             onPressed: onBack,
             style: IconButton.styleFrom(
               backgroundColor: AppColors.surfaceMuted,
@@ -286,7 +284,7 @@ class _TopBar extends StatelessWidget {
         Builder(
           builder: (scaffoldContext) => IconButton(
             key: const ValueKey('admin-drawer-button'),
-            tooltip: 'Open navigation menu',
+            tooltip: 'Mở menu điều hướng',
             onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
             style: IconButton.styleFrom(
               foregroundColor: AppColors.primaryEnd,
@@ -305,12 +303,15 @@ class _TopBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Ngô Chicken', style: AppTextStyles.titleMedium),
-              Text('Live order queue', style: AppTextStyles.bodySmall),
+              Text(
+                'Hàng đợi đơn hàng trực tiếp',
+                style: AppTextStyles.bodySmall,
+              ),
             ],
           ),
         ),
         IconButton(
-          tooltip: 'Open sales report',
+          tooltip: 'Mở báo cáo doanh thu',
           onPressed: onReport,
           style: IconButton.styleFrom(
             foregroundColor: AppColors.primaryEnd,
@@ -324,7 +325,7 @@ class _TopBar extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.xs),
         IconButton(
-          tooltip: 'Refresh orders',
+          tooltip: 'Làm mới đơn hàng',
           onPressed: onRefresh,
           style: IconButton.styleFrom(
             backgroundColor: AppColors.surfaceMuted,
@@ -368,11 +369,11 @@ class _OrderSummary extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: _Metric(value: '$pending', label: 'New orders'),
+            child: _Metric(value: '$pending', label: 'Đơn hàng mới'),
           ),
           const SizedBox(height: 36, child: VerticalDivider()),
           Expanded(
-            child: _Metric(value: '$active', label: 'In progress'),
+            child: _Metric(value: '$active', label: 'Đang xử lý'),
           ),
           Container(
             width: 40,
@@ -431,7 +432,7 @@ class _SearchField extends StatelessWidget {
         key: const ValueKey('admin-order-search'),
         onChanged: onChanged,
         decoration: const InputDecoration(
-          hintText: 'Search order, customer, or phone',
+          hintText: 'Tìm mã đơn, khách hàng hoặc số điện thoại',
           prefixIcon: Icon(Icons.search_rounded, color: AppColors.primaryEnd),
         ),
       ),
@@ -477,7 +478,7 @@ class _StatusFilterMenu extends StatelessWidget {
           ),
           child: PopupMenuButton<OrderStatus?>(
             key: const ValueKey('order-status-filters'),
-            tooltip: 'Filter by status',
+            tooltip: 'Lọc theo trạng thái',
             enabled: onSelected != null,
             initialValue: selected,
             onSelected: onSelected,
@@ -505,7 +506,7 @@ class _StatusFilterMenu extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        'All (${count(null)})',
+                        'Tất cả (${count(null)})',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontWeight: selected == null
@@ -609,10 +610,10 @@ class _EmptyState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          Text('No orders yet', style: AppTextStyles.titleLarge),
+          Text('Chưa có đơn hàng', style: AppTextStyles.titleLarge),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'New customer orders will appear here automatically.',
+            'Đơn hàng mới của khách sẽ tự động xuất hiện tại đây.',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMedium,
           ),
@@ -640,9 +641,9 @@ class _NoResultsState extends StatelessWidget {
             size: 52,
           ),
           const SizedBox(height: AppSpacing.md),
-          Text('No matching orders', style: AppTextStyles.titleMedium),
+          Text('Không có đơn hàng phù hợp', style: AppTextStyles.titleMedium),
           const SizedBox(height: AppSpacing.xs),
-          TextButton(onPressed: onClear, child: const Text('Clear filters')),
+          TextButton(onPressed: onClear, child: const Text('Xóa bộ lọc')),
         ],
       ),
     );
@@ -673,7 +674,7 @@ class _ErrorState extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onRetry,
             icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Try again'),
+            label: const Text('Thử lại'),
           ),
         ],
       ),
@@ -684,10 +685,10 @@ class _ErrorState extends StatelessWidget {
 String _friendlyError(Object error) {
   final value = error.toString().toLowerCase();
   if (value.contains('permission-denied')) {
-    return 'Admin sign-in is required to view the order queue.';
+    return 'Cần đăng nhập tài khoản quản trị để xem hàng đợi đơn.';
   }
   if (value.contains('network')) {
-    return 'Check your internet connection and try again.';
+    return 'Hãy kiểm tra kết nối Internet và thử lại.';
   }
-  return 'Orders could not be loaded. Please try again.';
+  return 'Không thể tải đơn hàng. Vui lòng thử lại.';
 }

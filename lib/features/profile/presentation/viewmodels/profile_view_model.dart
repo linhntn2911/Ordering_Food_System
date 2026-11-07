@@ -71,7 +71,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Failed to load user profile.',
+        errorMessage: 'Không thể tải thông tin tài khoản.',
       );
     }
   }
@@ -85,7 +85,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
     if (currentUser == null) {
       state = state.copyWith(
         isUpdating: false,
-        errorMessage: 'No active user session found.',
+        errorMessage: 'Không tìm thấy phiên đăng nhập đang hoạt động.',
       );
       return false;
     }
@@ -93,7 +93,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
     if (fullName.trim().isEmpty) {
       state = state.copyWith(
         isUpdating: false,
-        errorMessage: 'Full name cannot be empty.',
+        errorMessage: 'Họ và tên không được để trống.',
       );
       return false;
     }
@@ -103,7 +103,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
       if (!phoneRegex.hasMatch(phone.trim())) {
         state = state.copyWith(
           isUpdating: false,
-          errorMessage: 'Please enter a valid 10-digit phone number.',
+          errorMessage: 'Vui lòng nhập số điện thoại hợp lệ gồm 10 chữ số.',
         );
         return false;
       }
@@ -134,7 +134,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
       state = state.copyWith(
         isUpdating: false,
         user: updatedUser,
-        successMessage: 'Profile updated successfully!',
+        successMessage: 'Đã cập nhật hồ sơ thành công!',
       );
       return true;
     } on AppException catch (e) {
@@ -143,7 +143,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
     } catch (_) {
       state = state.copyWith(
         isUpdating: false,
-        errorMessage: 'Failed to update profile. Please try again.',
+        errorMessage: 'Không thể cập nhật thông tin. Vui lòng thử lại.',
       );
       return false;
     }
@@ -157,7 +157,7 @@ class ProfileViewModel extends Notifier<ProfileState> {
     if (currentUser == null) {
       state = state.copyWith(
         isUpdating: false,
-        errorMessage: 'No active user session found.',
+        errorMessage: 'Không tìm thấy phiên đăng nhập đang hoạt động.',
       );
       return false;
     }
@@ -220,13 +220,13 @@ class ProfileViewModel extends Notifier<ProfileState> {
       state = state.copyWith(
         isUpdating: false,
         user: updatedUser,
-        successMessage: 'Profile picture updated successfully!',
+        successMessage: 'Đã cập nhật ảnh đại diện thành công!',
       );
       return true;
     } catch (e) {
       state = state.copyWith(
         isUpdating: false,
-        errorMessage: 'Failed to update profile picture. Please try again.',
+        errorMessage: 'Không thể cập nhật ảnh đại diện. Vui lòng thử lại.',
       );
       return false;
     }

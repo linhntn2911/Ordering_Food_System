@@ -21,11 +21,11 @@ class CategoryModel {
   ) {
     final data = document.data();
     if (data == null) {
-      throw StateError('Category ${document.id} has no data.');
+      throw StateError('Danh mục ${document.id} không có dữ liệu.');
     }
     final name = data['name'];
     if (name is! String || name.trim().isEmpty) {
-      throw FormatException('Category ${document.id} has an invalid name.');
+      throw FormatException('Tên danh mục ${document.id} không hợp lệ.');
     }
     return CategoryModel(
       id: document.id,

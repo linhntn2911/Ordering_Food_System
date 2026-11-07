@@ -86,7 +86,7 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
 
                 // Frame 1.14 Headline
                 Text(
-                  'Reset your password\nhere',
+                  'Đặt lại mật khẩu\ntại đây',
                   style: AppTextStyles.headlineLarge.copyWith(
                     fontSize: 26,
                     height: 1.3,
@@ -94,7 +94,7 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                 ),
                 const SizedBox(height: AppSpacing.p12),
                 Text(
-                  'Select a strong password of at least 6 characters for ${widget.args.email}',
+                  'Chọn mật khẩu mạnh có ít nhất 6 ký tự cho ${widget.args.email}',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.5,
@@ -139,10 +139,10 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      // New Password Field
+                      // Mật khẩu mới Field
                       CustomTextField(
                         controller: _newPasswordController,
-                        hintText: 'New Password',
+                        hintText: 'Mật khẩu mới',
                         isPassword: true,
                         textInputAction: TextInputAction.next,
                         prefixIcon: const Icon(
@@ -156,10 +156,10 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                       ),
                       const SizedBox(height: AppSpacing.p20),
 
-                      // Confirm Password Field
+                      // Xác nhận mật khẩu Field
                       CustomTextField(
                         controller: _confirmPasswordController,
-                        hintText: 'Confirm Password',
+                        hintText: 'Xác nhận mật khẩu',
                         isPassword: true,
                         textInputAction: TextInputAction.done,
                         onSubmitted: (_) => _handleSubmit(),
@@ -185,7 +185,7 @@ class _ResetPasswordViewState extends ConsumerState<ResetPasswordView> {
                 Center(
                   child: PrimaryButton(
                     width: 160,
-                    text: 'Next',
+                    text: 'Tiếp theo',
                     isLoading: state.isLoading,
                     onPressed: _handleSubmit,
                   ),

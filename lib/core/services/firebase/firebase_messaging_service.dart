@@ -28,8 +28,12 @@ class FirebaseMessagingService {
   Future<String?> getToken() => _messaging.getToken();
 }
 
-final firebaseMessagingProvider = Provider<FirebaseMessaging>((ref) => FirebaseMessaging.instance);
-final firebaseMessagingServiceProvider = Provider<FirebaseMessagingService>((ref) {
+final firebaseMessagingProvider = Provider<FirebaseMessaging>(
+  (ref) => FirebaseMessaging.instance,
+);
+final firebaseMessagingServiceProvider = Provider<FirebaseMessagingService>((
+  ref,
+) {
   final messaging = ref.watch(firebaseMessagingProvider);
   final prefsService = ref.watch(sharedPreferencesServiceProvider);
   return FirebaseMessagingService(messaging, prefsService);

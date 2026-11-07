@@ -9,4 +9,3 @@ extension AppNavigationContextExtension on BuildContext {
     Navigator.of(this).pop<T>(result);
   }
 }
-

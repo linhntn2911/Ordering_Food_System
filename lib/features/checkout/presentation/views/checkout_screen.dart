@@ -182,120 +182,136 @@ class CheckoutScreen extends ConsumerWidget {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogCtx) => AlertDialog(
-        shape: const RoundedRectangleBorder(
-          borderRadius: AppRadii.radiusDialog,
-        ),
-        content: Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.s8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Success green circle
-              Container(
-                width: 72,
-                height: 72,
-                decoration: const BoxDecoration(
-                  color: AppColors.primarySoft,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_circle_rounded,
-                  color: AppColors.primarySolid,
-                  size: 48,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.s16),
-              const Text(
-                'Đặt hàng thành công!',
-                style: AppTextStyles.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.s8),
-              Text(
-                'Mã đơn hàng: ${order.orderCode}',
-                style: AppTextStyles.labelLarge.copyWith(
-                  color: AppColors.primaryEnd,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.s12),
-              Text(
-                'Đơn hàng của bạn đang ở trạng thái "${order.status.displayName}". Quán sẽ sớm chuẩn bị và giao món ăn đến bạn.',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.s8),
-              Text(
-                'Tổng tiền: ${CurrencyFormatter.formatVND(order.total)} (COD)',
-                style: AppTextStyles.titleMedium.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.s24),
-              GestureDetector(
-                onTap: () => _finishCheckout(
-                  context: context,
-                  dialogContext: dialogCtx,
-                  ref: ref,
-                  action: CheckoutSuccessAction.viewOrders,
-                ),
-                child: Container(
-                  height: 48,
-                  decoration: const BoxDecoration(
-                    gradient: AppGradients.primary,
-                    borderRadius: AppRadii.radiusMedium,
-                  ),
-                  alignment: Alignment.center,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.receipt_long_rounded,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: AppSpacing.s8),
-                      Text(
-                        'Xem lịch sử đơn hàng',
-                        style: AppTextStyles.labelLarge.copyWith(
-                          color: Colors.white,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.s12),
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: OutlinedButton.icon(
-                  onPressed: () => _finishCheckout(
-                    context: context,
-                    dialogContext: dialogCtx,
-                    ref: ref,
-                    action: CheckoutSuccessAction.stayInCart,
-                  ),
-                  icon: const Icon(Icons.shopping_cart_outlined, size: 20),
-                  label: const Text('Quay lại giỏ hàng'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primaryEnd,
-                    side: const BorderSide(color: AppColors.primaryEnd),
-                    textStyle: AppTextStyles.labelLarge.copyWith(fontSize: 16),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: AppRadii.radiusMedium,
+      builder: (dialogCtx) {
+        final screenSize = MediaQuery.sizeOf(dialogCtx);
+
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.s20,
+            vertical: AppSpacing.s24,
+          ),
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadii.radiusDialog,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: 480,
+              maxHeight: screenSize.height - (AppSpacing.s24 * 2),
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.s24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Success green circle
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primarySoft,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.check_circle_rounded,
+                      color: AppColors.primarySolid,
+                      size: 48,
                     ),
                   ),
-                ),
+                  const SizedBox(height: AppSpacing.s16),
+                  const Text(
+                    'Đặt hàng thành công!',
+                    style: AppTextStyles.headlineMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.s8),
+                  Text(
+                    'Mã đơn hàng: ${order.orderCode}',
+                    style: AppTextStyles.labelLarge.copyWith(
+                      color: AppColors.primaryEnd,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.s12),
+                  Text(
+                    'Đơn hàng của bạn đang ở trạng thái "${order.status.displayName}". Quán sẽ sớm chuẩn bị và giao món ăn đến bạn.',
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.s8),
+                  Text(
+                    'Tổng tiền: ${CurrencyFormatter.formatVND(order.total)} (COD)',
+                    style: AppTextStyles.titleMedium.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.s24),
+                  GestureDetector(
+                    onTap: () => _finishCheckout(
+                      context: context,
+                      dialogContext: dialogCtx,
+                      ref: ref,
+                      action: CheckoutSuccessAction.viewOrders,
+                    ),
+                    child: Container(
+                      height: 48,
+                      decoration: const BoxDecoration(
+                        gradient: AppGradients.primary,
+                        borderRadius: AppRadii.radiusMedium,
+                      ),
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.receipt_long_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: AppSpacing.s8),
+                          Text(
+                            'Xem lịch sử đơn hàng',
+                            style: AppTextStyles.labelLarge.copyWith(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.s12),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _finishCheckout(
+                        context: context,
+                        dialogContext: dialogCtx,
+                        ref: ref,
+                        action: CheckoutSuccessAction.stayInCart,
+                      ),
+                      icon: const Icon(Icons.shopping_cart_outlined, size: 20),
+                      label: const Text('Quay lại giỏ hàng'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primaryEnd,
+                        side: const BorderSide(color: AppColors.primaryEnd),
+                        textStyle: AppTextStyles.labelLarge.copyWith(
+                          fontSize: 16,
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: AppRadii.radiusMedium,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -323,9 +339,13 @@ class CheckoutScreen extends ConsumerWidget {
       onBackPressed!();
       return;
     }
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop(action);
-    }
+
+    // Checkout can be opened either from the Cart tab in MainShell or from a
+    // standalone Cart route (for example, via the cart icon on Food Details).
+    // Merely popping Checkout would reveal that standalone Cart route even
+    // though the selected shell tab is Orders. Return to the root MainShell so
+    // the tab selected above is the screen the customer actually sees.
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 }
 

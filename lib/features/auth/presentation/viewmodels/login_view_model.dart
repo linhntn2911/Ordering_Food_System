@@ -49,21 +49,21 @@ class LoginViewModel extends Notifier<LoginState> {
 
   String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Please enter your email.';
+      return 'Vui lòng nhập email.';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value.trim())) {
-      return 'Please enter a valid email address.';
+      return 'Vui lòng nhập địa chỉ email hợp lệ.';
     }
     return null;
   }
 
   String? validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Please enter your password.';
+      return 'Vui lòng nhập mật khẩu.';
     }
     if (value.length < 6) {
-      return 'Password must be at least 6 characters.';
+      return 'Mật khẩu phải có ít nhất 6 ký tự.';
     }
     return null;
   }
@@ -114,7 +114,7 @@ class LoginViewModel extends Notifier<LoginState> {
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'An unexpected error occurred.',
+        errorMessage: 'Đã xảy ra lỗi không mong muốn.',
       );
       return null;
     }
@@ -136,7 +136,7 @@ class LoginViewModel extends Notifier<LoginState> {
     } catch (_) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Google sign-in failed.',
+        errorMessage: 'Đăng nhập Google không thành công.',
       );
       return null;
     }

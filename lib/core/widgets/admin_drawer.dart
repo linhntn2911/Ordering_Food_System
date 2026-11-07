@@ -113,7 +113,7 @@ class AdminDrawer extends StatelessWidget {
                             const SizedBox(width: AppSpacing.xs),
                             Flexible(
                               child: Text(
-                                'Admin Workspace',
+                                'Khu vực quản trị',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: AppTextStyles.labelSmall.copyWith(
@@ -127,7 +127,7 @@ class AdminDrawer extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    tooltip: 'Close menu',
+                    tooltip: 'Đóng menu',
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(
                       Icons.close_rounded,
@@ -148,8 +148,8 @@ class AdminDrawer extends StatelessWidget {
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-dashboard'),
                     icon: Icons.dashboard_rounded,
-                    title: 'Dashboard',
-                    subtitle: 'Overview & metrics',
+                    title: 'Bảng điều khiển',
+                    subtitle: 'Tổng quan và chỉ số',
                     isSelected:
                         currentDestination == AdminDestination.dashboard,
                     onTap: () => _navigate(context, AdminDestination.dashboard),
@@ -174,8 +174,8 @@ class AdminDrawer extends StatelessWidget {
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-categories'),
                     icon: Icons.category_rounded,
-                    title: 'Categories',
-                    subtitle: 'Organize menu sections',
+                    title: 'Danh mục',
+                    subtitle: 'Quản lý các danh mục thực đơn',
                     isSelected:
                         currentDestination == AdminDestination.categories,
                     onTap: () =>
@@ -185,8 +185,8 @@ class AdminDrawer extends StatelessWidget {
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-menu-items'),
                     icon: Icons.restaurant_menu_rounded,
-                    title: 'Menu Items',
-                    subtitle: 'Dishes, prices & availability',
+                    title: 'Món ăn',
+                    subtitle: 'Món ăn, giá và trạng thái bán',
                     isSelected:
                         currentDestination == AdminDestination.menuItems,
                     onTap: () => _navigate(context, AdminDestination.menuItems),
@@ -209,8 +209,8 @@ class AdminDrawer extends StatelessWidget {
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-orders'),
                     icon: Icons.receipt_long_rounded,
-                    title: 'Live Orders',
-                    subtitle: 'Queue & kitchen progress',
+                    title: 'Đơn hàng trực tiếp',
+                    subtitle: 'Hàng đợi đơn và tiến độ bếp',
                     isSelected: currentDestination == AdminDestination.orders,
                     onTap: () => _navigate(context, AdminDestination.orders),
                   ),
@@ -218,8 +218,8 @@ class AdminDrawer extends StatelessWidget {
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-sales-report'),
                     icon: Icons.bar_chart_rounded,
-                    title: 'Sales Report',
-                    subtitle: 'Revenue, orders & top sellers',
+                    title: 'Báo cáo doanh thu',
+                    subtitle: 'Doanh thu, đơn hàng và món bán chạy',
                     isSelected:
                         currentDestination == AdminDestination.salesReport,
                     onTap: () =>
@@ -229,8 +229,8 @@ class AdminDrawer extends StatelessWidget {
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-broadcasts'),
                     icon: Icons.campaign_rounded,
-                    title: 'Broadcasts',
-                    subtitle: 'Promo & system notices',
+                    title: 'Gửi thông báo',
+                    subtitle: 'Khuyến mãi và thông báo hệ thống',
                     isSelected:
                         currentDestination == AdminDestination.broadcasts,
                     onTap: () =>
@@ -254,8 +254,8 @@ class AdminDrawer extends StatelessWidget {
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-profile'),
                     icon: Icons.person_outline_rounded,
-                    title: 'Profile',
-                    subtitle: 'View admin profile',
+                    title: 'Hồ sơ',
+                    subtitle: 'Xem hồ sơ quản trị viên',
                     isSelected: false,
                     onTap: () {
                       Navigator.of(context).pop();
@@ -266,8 +266,8 @@ class AdminDrawer extends StatelessWidget {
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-logout'),
                     icon: Icons.logout_rounded,
-                    title: 'Sign Out',
-                    subtitle: 'Exit admin workspace',
+                    title: 'Đăng xuất',
+                    subtitle: 'Rời khu vực quản trị',
                     isSelected: false,
                     onTap: () async {
                       Navigator.of(context).pop();

@@ -15,7 +15,7 @@ class FirestoreProfileRepository implements ProfileRepository {
     try {
       final doc = await _firestore.doc(FirestorePaths.user(uid)).get();
       if (!doc.exists) {
-        throw const NotFoundException('User profile not found.');
+        throw const NotFoundException('Không tìm thấy thông tin tài khoản.');
       }
       return UserModel.fromFirestore(doc).toEntity();
     } on AppException {
@@ -49,7 +49,7 @@ class FirestoreProfileRepository implements ProfileRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ValidationException('Failed to update profile: ${e.toString()}');
+      throw ValidationException('Không thể cập nhật thông tin: ${e.toString()}');
     }
   }
 }

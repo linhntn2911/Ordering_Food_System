@@ -176,7 +176,7 @@ class FirebaseAuthRepository implements AuthRepository {
           await _firebaseAuth.signOut();
           _cachedUser = null;
           throw const AuthException(
-            'Your account has been disabled. Please contact support.',
+            'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.',
             code: 'user-disabled',
           );
         }
@@ -213,7 +213,7 @@ class FirebaseAuthRepository implements AuthRepository {
         final remaining =
             _lockoutUntil!.difference(DateTime.now()).inMinutes + 1;
         throw AuthException(
-          'Account is temporarily locked. Please try again in $remaining minute(s).',
+          'Tài khoản đang tạm khóa. Vui lòng thử lại sau $remaining phút.',
           code: 'too-many-requests',
         );
       } else {
@@ -262,7 +262,7 @@ class FirebaseAuthRepository implements AuthRepository {
         await _firebaseAuth.signOut();
         _cachedUser = null;
         throw const AuthException(
-          'Your account has been disabled. Please contact support.',
+          'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.',
           code: 'user-disabled',
         );
       }
@@ -288,7 +288,7 @@ class FirebaseAuthRepository implements AuthRepository {
                   .toEntity();
               if (userModel.isDisabled) {
                 throw const AuthException(
-                  'Your account has been disabled. Please contact support.',
+                  'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.',
                   code: 'user-disabled',
                 );
               }
@@ -332,7 +332,7 @@ class FirebaseAuthRepository implements AuthRepository {
                   .toEntity();
               if (userModel.isDisabled) {
                 throw const AuthException(
-                  'Your account has been disabled. Please contact support.',
+                  'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ hỗ trợ.',
                   code: 'user-disabled',
                 );
               }
@@ -351,7 +351,7 @@ class FirebaseAuthRepository implements AuthRepository {
       if (_failedAttempts >= 5) {
         _lockoutUntil = DateTime.now().add(const Duration(minutes: 15));
         throw const AuthException(
-          'Too many failed attempts. Account locked for 15 minutes.',
+          'Bạn đã thử quá nhiều lần. Tài khoản tạm khóa trong 15 phút.',
           code: 'too-many-requests',
         );
       }
@@ -389,7 +389,7 @@ class FirebaseAuthRepository implements AuthRepository {
       final firebaseUser = credential.user;
       if (firebaseUser == null) {
         throw const AuthException(
-          'Registration failed: user creation returned empty.',
+          'Đăng ký không thành công: không tạo được tài khoản.',
           code: 'null-user',
         );
       }
@@ -471,7 +471,7 @@ class FirebaseAuthRepository implements AuthRepository {
       rethrow;
     } catch (e) {
       throw AuthException(
-        'Registration failed: $e',
+        'Đăng ký không thành công: $e',
         code: 'registration-failed',
       );
     }

@@ -5,9 +5,18 @@
   "restaurantLongitude": 106.7009,
   "maxDeliveryDistanceKm": 8,
   "deliveryRules": [
-    { "maxDistanceKm": 3, "fee": 15000 },
-    { "maxDistanceKm": 5, "fee": 20000 },
-    { "maxDistanceKm": 8, "fee": 30000 }
+    {
+      "maxDistanceKm": 3,
+      "fee": 15000
+    },
+    {
+      "maxDistanceKm": 5,
+      "fee": 20000
+    },
+    {
+      "maxDistanceKm": 8,
+      "fee": 30000
+    }
   ],
   "categories": [
     {
@@ -111,8 +120,8 @@
       "toppings": [],
       "isPublished": true,
       "isAvailable": true,
-      "ratingAverage": 4.5,
-      "reviewCount": 12
+      "ratingAverage": 0,
+      "reviewCount": 0
     },
     {
       "id": "ga-ran-canh-ga-nuong",
@@ -141,8 +150,8 @@
       "toppings": [],
       "isPublished": true,
       "isAvailable": true,
-      "ratingAverage": 4.7,
-      "reviewCount": 3
+      "ratingAverage": 0,
+      "reviewCount": 0
     },
     {
       "id": "com-com-rang-ga-chien-mam-toi",
@@ -482,8 +491,8 @@
       ],
       "isPublished": true,
       "isAvailable": true,
-      "ratingAverage": 4.7,
-      "reviewCount": 3
+      "ratingAverage": 0,
+      "reviewCount": 0
     },
     {
       "id": "do-uong-sua-chua-lac-dau",
@@ -590,217 +599,5 @@
       "reviewCount": 0
     }
   ],
-  "reviews": [
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r01",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 5,
-      "comment": "Sốt cay ngọt rất vừa, gà giòn lâu.",
-      "imageUrls": [
-        "https://picsum.photos/seed/ga1/600/600",
-        "https://picsum.photos/seed/ga2/600/600"
-      ],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1792411200000,
-      "updatedAt": 1792411200000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r02",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 4,
-      "comment": "Ngon nhưng hơi ngọt với mình.",
-      "imageUrls": [],
-      "isAnonymous": true,
-      "isEdited": false,
-      "createdAt": 1792324800000,
-      "updatedAt": 1792324800000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r03",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 5,
-      "comment": "Đặt lần thứ ba rồi, vẫn ngon như cũ.",
-      "imageUrls": [],
-      "isAnonymous": false,
-      "isEdited": true,
-      "createdAt": 1792238400000,
-      "updatedAt": 1792281600000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r04",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 5,
-      "comment": "",
-      "imageUrls": [],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1792152000000,
-      "updatedAt": 1792152000000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r05",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 4,
-      "comment": "Phần ăn vừa đủ, giao nhanh.",
-      "imageUrls": [
-        "https://picsum.photos/seed/ga3/600/600"
-      ],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1792065600000,
-      "updatedAt": 1792065600000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r06",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 5,
-      "comment": "Gà nóng hổi, sốt sánh, rất đáng tiền. Lần sau sẽ thử thêm vị phô mai cay và gọi thêm khoai tây chiên để ăn kèm cho đủ bữa.",
-      "imageUrls": [],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1791979200000,
-      "updatedAt": 1791979200000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r07",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 3,
-      "comment": "Hôm nay gà hơi nguội khi tới nơi.",
-      "imageUrls": [],
-      "isAnonymous": true,
-      "isEdited": false,
-      "createdAt": 1791892800000,
-      "updatedAt": 1791892800000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r08",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 5,
-      "comment": "Ngon!",
-      "imageUrls": [],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1791806400000,
-      "updatedAt": 1791806400000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r09",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 4,
-      "comment": "Ổn, sẽ quay lại.",
-      "imageUrls": [],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1791720000000,
-      "updatedAt": 1791720000000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r10",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 5,
-      "comment": "Sốt Hàn Quốc chuẩn vị.",
-      "imageUrls": [
-        "https://picsum.photos/seed/ga4/600/600",
-        "https://picsum.photos/seed/ga5/600/600",
-        "https://picsum.photos/seed/ga6/600/600"
-      ],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1791633600000,
-      "updatedAt": 1791633600000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r11",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 4,
-      "comment": "",
-      "imageUrls": [],
-      "isAnonymous": true,
-      "isEdited": false,
-      "createdAt": 1791547200000,
-      "updatedAt": 1791547200000
-    },
-    {
-      "id": "ga-ran-ga-sot-cay-ngot-han-quoc-r12",
-      "menuItemId": "ga-ran-ga-sot-cay-ngot-han-quoc",
-      "rating": 5,
-      "comment": "Bạn bè đều khen.",
-      "imageUrls": [],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1791460800000,
-      "updatedAt": 1791460800000
-    },
-    {
-      "id": "do-uong-tra-sua-tran-chau-duong-den-r01",
-      "menuItemId": "do-uong-tra-sua-tran-chau-duong-den",
-      "rating": 5,
-      "comment": "Trân châu dẻo, đường đen thơm.",
-      "imageUrls": [
-        "https://picsum.photos/seed/ts1/600/600"
-      ],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1792411200000,
-      "updatedAt": 1792411200000
-    },
-    {
-      "id": "do-uong-tra-sua-tran-chau-duong-den-r02",
-      "menuItemId": "do-uong-tra-sua-tran-chau-duong-den",
-      "rating": 4,
-      "comment": "Hơi ngọt, lần sau sẽ ghi chú ít đường.",
-      "imageUrls": [],
-      "isAnonymous": true,
-      "isEdited": false,
-      "createdAt": 1792324800000,
-      "updatedAt": 1792324800000
-    },
-    {
-      "id": "do-uong-tra-sua-tran-chau-duong-den-r03",
-      "menuItemId": "do-uong-tra-sua-tran-chau-duong-den",
-      "rating": 5,
-      "comment": "Size L uống đã.",
-      "imageUrls": [],
-      "isAnonymous": false,
-      "isEdited": true,
-      "createdAt": 1792238400000,
-      "updatedAt": 1792281600000
-    },
-    {
-      "id": "com-com-ga-chien-mam-toi-r01",
-      "menuItemId": "com-com-ga-chien-mam-toi",
-      "rating": 5,
-      "comment": "Mắm tỏi thơm, cơm dẻo.",
-      "imageUrls": [],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1792411200000,
-      "updatedAt": 1792411200000
-    },
-    {
-      "id": "com-com-ga-chien-mam-toi-r02",
-      "menuItemId": "com-com-ga-chien-mam-toi",
-      "rating": 4,
-      "comment": "Gà hơi nhỏ nhưng ngon.",
-      "imageUrls": [
-        "https://picsum.photos/seed/com1/600/600"
-      ],
-      "isAnonymous": false,
-      "isEdited": false,
-      "createdAt": 1792324800000,
-      "updatedAt": 1792324800000
-    },
-    {
-      "id": "com-com-ga-chien-mam-toi-r03",
-      "menuItemId": "com-com-ga-chien-mam-toi",
-      "rating": 5,
-      "comment": "",
-      "imageUrls": [],
-      "isAnonymous": true,
-      "isEdited": false,
-      "createdAt": 1792238400000,
-      "updatedAt": 1792238400000
-    }
-  ]
+  "reviews": []
 }

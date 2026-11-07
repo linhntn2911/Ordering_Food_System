@@ -156,7 +156,8 @@ class CartScreen extends ConsumerWidget {
                                 if (onBrowseMenu != null) {
                                   onBrowseMenu!();
                                 }
-                                Navigator.of(context).popUntil((route) => route.isFirst);
+                                Navigator.of(context)
+                                    .popUntil((route) => route.isFirst);
                               },
                             ),
                           );
@@ -228,9 +229,7 @@ class CartScreen extends ConsumerWidget {
           const Spacer(),
           Text(
             '(${state.itemCount} món trong giỏ)',
-            style: AppTextStyles.bodySmall.copyWith(
-              color: AppColors.textMuted,
-            ),
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textMuted),
           ),
         ],
       ),
@@ -284,11 +283,11 @@ class CartScreen extends ConsumerWidget {
         boxShadow: const [AppShadows.cardShadow],
         border: item.isAvailable
             ? (item.isSelected
-                ? Border.all(
-                    color: AppColors.primarySolid.withValues(alpha: 0.5),
-                    width: 1.2,
-                  )
-                : Border.all(color: AppColors.surfaceMuted, width: 1))
+                  ? Border.all(
+                      color: AppColors.primarySolid.withValues(alpha: 0.5),
+                      width: 1.2,
+                    )
+                  : Border.all(color: AppColors.surfaceMuted, width: 1))
             : Border.all(color: AppColors.error, width: 1.2),
       ),
       child: Row(

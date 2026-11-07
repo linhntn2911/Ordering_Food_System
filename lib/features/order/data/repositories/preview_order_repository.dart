@@ -43,10 +43,10 @@ class PreviewOrderRepository implements OrderRepository {
   }) async {
     final order = _find(orderId);
     if (order.status != expectedStatus) {
-      throw StateError('The order was updated. Refresh and try again.');
+      throw StateError('Đơn hàng đã được cập nhật. Vui lòng làm mới và thử lại.');
     }
     if (!expectedStatus.canTransitionTo(targetStatus)) {
-      throw ArgumentError('This order status transition is not allowed.');
+      throw ArgumentError('Không thể chuyển đơn hàng sang trạng thái này.');
     }
     final normalizedReason = reason.trim();
     if (targetStatus == OrderStatus.rejected && normalizedReason.isEmpty) {
@@ -153,10 +153,10 @@ List<FoodOrder> _seedOrders() {
       deliveryFee: deliveryFee,
       deliveryDistanceKm: 2.4,
       customerNote: id == 'order-1'
-          ? 'Please make the chicken mildly spicy.'
+          ? 'Vui lòng làm gà cay vừa phải.'
           : '',
       rejectionReason: status == OrderStatus.rejected
-          ? 'Item was sold out.'
+          ? 'Món ăn đã hết hàng.'
           : '',
       paymentMethod: 'cod',
       paymentStatus: status == OrderStatus.completed ? 'paid' : 'unpaid',
@@ -300,7 +300,7 @@ Map<String, List<OrderStatusEvent>> _seedEvents() {
             ? 'customer-$id'
             : 'preview-admin',
         actorRole: status == OrderStatus.pending ? 'customer' : 'admin',
-        reason: status == OrderStatus.rejected ? 'Item was sold out.' : '',
+        reason: status == OrderStatus.rejected ? 'Món ăn đã hết hàng.' : '',
         createdAt: now.subtract(const Duration(minutes: 20)),
       ),
     ]),

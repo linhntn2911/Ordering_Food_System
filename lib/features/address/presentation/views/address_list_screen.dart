@@ -396,7 +396,7 @@ class _AddressCard extends StatelessWidget {
                     ],
                   )
                 else
-                  // Quick Actions Menu
+                  // Thao tác nhanh Menu
                   Row(
                     children: [
                       IconButton(

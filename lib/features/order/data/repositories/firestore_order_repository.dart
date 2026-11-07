@@ -28,7 +28,7 @@ class FirestoreOrderRepository implements OrderRepository {
         .withConverter<FoodOrderModel>(
           fromFirestore: FoodOrderModel.fromFirestore,
           toFirestore: (_, _) =>
-              throw UnsupportedError('Orders are read-only.'),
+              throw UnsupportedError('Đơn hàng chỉ được phép xem.'),
         )
         .orderBy('createdAt', descending: true)
         .limit(limit)
@@ -48,12 +48,12 @@ class FirestoreOrderRepository implements OrderRepository {
         .withConverter<FoodOrderModel>(
           fromFirestore: FoodOrderModel.fromFirestore,
           toFirestore: (_, _) =>
-              throw UnsupportedError('Orders are read-only.'),
+              throw UnsupportedError('Đơn hàng chỉ được phép xem.'),
         )
         .snapshots()
         .map((snapshot) {
           final data = snapshot.data();
-          if (data == null) throw StateError('Order $orderId was not found.');
+          if (data == null) throw StateError('Không tìm thấy đơn hàng $orderId.');
           return data.toEntity();
         });
   }
@@ -65,7 +65,7 @@ class FirestoreOrderRepository implements OrderRepository {
         .withConverter<OrderItemModel>(
           fromFirestore: OrderItemModel.fromFirestore,
           toFirestore: (_, _) =>
-              throw UnsupportedError('Order items are immutable.'),
+              throw UnsupportedError('Món đã đặt are immutable.'),
         )
         .snapshots()
         .map(
@@ -101,14 +101,14 @@ class FirestoreOrderRepository implements OrderRepository {
     String reason = '',
   }) async {
     if (!expectedStatus.canTransitionTo(targetStatus)) {
-      throw ArgumentError('This order status transition is not allowed.');
+      throw ArgumentError('Không thể chuyển đơn hàng sang trạng thái này.');
     }
     final normalizedReason = reason.trim();
     if (targetStatus == OrderStatus.rejected && normalizedReason.isEmpty) {
-      throw ArgumentError('A rejection reason is required.');
+      throw ArgumentError('Vui lòng nhập lý do từ chối đơn hàng.');
     }
     final actorId = _auth.currentUser?.uid;
-    if (actorId == null) throw StateError('Admin sign-in is required.');
+    if (actorId == null) throw StateError('Cần đăng nhập quản trị viên.');
 
     final orderRef = _firestore.collection(FirestorePaths.orders).doc(orderId);
     final eventRef = _firestore
@@ -117,16 +117,16 @@ class FirestoreOrderRepository implements OrderRepository {
     await _firestore.runTransaction((transaction) async {
       final snapshot = await transaction.get(orderRef);
       final data = snapshot.data();
-      if (data == null) throw StateError('Order $orderId was not found.');
+      if (data == null) throw StateError('Không tìm thấy đơn hàng $orderId.');
       final current = OrderStatus.parse(data['orderStatus']);
       if (current != expectedStatus) {
         throw StateError(
-          'The order was updated by another admin. Refresh and try again.',
+          'Đơn hàng đã được quản trị viên khác cập nhật. Vui lòng làm mới và thử lại.',
         );
       }
       final customerId = data['customerId']?.toString() ?? '';
       if (customerId.isEmpty) {
-        throw StateError('The order has no customer owner.');
+        throw StateError('Đơn hàng chưa có thông tin khách hàng.');
       }
       final notificationRef = _firestore
           .collection(FirestorePaths.notifications(customerId))
@@ -150,7 +150,7 @@ class FirestoreOrderRepository implements OrderRepository {
       });
       transaction.set(notificationRef, {
         'type': 'order_status',
-        'title': 'Order ${targetStatus.label}',
+        'title': 'Đơn hàng ${targetStatus.label}',
         'body': _notificationBody(targetStatus, normalizedReason),
         'orderId': orderId,
         'isRead': false,
@@ -224,9 +224,9 @@ class FirestoreOrderRepository implements OrderRepository {
 
   String _notificationBody(OrderStatus status, String reason) {
     if (status == OrderStatus.rejected) {
-      return 'Your order was rejected. Reason: $reason';
+      return 'Đơn hàng của bạn đã bị từ chối. Lý do: $reason';
     }
-    return 'Your order is now ${status.label.toLowerCase()}.';
+    return 'Đơn hàng của bạn hiện đang ${status.label.toLowerCase()}.';
   }
 }
 

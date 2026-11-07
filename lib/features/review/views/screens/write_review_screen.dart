@@ -21,7 +21,9 @@ class WriteReviewScreen extends ConsumerWidget {
     final requiresComment = form.rating <= 2;
     final missingRequiredComment =
         requiresComment && form.comment.trim().isEmpty;
-    final alreadyReviewed = ref.watch(reviewedOrderIdsProvider).contains(orderId);
+    final alreadyReviewed = ref
+        .watch(reviewedOrderIdsProvider)
+        .contains(orderId);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -59,10 +61,15 @@ class WriteReviewScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: AppSpacing.xl),
                           GradientButton(
-                            label: alreadyReviewed ? 'Đã đánh giá' : 'Gửi đánh giá',
+                            label: alreadyReviewed
+                                ? 'Đã đánh giá'
+                                : 'Gửi đánh giá',
                             icon: Icons.send_rounded,
                             isLoading: form.submitting,
-                            onPressed: form.submitting || missingRequiredComment || alreadyReviewed
+                            onPressed:
+                                form.submitting ||
+                                    missingRequiredComment ||
+                                    alreadyReviewed
                                 ? null
                                 : () => _submit(context, notifier),
                           ),

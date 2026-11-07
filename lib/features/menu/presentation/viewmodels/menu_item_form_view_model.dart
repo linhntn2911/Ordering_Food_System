@@ -30,15 +30,15 @@ class MenuItemFormViewModel extends AsyncNotifier<String?> {
 
   static String? validateName(String? value) {
     final name = value?.trim() ?? '';
-    if (name.isEmpty) return 'Enter the item name.';
-    if (name.length < 2) return 'Name must contain at least 2 characters.';
-    if (name.length > 80) return 'Name cannot exceed 80 characters.';
+    if (name.isEmpty) return 'Vui lòng nhập tên món.';
+    if (name.length < 2) return 'Tên món phải có ít nhất 2 ký tự.';
+    if (name.length > 80) return 'Tên món không được vượt quá 80 ký tự.';
     return null;
   }
 
   static String? validateDescription(String? value) {
     if ((value?.trim().length ?? 0) > 300) {
-      return 'Description cannot exceed 300 characters.';
+      return 'Mô tả không được vượt quá 300 ký tự.';
     }
     return null;
   }
@@ -46,17 +46,17 @@ class MenuItemFormViewModel extends AsyncNotifier<String?> {
   static String? validatePrice(String? value) {
     final normalized = (value ?? '').replaceAll(RegExp(r'[^0-9]'), '');
     final price = int.tryParse(normalized);
-    if (price == null || price <= 0) return 'Enter a price greater than 0.';
-    if (price > 10000000) return 'Price cannot exceed 10,000,000 VND.';
+    if (price == null || price <= 0) return 'Vui lòng nhập giá lớn hơn 0.';
+    if (price > 10000000) return 'Giá không được vượt quá 10.000.000 ₫.';
     return null;
   }
 
   static String? validateSurcharge(String? value) {
     final normalized = (value ?? '').replaceAll(RegExp(r'[^0-9]'), '');
     final price = int.tryParse(normalized);
-    if (price == null) return 'Enter the L-size surcharge.';
+    if (price == null) return 'Vui lòng nhập phụ thu cỡ L.';
     if (price < 0 || price > 1000000) {
-      return 'Surcharge must be from 0 to 1,000,000 VND.';
+      return 'Phụ thu phải từ 0 đến 1.000.000 ₫.';
     }
     return null;
   }
@@ -64,16 +64,16 @@ class MenuItemFormViewModel extends AsyncNotifier<String?> {
   static String? validateDraft(MenuItemDraft draft) {
     final nameError = validateName(draft.name);
     if (nameError != null) return nameError;
-    if (draft.categoryId.trim().isEmpty) return 'Select a category.';
-    if (draft.basePrice <= 0) return 'Enter a price greater than 0.';
+    if (draft.categoryId.trim().isEmpty) return 'Vui lòng chọn danh mục.';
+    if (draft.basePrice <= 0) return 'Vui lòng nhập giá lớn hơn 0.';
     if (draft.description.length > 300) {
-      return 'Description cannot exceed 300 characters.';
+      return 'Mô tả không được vượt quá 300 ký tự.';
     }
     if (draft.existingImageUrl.isEmpty && draft.imageBytes == null) {
-      return 'Select an item image.';
+      return 'Vui lòng chọn ảnh món ăn.';
     }
     if (draft.sizes.any((size) => size.priceDelta < 0)) {
-      return 'Size surcharge cannot be negative.';
+      return 'Phụ thu kích cỡ không được là số âm.';
     }
     return null;
   }

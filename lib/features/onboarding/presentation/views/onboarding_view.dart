@@ -20,23 +20,22 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
 
   final List<Map<String, dynamic>> _pages = const [
     {
-      'title': 'Find your Comfort\nFood here',
-      'description':
-          'Here You Can find a chef or dish for every taste and color. Enjoy!',
+      'title': 'Tìm món ăn\nyêu thích',
+      'description': 'Khám phá những món ăn phù hợp với sở thích của bạn.',
       'icon': Icons.fastfood_rounded,
       'accentColor': AppColors.primarySoft,
       'iconColor': AppColors.primarySolid,
     },
     {
       'title': 'Ngô Chicken –\nMón ngon mỗi ngày',
-      'description': 'Enjoy a fast and smooth food delivery directly to your doorstep with Cash on Delivery.',
+      'description': 'Giao món nhanh chóng, tiện lợi đến tận nơi với hình thức thanh toán khi nhận hàng.',
       'icon': Icons.delivery_dining_rounded,
       'accentColor': AppColors.warningSurface,
       'iconColor': AppColors.foodAccentDark,
     },
     {
-      'title': 'Track & Receive\nYour Meals Easily',
-      'description': 'Stay notified at each step from preparation to arrival. Order now and satisfy your cravings!',
+      'title': 'Theo dõi và nhận\nmón thật dễ dàng',
+      'description': 'Luôn cập nhật hành trình đơn hàng từ lúc chuẩn bị đến khi giao tới bạn.',
       'icon': Icons.notifications_active_rounded,
       'accentColor': AppColors.successSoft,
       'iconColor': AppColors.success,
@@ -72,13 +71,13 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
               children: [
                 const SizedBox(height: AppSpacing.p8),
 
-                // Top bar: Skip button in Food Ninja green
+                // Top bar: Bỏ qua button in Food Ninja green
                 Align(
                   alignment: Alignment.topRight,
                   child: TextButton(
                     onPressed: _handleFinish,
                     child: Text(
-                      'Skip',
+                      'Bỏ qua',
                       style: AppTextStyles.titleMedium.copyWith(
                         color: AppColors.primarySolid,
                         fontSize: 14,
@@ -179,11 +178,11 @@ class _OnboardingViewState extends ConsumerState<OnboardingView> {
                 ),
                 const SizedBox(height: AppSpacing.p32),
 
-                // Food Ninja CTA Next Button (157px minimum width, centered)
+                // Food Ninja CTA Tiếp theo Button (157px minimum width, centered)
                 Center(
                   child: PrimaryButton(
                     width: 160,
-                    text: isLastPage ? 'Get Started' : 'Next',
+                    text: isLastPage ? 'Bắt đầu' : 'Tiếp theo',
                     onPressed: () {
                       if (isLastPage) {
                         _handleFinish();

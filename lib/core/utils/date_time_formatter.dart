@@ -6,8 +6,8 @@ abstract final class DateTimeFormatter {
     final currentDate = DateTime(current.year, current.month, current.day);
     final difference = currentDate.difference(valueDate).inDays;
     final time = '${_two(local.hour)}:${_two(local.minute)}';
-    if (difference == 0) return 'Today, $time';
-    if (difference == 1) return 'Yesterday, $time';
+    if (difference == 0) return 'Hôm nay, $time';
+    if (difference == 1) return 'Hôm qua, $time';
     return '${_two(local.day)}/${_two(local.month)}/${local.year}, $time';
   }
 

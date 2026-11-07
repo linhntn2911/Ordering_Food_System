@@ -12,7 +12,11 @@ import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:ordering_food_system/features/order_history/data/models/order_model.dart';
 
 class OrderHistoryCard extends StatelessWidget {
-  const OrderHistoryCard({super.key, required this.order, this.isReviewed = false});
+  const OrderHistoryCard({
+    super.key,
+    required this.order,
+    this.isReviewed = false,
+  });
   final bool isReviewed;
 
   final OrderModel order;
