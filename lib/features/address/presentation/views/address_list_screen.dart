@@ -9,7 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/address_model.dart';
-import '../controllers/address_controller.dart';
+import '../viewmodels/address_controller.dart';
 import 'add_edit_address_screen.dart';
 
 /// AddressListScreen (Màn hình Danh sách Địa chỉ Giao hàng - Member 3)

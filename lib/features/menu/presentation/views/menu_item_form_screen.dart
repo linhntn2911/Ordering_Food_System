@@ -240,7 +240,8 @@ class _MenuItemFormScreenState extends ConsumerState<MenuItemFormScreen> {
                             const SizedBox(height: AppSpacing.sm),
                             _SettingCard(
                               title: _isAvailable ? 'Còn hàng' : 'Hết hàng',
-                              subtitle: 'Khách có thể đặt món này khi còn hàng.',
+                              subtitle:
+                                  'Khách có thể đặt món này khi còn hàng.',
                               value: _isAvailable,
                               enabled: !saveState.isLoading,
                               onChanged: (value) =>
@@ -512,7 +513,8 @@ class _CategoryDropdown extends StatelessWidget {
           )
           .toList(growable: false),
       onChanged: enabled ? onChanged : null,
-      validator: (selected) => selected == null ? 'Vui lòng chọn danh mục.' : null,
+      validator: (selected) =>
+          selected == null ? 'Vui lòng chọn danh mục.' : null,
       decoration: const InputDecoration(
         labelText: 'Danh mục *',
         prefixIcon: Icon(Icons.category_outlined),

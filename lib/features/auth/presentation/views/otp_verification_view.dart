@@ -165,9 +165,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
     if (otp != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Mã xác thực mới đã được gửi đến ${widget.args.email}',
-          ),
+          content: Text('Mã xác thực mới đã được gửi đến ${widget.args.email}'),
           backgroundColor: AppColors.success,
         ),
       );
@@ -214,7 +212,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                       height: 1.5,
                     ),
                     children: [
-                      const TextSpan(text: 'Code has been sent to '),
+                      const TextSpan(text: 'Mã xác thực đã được gửi đến '),
                       TextSpan(
                         text: widget.args.email,
                         style: const TextStyle(
@@ -222,9 +220,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const TextSpan(
-                        text: '.\nMã sẽ hết hạn trong 5 phút.',
-                      ),
+                      const TextSpan(text: '.\nMã sẽ hết hạn trong 5 phút.'),
                     ],
                   ),
                 ),
@@ -316,7 +312,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                 Center(
                   child: state.resendCountdown > 0
                       ? Text(
-                          'Resend Code in ${state.resendCountdown}s',
+                          'Gửi lại mã sau ${state.resendCountdown} giây',
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: AppColors.textMuted,
                           ),
@@ -324,7 +320,7 @@ class _OtpVerificationViewState extends ConsumerState<OtpVerificationView> {
                       : TextButton(
                           onPressed: state.isLoading ? null : _handleResend,
                           child: Text(
-                            'Resend Code',
+                            'Gửi lại mã',
                             style: AppTextStyles.titleMedium.copyWith(
                               color: AppColors.primarySolid,
                               fontWeight: FontWeight.w700,

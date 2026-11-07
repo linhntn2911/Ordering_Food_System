@@ -43,14 +43,16 @@ class PreviewOrderRepository implements OrderRepository {
   }) async {
     final order = _find(orderId);
     if (order.status != expectedStatus) {
-      throw StateError('Đơn hàng đã được cập nhật. Vui lòng làm mới và thử lại.');
+      throw StateError(
+        'Đơn hàng đã được cập nhật. Vui lòng làm mới và thử lại.',
+      );
     }
     if (!expectedStatus.canTransitionTo(targetStatus)) {
       throw ArgumentError('Không thể chuyển đơn hàng sang trạng thái này.');
     }
     final normalizedReason = reason.trim();
     if (targetStatus == OrderStatus.rejected && normalizedReason.isEmpty) {
-      throw ArgumentError('A rejection reason is required.');
+      throw ArgumentError('Vui lòng nhập lý do từ chối đơn hàng.');
     }
     final now = DateTime.now();
     final index = _orders.indexWhere((candidate) => candidate.id == orderId);
@@ -116,7 +118,7 @@ class PreviewOrderRepository implements OrderRepository {
 
   FoodOrder _find(String orderId) => _orders.firstWhere(
     (order) => order.id == orderId,
-    orElse: () => throw StateError('Order $orderId was not found.'),
+    orElse: () => throw StateError('Không tìm thấy đơn hàng $orderId.'),
   );
 
   Stream<T> _watch<T>(T Function() read) async* {
@@ -152,9 +154,7 @@ List<FoodOrder> _seedOrders() {
       subtotal: total - deliveryFee,
       deliveryFee: deliveryFee,
       deliveryDistanceKm: 2.4,
-      customerNote: id == 'order-1'
-          ? 'Vui lòng làm gà cay vừa phải.'
-          : '',
+      customerNote: id == 'order-1' ? 'Vui lòng làm gà cay vừa phải.' : '',
       rejectionReason: status == OrderStatus.rejected
           ? 'Món ăn đã hết hàng.'
           : '',
@@ -256,8 +256,8 @@ Map<String, List<OrderItem>> _seedItems() {
       id: '$suffix-1',
       menuItemId: 'fried-chicken',
       name: 'Gà sốt phô mai cay',
-      selectedSize: 'Regular',
-      selectedToppings: const ['Extra cheese'],
+      selectedSize: 'Cỡ thường',
+      selectedToppings: const ['Thêm phô mai'],
       quantity: 2,
       unitPrice: 35000,
       lineTotal: 70000,
@@ -266,11 +266,11 @@ Map<String, List<OrderItem>> _seedItems() {
       id: '$suffix-2',
       menuItemId: 'lemon-tea',
       name: 'Trà chanh',
-      selectedSize: 'Large',
+      selectedSize: 'Cỡ lớn',
       quantity: 1,
       unitPrice: 15000,
       lineTotal: 15000,
-      note: 'Less ice',
+      note: 'Ít đá',
     ),
   ];
   return {

@@ -1,13 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ordering_food_system/features/address/data/address_repository.dart';
+import 'package:ordering_food_system/features/address/data/repositories/address_repository.dart';
 import 'package:ordering_food_system/features/address/data/models/address_model.dart';
-import 'package:ordering_food_system/features/address/presentation/controllers/address_controller.dart';
+import 'package:ordering_food_system/features/address/presentation/viewmodels/address_controller.dart';
 import 'package:ordering_food_system/features/cart/data/models/cart_item_model.dart';
-import 'package:ordering_food_system/features/cart/presentation/controllers/cart_controller.dart';
-import 'package:ordering_food_system/features/checkout/data/checkout_repository.dart';
+import 'package:ordering_food_system/features/cart/presentation/viewmodels/cart_controller.dart';
+import 'package:ordering_food_system/features/checkout/data/repositories/checkout_repository.dart';
 import 'package:ordering_food_system/features/checkout/data/models/order_model.dart';
-import 'package:ordering_food_system/features/checkout/presentation/controllers/checkout_controller.dart';
+import 'package:ordering_food_system/features/checkout/presentation/viewmodels/checkout_controller.dart';
 
 void main() {
   group('OrderModel & FR-050 Order Code Generation', () {

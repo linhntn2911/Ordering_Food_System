@@ -15,7 +15,7 @@ import '../features/order_chat/presentation/widgets/chat_unread_dot.dart';
 import '../features/order_history/presentation/views/order_history_view.dart';
 import '../features/profile/presentation/views/profile_view.dart';
 import 'router.dart';
-import 'main_shell_controller.dart';
+import 'main_shell_view_model.dart';
 
 /// Customer app shell with the bottom tabs Home, Cart, Orders and Profile.
 ///

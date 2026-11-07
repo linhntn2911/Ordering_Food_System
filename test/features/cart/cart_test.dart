@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ordering_food_system/core/errors/failures.dart';
 import 'package:ordering_food_system/features/cart/data/models/cart_item_model.dart';
-import 'package:ordering_food_system/features/cart/presentation/controllers/cart_controller.dart';
+import 'package:ordering_food_system/features/cart/presentation/viewmodels/cart_controller.dart';
 
 void main() {
   group('CartItemModel Business Rules', () {

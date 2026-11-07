@@ -168,7 +168,7 @@ class _PublicationChip extends StatelessWidget {
               Flexible(
                 child: Text(
                   compact
-                      ? (isPublished ? 'On' : 'Off')
+                      ? (isPublished ? 'Bật' : 'Tắt')
                       : (isPublished ? 'Đã đăng' : 'Đã ẩn'),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

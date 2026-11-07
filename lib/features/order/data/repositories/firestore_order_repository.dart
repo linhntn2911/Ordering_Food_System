@@ -53,7 +53,9 @@ class FirestoreOrderRepository implements OrderRepository {
         .snapshots()
         .map((snapshot) {
           final data = snapshot.data();
-          if (data == null) throw StateError('Không tìm thấy đơn hàng $orderId.');
+          if (data == null) {
+            throw StateError('Không tìm thấy đơn hàng $orderId.');
+          }
           return data.toEntity();
         });
   }
@@ -65,7 +67,7 @@ class FirestoreOrderRepository implements OrderRepository {
         .withConverter<OrderItemModel>(
           fromFirestore: OrderItemModel.fromFirestore,
           toFirestore: (_, _) =>
-              throw UnsupportedError('Món đã đặt are immutable.'),
+              throw UnsupportedError('Không thể chỉnh sửa món đã đặt.'),
         )
         .snapshots()
         .map(
@@ -82,7 +84,7 @@ class FirestoreOrderRepository implements OrderRepository {
         .withConverter<OrderStatusEventModel>(
           fromFirestore: OrderStatusEventModel.fromFirestore,
           toFirestore: (_, _) =>
-              throw UnsupportedError('Events are append-only.'),
+              throw UnsupportedError('Chỉ có thể thêm mới lịch sử trạng thái.'),
         )
         .orderBy('createdAt')
         .snapshots()

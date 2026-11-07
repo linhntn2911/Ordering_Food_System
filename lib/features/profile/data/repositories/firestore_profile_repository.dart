@@ -49,7 +49,9 @@ class FirestoreProfileRepository implements ProfileRepository {
     } on AppException {
       rethrow;
     } catch (e) {
-      throw ValidationException('Không thể cập nhật thông tin: ${e.toString()}');
+      throw ValidationException(
+        'Không thể cập nhật thông tin: ${e.toString()}',
+      );
     }
   }
 }

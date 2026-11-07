@@ -14,7 +14,7 @@ import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/address_model.dart';
 import '../../domain/entities/resolved_location.dart';
-import '../controllers/address_controller.dart';
+import '../viewmodels/address_controller.dart';
 import '../viewmodels/location_selection_view_model.dart';
 
 /// AddEditAddressScreen (Màn hình Thêm hoặc Sửa Địa chỉ - Member 3)

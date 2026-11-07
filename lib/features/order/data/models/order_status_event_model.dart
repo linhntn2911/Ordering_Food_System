@@ -14,7 +14,7 @@ class OrderStatusEventModel {
   ) {
     final data = document.data();
     if (data == null) {
-      throw StateError('Status event ${document.id} has no data.');
+      throw StateError('Lịch sử trạng thái ${document.id} không có dữ liệu.');
     }
     final from = data['fromStatus'];
     final createdAt = data['createdAt'];

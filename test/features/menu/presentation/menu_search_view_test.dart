@@ -8,7 +8,7 @@ import 'package:ordering_food_system/core/widgets/offline_banner.dart';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_failure.dart';
 import 'package:ordering_food_system/features/menu/domain/entities/menu_option.dart';
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/menu_providers.dart';
-import 'package:ordering_food_system/features/reviews/presentation/review_providers.dart';
+import 'package:ordering_food_system/features/reviews/presentation/viewmodels/review_providers.dart';
 import 'package:ordering_food_system/features/menu/presentation/views/menu_item_detail_view.dart';
 import 'package:ordering_food_system/features/menu/presentation/views/menu_search_view.dart';
 import 'package:ordering_food_system/features/menu/presentation/widgets/search_filter_sheet.dart';

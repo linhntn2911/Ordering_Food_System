@@ -43,7 +43,7 @@ class FirebaseAuthRepository implements AuthRepository {
       final firebaseUser = result.user;
       if (firebaseUser == null) {
         throw const AuthException(
-          'Google sign-in failed.',
+          'Đăng nhập bằng Google không thành công.',
           code: 'google-sign-in-failed',
         );
       }
@@ -95,12 +95,12 @@ class FirebaseAuthRepository implements AuthRepository {
       final msg = e.toString().toLowerCase();
       if (msg.contains('cancel') || msg.contains('abort')) {
         throw const AuthException(
-          'Google sign-in was canceled.',
+          'Đã hủy đăng nhập bằng Google.',
           code: 'canceled',
         );
       }
       throw AuthException(
-        'Google sign-in failed: $e',
+        'Đăng nhập bằng Google không thành công: $e',
         code: 'google-sign-in-failed',
       );
     }
@@ -231,7 +231,7 @@ class FirebaseAuthRepository implements AuthRepository {
       final firebaseUser = credential.user;
       if (firebaseUser == null) {
         throw const AuthException(
-          'Sign in failed: user not found.',
+          'Đăng nhập không thành công: không tìm thấy người dùng.',
           code: 'user-not-found',
         );
       }
@@ -304,7 +304,7 @@ class FirebaseAuthRepository implements AuthRepository {
           _lockoutUntil = null;
           final fallbackUser = AppUser(
             id: email.trim().toLowerCase(),
-            fullName: 'Customer',
+            fullName: 'Khách hàng',
             email: email.trim().toLowerCase(),
             phone: '',
             role: 'customer',
@@ -360,7 +360,7 @@ class FirebaseAuthRepository implements AuthRepository {
       rethrow;
     } catch (e) {
       throw AuthException(
-        'An unexpected error occurred during sign in.',
+        'Đã xảy ra lỗi không mong muốn khi đăng nhập.',
         code: 'unknown',
       );
     }
@@ -509,7 +509,7 @@ class FirebaseAuthRepository implements AuthRepository {
           .get();
       if (identDoc.exists) {
         throw const AuthException(
-          'An account already exists with this email address.',
+          'Đã có tài khoản sử dụng địa chỉ email này.',
           code: 'email-already-in-use',
         );
       }
@@ -525,7 +525,7 @@ class FirebaseAuthRepository implements AuthRepository {
           .get();
       if (credEmailDoc.exists) {
         throw const AuthException(
-          'An account already exists with this email address.',
+          'Đã có tài khoản sử dụng địa chỉ email này.',
           code: 'email-already-in-use',
         );
       }
@@ -571,13 +571,13 @@ class FirebaseAuthRepository implements AuthRepository {
         );
         await _firebaseAuth.signOut();
         throw const AuthException(
-          'An account already exists with this email address.',
+          'Đã có tài khoản sử dụng địa chỉ email này.',
           code: 'email-already-in-use',
         );
       } on FirebaseAuthException catch (e) {
         if (e.code == 'wrong-password' || e.code == 'user-disabled') {
           throw const AuthException(
-            'An account already exists with this email address.',
+            'Đã có tài khoản sử dụng địa chỉ email này.',
             code: 'email-already-in-use',
           );
         }
@@ -597,7 +597,7 @@ class FirebaseAuthRepository implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         throw const AuthException(
-          'An account already exists with this email address.',
+          'Đã có tài khoản sử dụng địa chỉ email này.',
           code: 'email-already-in-use',
         );
       }

@@ -12,8 +12,8 @@ import 'package:ordering_food_system/features/order_chat/presentation/views/orde
 import 'package:ordering_food_system/features/order_chat/presentation/widgets/chat_unread_dot.dart';
 import 'package:ordering_food_system/features/order_history/data/models/order_model.dart';
 import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
-import 'package:ordering_food_system/features/order_tracking/views/screens/order_detail_screen.dart';
-import 'package:ordering_food_system/features/review/providers/review_provider.dart';
+import 'package:ordering_food_system/features/order_tracking/presentation/views/order_detail_screen.dart';
+import 'package:ordering_food_system/features/review/presentation/viewmodels/review_provider.dart';
 
 import '../../../support/fake_order_chat_repository.dart';
 import '../../../support/order_chat_order_fixture.dart';

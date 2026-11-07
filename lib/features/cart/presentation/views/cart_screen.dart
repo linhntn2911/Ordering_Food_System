@@ -10,7 +10,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../data/models/cart_item_model.dart';
-import '../controllers/cart_controller.dart';
+import '../viewmodels/cart_controller.dart';
 
 /// CartScreen (Màn hình Giỏ hàng - Phụ trách bởi Member 3 - Hồng Anh)
 /// Toàn bộ giao diện được viết gọn gàng và khép kín trong duy nhất file này.

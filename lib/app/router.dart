@@ -14,9 +14,9 @@ import '../features/cart/presentation/views/cart_screen.dart';
 import '../features/category/presentation/views/category_management_screen.dart';
 import '../features/checkout/presentation/views/checkout_screen.dart';
 import '../features/menu/presentation/views/admin_menu_item_list_screen.dart';
-import '../features/notifications/views/screens/admin_broadcast_screen.dart';
-import '../features/notifications/views/screens/notification_detail_screen.dart';
-import '../features/notifications/views/screens/notification_list_screen.dart';
+import '../features/notifications/presentation/views/admin_broadcast_screen.dart';
+import '../features/notifications/presentation/views/notification_detail_screen.dart';
+import '../features/notifications/presentation/views/notification_list_screen.dart';
 import '../features/onboarding/presentation/views/onboarding_view.dart';
 import '../features/order/presentation/views/admin_dashboard_screen.dart';
 import '../features/order/presentation/views/admin_order_list_screen.dart';
@@ -24,11 +24,11 @@ import '../features/order/presentation/views/sales_report_screen.dart';
 import '../features/order_chat/domain/entities/chat_role.dart';
 import '../features/order_chat/presentation/views/order_chat_screen.dart';
 import '../features/order_history/presentation/views/order_history_view.dart';
-import '../features/order_tracking/views/screens/order_detail_screen.dart';
-import '../features/order_tracking/views/screens/order_tracking_timeline_screen.dart';
+import '../features/order_tracking/presentation/views/order_detail_screen.dart';
+import '../features/order_tracking/presentation/views/order_tracking_timeline_screen.dart';
 import '../features/profile/presentation/views/profile_view.dart';
-import '../features/review/views/screens/my_reviews_screen.dart';
-import '../features/review/views/screens/write_review_screen.dart';
+import '../features/review/presentation/views/my_reviews_screen.dart';
+import '../features/review/presentation/views/write_review_screen.dart';
 import 'admin_gate.dart';
 import 'main_shell.dart';
 
@@ -224,7 +224,9 @@ abstract final class AppRoutes {
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            body: Center(child: Text('Không tìm thấy đường dẫn: ${settings.name}')),
+            body: Center(
+              child: Text('Không tìm thấy đường dẫn: ${settings.name}'),
+            ),
           ),
         );
     }

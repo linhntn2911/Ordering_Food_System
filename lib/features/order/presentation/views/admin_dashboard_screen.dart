@@ -19,7 +19,7 @@ import '../widgets/admin_order_card.dart';
 import 'admin_order_details_screen.dart';
 import 'admin_order_list_screen.dart';
 import 'sales_report_screen.dart';
-import '../../../notifications/views/screens/admin_broadcast_screen.dart';
+import '../../../notifications/presentation/views/admin_broadcast_screen.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});

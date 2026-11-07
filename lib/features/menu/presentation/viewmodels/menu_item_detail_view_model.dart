@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ordering_food_system/features/cart/data/models/cart_item_model.dart';
-import 'package:ordering_food_system/features/cart/presentation/controllers/cart_controller.dart';
+import 'package:ordering_food_system/features/cart/presentation/viewmodels/cart_controller.dart';
 
 import '../../../reviews/domain/entities/review.dart';
-import '../../../reviews/presentation/review_providers.dart';
+import '../../../reviews/presentation/viewmodels/review_providers.dart';
 import '../../domain/entities/item_selection.dart';
 import '../../domain/entities/menu_failure.dart';
 import '../../domain/entities/menu_feed.dart';
@@ -91,7 +91,7 @@ class MenuItemDetailViewModel extends Notifier<MenuItemDetailState> {
         .where((size) => size.id == selection.sizeId)
         .firstOrNull;
     final size = selectedSize == null
-        ? const CartOptionItem(id: 'default', name: 'Standard')
+        ? const CartOptionItem(id: 'default', name: 'Tiêu chuẩn')
         : CartOptionItem(
             id: selectedSize.id,
             name: selectedSize.name,

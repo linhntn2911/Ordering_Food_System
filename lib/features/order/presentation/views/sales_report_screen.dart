@@ -102,12 +102,12 @@ class SalesReportScreen extends ConsumerWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    'Top-selling items',
+                                    'Món bán chạy',
                                     style: AppTextStyles.titleLarge,
                                   ),
                                 ),
                                 Text(
-                                  '${data.topItems.length} items',
+                                  '${data.topItems.length} món',
                                   style: AppTextStyles.bodySmall,
                                 ),
                               ],
@@ -294,7 +294,7 @@ class _RevenueHero extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'Trending up',
+                      'Đang tăng',
                       style: AppTextStyles.labelSmall.copyWith(
                         color: AppColors.primaryEnd,
                         fontWeight: FontWeight.bold,
@@ -626,7 +626,7 @@ class _EmptyReport extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         Text('Chưa có đơn hoàn thành', style: AppTextStyles.titleMedium),
         Text(
-          'Choose another period or check again later.',
+          'Hãy chọn khoảng thời gian khác hoặc kiểm tra lại sau.',
           textAlign: TextAlign.center,
           style: AppTextStyles.bodySmall,
         ),

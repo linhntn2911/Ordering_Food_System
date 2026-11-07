@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../core/firebase/firebase_providers.dart';
 import '../core/theme/app_colors.dart';
 import '../features/auth/presentation/viewmodels/auth_providers.dart';
 import 'router.dart';
@@ -21,13 +20,8 @@ class AdminGate extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authStateProvider);
     final user = authState.value;
-    final firebaseUser = ref.watch(firebaseAuthProvider).currentUser;
 
-    if (firebaseUser != null &&
-        user != null &&
-        user.id == firebaseUser.uid &&
-        user.isAdmin &&
-        user.isActive) {
+    if (user != null && user.isAdmin && user.isActive) {
       return child;
     }
     if (authState.isLoading) {

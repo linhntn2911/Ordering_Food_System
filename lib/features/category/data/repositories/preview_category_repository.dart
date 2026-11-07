@@ -176,7 +176,7 @@ class PreviewCategoryRepository implements CategoryRepository {
   int _indexOf(String id) {
     final index = _categories.indexWhere((category) => category.id == id);
     if (index == -1) {
-      throw StateError('Preview category $id was not found.');
+      throw StateError('Không tìm thấy danh mục xem trước $id.');
     }
     return index;
   }

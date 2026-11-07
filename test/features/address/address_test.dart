@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ordering_food_system/core/errors/failures.dart';
-import 'package:ordering_food_system/features/address/data/address_repository.dart';
+import 'package:ordering_food_system/features/address/data/repositories/address_repository.dart';
 import 'package:ordering_food_system/features/address/data/models/address_model.dart';
-import 'package:ordering_food_system/features/address/presentation/controllers/address_controller.dart';
+import 'package:ordering_food_system/features/address/presentation/viewmodels/address_controller.dart';
 
 void main() {
   group('AddressModel Unit Tests', () {

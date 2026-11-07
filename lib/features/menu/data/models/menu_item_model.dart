@@ -115,7 +115,7 @@ class MenuItemModel {
     if (value is String && value.trim().isNotEmpty) {
       return value;
     }
-    throw FormatException('Missing or invalid $field.');
+    throw FormatException('Trường $field bị thiếu hoặc không hợp lệ.');
   }
 
   static int _requiredInt(Map<String, dynamic> data, String field) {
@@ -123,7 +123,7 @@ class MenuItemModel {
     if (value is num) {
       return value.toInt();
     }
-    throw FormatException('Missing or invalid $field.');
+    throw FormatException('Trường $field bị thiếu hoặc không hợp lệ.');
   }
 
   /// Reads `{ id, name, priceDelta }` maps, skipping malformed entries.

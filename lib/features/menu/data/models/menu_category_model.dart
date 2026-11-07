@@ -33,7 +33,7 @@ class MenuCategoryModel {
   factory MenuCategoryModel.fromMap(String id, Map<String, dynamic> data) {
     final name = data['name'];
     if (name is! String || name.trim().isEmpty) {
-      throw const FormatException('Missing or invalid name.');
+      throw const FormatException('Tên danh mục bị thiếu hoặc không hợp lệ.');
     }
     return MenuCategoryModel(
       id: id,

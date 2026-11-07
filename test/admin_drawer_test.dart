@@ -54,8 +54,8 @@ void main() {
     expect(find.text('Ngô Chicken'), findsWidgets);
     expect(find.text('Admin Workspace'), findsOneWidget);
     expect(find.text('Dashboard'), findsWidgets);
-    expect(find.text('CATALOG'), findsOneWidget);
-    expect(find.text('OPERATIONS'), findsOneWidget);
+    expect(find.text('THỰC ĐƠN'), findsOneWidget);
+    expect(find.text('VẬN HÀNH'), findsOneWidget);
     expect(find.text('Categories'), findsWidgets);
     expect(find.text('Menu Items'), findsWidgets);
     expect(find.text('Live Orders'), findsWidgets);

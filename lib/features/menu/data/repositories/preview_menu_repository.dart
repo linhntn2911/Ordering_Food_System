@@ -145,7 +145,9 @@ class PreviewMenuRepository implements MenuRepository {
 
   int _indexOf(String id) {
     final index = _items.indexWhere((item) => item.id == id);
-    if (index == -1) throw StateError('Preview menu item $id was not found.');
+    if (index == -1) {
+      throw StateError('Không tìm thấy món ăn xem trước $id.');
+    }
     return index;
   }
 

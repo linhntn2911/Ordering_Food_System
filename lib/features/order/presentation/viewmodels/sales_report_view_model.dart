@@ -4,8 +4,8 @@ import '../../domain/entities/sales_report.dart';
 import 'admin_order_list_view_model.dart';
 
 enum SalesReportPeriod {
-  last7Days('Last 7 days'),
-  last30Days('Last 30 days'),
+  last7Days('7 ngày qua'),
+  last30Days('30 ngày qua'),
   thisMonth('Tháng này');
 
   const SalesReportPeriod(this.label);

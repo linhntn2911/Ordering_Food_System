@@ -163,7 +163,7 @@ class _CategoryFormSheetState extends ConsumerState<CategoryFormSheet> {
                           name: _nameController.text.trim(),
                           imageUrl: value?.trim() ?? '',
                         );
-                        return error?.startsWith('Image') == true
+                        return error?.startsWith('Đường dẫn ảnh') == true
                             ? error
                             : null;
                       },

@@ -5,7 +5,7 @@ import 'package:ordering_food_system/features/menu/domain/entities/menu_option.d
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/menu_item_detail_state.dart';
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/menu_item_detail_view_model.dart';
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/menu_providers.dart';
-import 'package:ordering_food_system/features/reviews/presentation/review_providers.dart';
+import 'package:ordering_food_system/features/reviews/presentation/viewmodels/review_providers.dart';
 
 import '../../../support/fake_menu_repository.dart';
 import '../../../support/fake_review_repository.dart';

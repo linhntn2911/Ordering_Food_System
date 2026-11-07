@@ -319,13 +319,13 @@ class FirestoreMenuRepository implements MenuRepository {
         details.contains('userprojectaccountproblem');
     if (requiresBilling) {
       return const MenuImageUploadException(
-        'Firebase Storage requires the Blaze plan. Upgrade the project or keep the current image.',
+        'Firebase Storage yêu cầu gói Blaze. Hãy nâng cấp dự án hoặc giữ nguyên ảnh hiện tại.',
         code: 'storage-plan-required',
       );
     }
     if (error.code == 'unauthorized' || error.code == 'permission-denied') {
       return const MenuImageUploadException(
-        'You do not have permission to upload menu images.',
+        'Bạn không có quyền tải ảnh món ăn lên.',
         code: 'storage-unauthorized',
       );
     }

@@ -13,7 +13,7 @@ class OrderItemModel {
   ) {
     final data = document.data();
     if (data == null) {
-      throw StateError('Order item ${document.id} has no data.');
+      throw StateError('Món trong đơn ${document.id} không có dữ liệu.');
     }
     int integer(String key) =>
         data[key] is num ? (data[key] as num).toInt() : 0;

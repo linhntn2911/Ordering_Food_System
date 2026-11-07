@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ordering_food_system/core/theme/app_theme.dart';
-import 'package:ordering_food_system/features/notifications/models/notification_model.dart';
-import 'package:ordering_food_system/features/notifications/providers/notification_provider.dart';
-import 'package:ordering_food_system/features/notifications/repositories/notification_repository.dart';
-import 'package:ordering_food_system/features/notifications/viewmodels/admin_broadcast_view_model.dart';
-import 'package:ordering_food_system/features/notifications/views/screens/admin_broadcast_screen.dart';
+import 'package:ordering_food_system/features/notifications/data/models/notification_model.dart';
+import 'package:ordering_food_system/features/notifications/presentation/viewmodels/notification_provider.dart';
+import 'package:ordering_food_system/features/notifications/data/repositories/notification_repository.dart';
+import 'package:ordering_food_system/features/notifications/presentation/viewmodels/admin_broadcast_view_model.dart';
+import 'package:ordering_food_system/features/notifications/presentation/views/admin_broadcast_screen.dart';
 
 void main() {
   group('AdminBroadcastViewModel Tests', () {

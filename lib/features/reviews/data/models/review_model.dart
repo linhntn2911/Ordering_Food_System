@@ -26,11 +26,11 @@ class ReviewModel {
   factory ReviewModel.fromMap(String id, Map<String, dynamic> data) {
     final rating = data['rating'];
     if (rating is! int || rating < 1 || rating > 5) {
-      throw const FormatException('Missing or invalid rating.');
+      throw const FormatException('Điểm đánh giá bị thiếu hoặc không hợp lệ.');
     }
     final createdAt = data['createdAt'];
     if (createdAt is! Timestamp) {
-      throw const FormatException('Missing or invalid createdAt.');
+      throw const FormatException('Thời gian tạo bị thiếu hoặc không hợp lệ.');
     }
     return ReviewModel(
       id: id,

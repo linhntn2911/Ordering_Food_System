@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ordering_food_system/app/main_shell_controller.dart';
+import 'package:ordering_food_system/app/main_shell_view_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ordering_food_system/app/router.dart';
 import 'package:ordering_food_system/core/theme/app_colors.dart';
@@ -58,7 +58,10 @@ class ProfileView extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Chỉnh sửa hồ sơ', style: AppTextStyles.titleLarge),
+                    const Text(
+                      'Chỉnh sửa hồ sơ',
+                      style: AppTextStyles.titleLarge,
+                    ),
                     IconButton(
                       icon: const Icon(Icons.close_rounded),
                       onPressed: () => Navigator.of(modalContext).pop(),
@@ -391,10 +394,7 @@ class ProfileView extends ConsumerWidget {
                   Icons.camera_alt_outlined,
                   color: AppColors.primarySolid,
                 ),
-                title: const Text(
-                  'Chụp ảnh',
-                  style: AppTextStyles.bodyMedium,
-                ),
+                title: const Text('Chụp ảnh', style: AppTextStyles.bodyMedium),
                 onTap: () => Navigator.of(modalCtx).pop(ImageSource.camera),
               ),
             ],
@@ -565,7 +565,7 @@ class ProfileView extends ConsumerWidget {
                             Text(
                               user.fullName.trim().isNotEmpty
                                   ? user.fullName
-                                  : 'Anam Wusono',
+                                  : 'Khách hàng',
                               style: AppTextStyles.titleLarge.copyWith(
                                 fontSize: 22,
                                 fontWeight: FontWeight.w700,
@@ -624,7 +624,7 @@ class ProfileView extends ConsumerWidget {
                                   Text(
                                     user.isAdmin
                                         ? 'Quản trị viên'
-                                        : 'Thành viên Gold',
+                                        : 'Thành viên Vàng',
                                     style: AppTextStyles.titleMedium.copyWith(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w700,

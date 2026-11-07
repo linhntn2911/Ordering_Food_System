@@ -473,7 +473,8 @@ String _friendlyError(Object? error) {
     return 'Hãy kiểm tra kết nối Internet và thử lại.';
   }
   if (error is ArgumentError) {
-    return error.message?.toString() ?? 'Vui lòng kiểm tra lại thông tin đã nhập.';
+    return error.message?.toString() ??
+        'Vui lòng kiểm tra lại thông tin đã nhập.';
   }
   return 'Không thể tải danh mục. Vui lòng thử lại.';
 }

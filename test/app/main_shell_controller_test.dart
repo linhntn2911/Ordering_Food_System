@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ordering_food_system/app/main_shell_controller.dart';
+import 'package:ordering_food_system/app/main_shell_view_model.dart';
 
 void main() {
   test('checkout success can select the Orders tab', () {

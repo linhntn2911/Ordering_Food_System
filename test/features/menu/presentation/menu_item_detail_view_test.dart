@@ -15,7 +15,7 @@ import 'package:ordering_food_system/features/menu/domain/entities/menu_item.dar
 import 'package:ordering_food_system/features/menu/domain/entities/menu_option.dart';
 import 'package:ordering_food_system/features/menu/presentation/viewmodels/menu_providers.dart';
 import 'package:ordering_food_system/features/menu/presentation/views/menu_item_detail_view.dart';
-import 'package:ordering_food_system/features/reviews/presentation/review_providers.dart';
+import 'package:ordering_food_system/features/reviews/presentation/viewmodels/review_providers.dart';
 
 import '../../../support/fake_menu_repository.dart';
 import '../../../support/fake_review_repository.dart';
@@ -292,8 +292,8 @@ void main() {
       await pumpDetail(tester);
       await showItem(tester);
 
-      expect(find.text('Chọn size'), findsOneWidget);
-      expect(find.text('Topping'), findsOneWidget);
+      expect(find.text('Chọn cỡ'), findsOneWidget);
+      expect(find.text('Món thêm'), findsOneWidget);
       expect(find.text('+${formatVnd(5000)}'), findsNWidgets(2));
       expect(
         tester.getSemantics(find.byKey(const ValueKey('detail-size-m'))),
@@ -320,8 +320,8 @@ void main() {
       await pumpDetail(tester);
       await showItem(tester, menuItem(_id, name: 'Trà đào'));
 
-      expect(find.text('Chọn size'), findsNothing);
-      expect(find.text('Topping'), findsNothing);
+      expect(find.text('Chọn cỡ'), findsNothing);
+      expect(find.text('Món thêm'), findsNothing);
     });
 
     testWidgets('sold-out options cannot be chosen', (tester) async {

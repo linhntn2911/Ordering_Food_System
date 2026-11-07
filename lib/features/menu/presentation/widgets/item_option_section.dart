@@ -39,7 +39,7 @@ class ItemOptionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (item.sizes.isNotEmpty) ...[
-          const _SectionTitle('Chọn size'),
+          const _SectionTitle('Chọn cỡ'),
           for (final size in item.sizes)
             _OptionRow(
               key: ValueKey('detail-size-${size.id}'),
@@ -52,7 +52,7 @@ class ItemOptionSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.p16),
         ],
         if (item.toppings.isNotEmpty) ...[
-          const _SectionTitle('Topping'),
+          const _SectionTitle('Món thêm'),
           for (final topping in item.toppings)
             _OptionRow(
               key: ValueKey('detail-topping-${topping.id}'),

@@ -8,7 +8,7 @@ import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
 import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
 import 'package:ordering_food_system/features/order_history/presentation/widgets/order_history_card.dart';
-import 'package:ordering_food_system/features/review/providers/review_provider.dart';
+import 'package:ordering_food_system/features/review/presentation/viewmodels/review_provider.dart';
 
 class OrderHistoryView extends ConsumerWidget {
   const OrderHistoryView({super.key});

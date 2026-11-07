@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../../core/errors/failures.dart';
-import '../address_repository.dart';
+import 'address_repository.dart';
 import '../models/address_model.dart';
 
 /// Firestore-backed address book scoped to the authenticated customer's UID.

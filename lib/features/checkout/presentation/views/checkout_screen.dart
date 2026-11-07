@@ -7,10 +7,10 @@ import 'package:ordering_food_system/core/theme/app_shadows.dart';
 import 'package:ordering_food_system/core/theme/app_spacing.dart';
 import 'package:ordering_food_system/core/theme/app_text_styles.dart';
 import 'package:ordering_food_system/core/utils/currency_formatter.dart';
-import 'package:ordering_food_system/app/main_shell_controller.dart';
+import 'package:ordering_food_system/app/main_shell_view_model.dart';
 import 'package:ordering_food_system/features/address/data/models/address_model.dart';
 import 'package:ordering_food_system/features/address/presentation/views/address_list_screen.dart';
-import 'package:ordering_food_system/features/checkout/presentation/controllers/checkout_controller.dart';
+import 'package:ordering_food_system/features/checkout/presentation/viewmodels/checkout_controller.dart';
 import 'package:ordering_food_system/features/checkout/data/models/order_model.dart';
 
 enum CheckoutSuccessAction { stayInCart, viewOrders }
@@ -650,7 +650,7 @@ class _OrderItemsPreview extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${item.selectedSize.name}${item.selectedToppings.isNotEmpty ? " + ${item.selectedToppings.length} topping" : ""}',
+                          '${item.selectedSize.name}${item.selectedToppings.isNotEmpty ? " + ${item.selectedToppings.length} món thêm" : ""}',
                           style: AppTextStyles.bodySmall.copyWith(
                             color: AppColors.textMuted,
                           ),

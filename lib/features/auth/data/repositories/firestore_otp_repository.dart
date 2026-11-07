@@ -174,9 +174,7 @@ class FirestoreOtpRepository implements OtpRepository {
     required String newPassword,
   }) async {
     if (newPassword.length < 6) {
-      throw const ValidationException(
-        'Mật khẩu mới phải có ít nhất 6 ký tự.',
-      );
+      throw const ValidationException('Mật khẩu mới phải có ít nhất 6 ký tự.');
     }
 
     // Verify OTP first.

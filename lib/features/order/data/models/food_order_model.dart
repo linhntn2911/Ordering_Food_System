@@ -51,7 +51,9 @@ class FoodOrderModel {
     SnapshotOptions? _,
   ) {
     final data = document.data();
-    if (data == null) throw StateError('Order ${document.id} has no data.');
+    if (data == null) {
+      throw StateError('Đơn hàng ${document.id} không có dữ liệu.');
+    }
     final createdAt = _date(data['createdAt']);
     return FoodOrderModel(
       id: document.id,
@@ -110,7 +112,7 @@ class FoodOrderModel {
   static int _int(Map<String, dynamic> data, String field) {
     final value = data[field];
     if (value is num) return value.toInt();
-    throw FormatException('Missing or invalid $field.');
+    throw FormatException('Trường $field bị thiếu hoặc không hợp lệ.');
   }
 
   static int _optionalInt(Object? value) => value is num ? value.toInt() : 0;

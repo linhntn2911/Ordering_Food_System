@@ -163,7 +163,7 @@ class AdminDrawer extends StatelessWidget {
                       vertical: AppSpacing.xs,
                     ),
                     child: Text(
-                      'CATALOG',
+                      'THỰC ĐƠN',
                       style: AppTextStyles.labelSmall.copyWith(
                         color: AppColors.textMuted,
                         letterSpacing: 1.2,
@@ -198,7 +198,7 @@ class AdminDrawer extends StatelessWidget {
                       vertical: AppSpacing.xs,
                     ),
                     child: Text(
-                      'OPERATIONS',
+                      'VẬN HÀNH',
                       style: AppTextStyles.labelSmall.copyWith(
                         color: AppColors.textMuted,
                         letterSpacing: 1.2,
@@ -243,7 +243,7 @@ class AdminDrawer extends StatelessWidget {
                       vertical: AppSpacing.xs,
                     ),
                     child: Text(
-                      'ACCOUNT',
+                      'TÀI KHOẢN',
                       style: AppTextStyles.labelSmall.copyWith(
                         color: AppColors.textMuted,
                         letterSpacing: 1.2,
