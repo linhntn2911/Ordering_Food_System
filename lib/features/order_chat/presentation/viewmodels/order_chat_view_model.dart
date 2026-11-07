@@ -66,13 +66,18 @@ class OrderChatViewModel extends Notifier<OrderChatState> {
 
   String? addImageUrl(String input) {
     final url = input.trim();
-    if (!ChatDraft.isImageUrl(url)) return 'Dán link ảnh HTTPS hợp lệ.';
-    if (state.draft.imageUrls.contains(url))
+    if (!ChatDraft.isImageUrl(url)) {
+      return 'Dán link ảnh HTTPS hợp lệ.';
+    }
+    if (state.draft.imageUrls.contains(url)) {
       return 'Link ảnh đã được đính kèm.';
+    }
     if (state.draft.imageUrls.length >= ChatDraft.maxPhotos) {
       return 'Chỉ được đính kèm tối đa 3 ảnh.';
     }
-    if (state.sending || state.expired) return 'Hiện không thể đính kèm ảnh.';
+    if (state.sending || state.expired) {
+      return 'Hiện không thể đính kèm ảnh.';
+    }
     _update(
       draft: ChatDraft(
         text: state.draft.text,
