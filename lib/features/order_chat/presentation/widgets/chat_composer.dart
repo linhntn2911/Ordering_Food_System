@@ -13,7 +13,6 @@ class ChatComposer extends StatelessWidget {
     required this.onAddImageUrl,
     required this.onSend,
     required this.sending,
-    required this.closed,
     required this.canSend,
   });
 
@@ -24,7 +23,6 @@ class ChatComposer extends StatelessWidget {
   final String? Function(String) onAddImageUrl;
   final VoidCallback onSend;
   final bool sending;
-  final bool closed;
   final bool canSend;
 
   @override
@@ -45,60 +43,58 @@ class ChatComposer extends StatelessWidget {
                     dimension: AppSpacing.minTouchTarget,
                     child: const Icon(Icons.link_rounded),
                   ),
-                  if (!closed)
-                    IconButton(
-                      tooltip: 'Gỡ ảnh ${index + 1}',
-                      onPressed: sending ? null : () => onRemove(index),
-                      icon: const Icon(Icons.close),
-                    ),
+
+                  IconButton(
+                    tooltip: 'Gỡ ảnh ${index + 1}',
+                    onPressed: sending ? null : () => onRemove(index),
+                    icon: const Icon(Icons.close),
+                  ),
                 ],
               ),
           ],
         ),
-      if (!closed || draft.text.isNotEmpty)
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (!closed)
-              IconButton(
-                key: const ValueKey('chat-add-photo'),
-                tooltip: 'Đính kèm link ảnh',
-                onPressed:
-                    sending || draft.imageUrls.length >= ChatDraft.maxPhotos
-                    ? null
-                    : () => _showImageLinkDialog(context),
-                icon: const Icon(Icons.add_photo_alternate_outlined),
-              ),
-            Expanded(
-              child: TextField(
-                key: const ValueKey('chat-text'),
-                controller: controller,
-                readOnly: sending || closed,
-                minLines: 1,
-                maxLines: 3,
-                maxLength: ChatDraft.maxTextLength,
-                buildCounter:
-                    (
-                      _, {
-                      required currentLength,
-                      required isFocused,
-                      required maxLength,
-                    }) => currentLength > 900
-                    ? Text('$currentLength/$maxLength')
-                    : null,
-                onChanged: onText,
-                decoration: const InputDecoration(hintText: 'Nhập tin nhắn'),
-              ),
+
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          IconButton(
+            key: const ValueKey('chat-add-photo'),
+            tooltip: 'Đính kèm link ảnh',
+            onPressed: sending || draft.imageUrls.length >= ChatDraft.maxPhotos
+                ? null
+                : () => _showImageLinkDialog(context),
+            icon: const Icon(Icons.add_photo_alternate_outlined),
+          ),
+          Expanded(
+            child: TextField(
+              key: const ValueKey('chat-text'),
+              controller: controller,
+              readOnly: sending,
+              minLines: 1,
+              maxLines: 3,
+              maxLength: ChatDraft.maxTextLength,
+              buildCounter:
+                  (
+                    _, {
+                    required currentLength,
+                    required isFocused,
+                    required maxLength,
+                  }) => currentLength > 900
+                  ? Text('$currentLength/$maxLength')
+                  : null,
+              onChanged: onText,
+              decoration: const InputDecoration(hintText: 'Nhập tin nhắn'),
             ),
-            if (!closed)
-              IconButton(
-                key: const ValueKey('chat-send'),
-                tooltip: 'Gửi tin nhắn',
-                onPressed: canSend ? onSend : null,
-                icon: const Icon(Icons.send_rounded),
-              ),
-          ],
-        ),
+          ),
+
+          IconButton(
+            key: const ValueKey('chat-send'),
+            tooltip: 'Gửi tin nhắn',
+            onPressed: canSend ? onSend : null,
+            icon: const Icon(Icons.send_rounded),
+          ),
+        ],
+      ),
     ],
   );
   void _showImageLinkDialog(BuildContext context) {

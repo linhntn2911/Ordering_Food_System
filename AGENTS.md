@@ -30,7 +30,7 @@ Use the installed Spec Kit skills in this order:
 Do not begin a substantial feature from a chat description alone. Update the feature spec, plan, and tasks first. Small repairs that preserve specified behavior may be implemented directly, but document any changed requirement.
 
 <!-- SPECKIT START -->
-For additional context about technologies, project structure, commands, and decisions, read the current feature plan at `specs/008-order-issue-chat/plan.md`.
+For additional context about technologies, project structure, commands, and decisions, read the current feature plan at `specs/009-general-support-chat/plan.md`.
 <!-- SPECKIT END -->
 
 ## Product Boundaries
@@ -38,7 +38,7 @@ For additional context about technologies, project structure, commands, and deci
 - One restaurant: **Ngô Chicken** (fried chicken, rice, noodles, snacks, combos, drinks). Menu data comes from Firestore; `tools/seed_menu/menu_seed.json` holds the restaurant's menu for the emulator. Never hard-code menu items in widgets.
 - Human roles: Customer and pre-provisioned Admin. Guest is an unauthenticated state.
 - COD only.
-- No driver application, GPS tracking, online payment, refunds, general-purpose chat, marketplace behavior, or complex promotions.
+- No driver application, GPS tracking, online payment, refunds, peer-to-peer chat, marketplace behavior, or complex promotions.
 - The required integrations are Firebase Authentication, Cloud Firestore, Firebase Cloud Messaging, Firebase Storage when images are uploaded, Riverpod, MVVM, and SharedPreferences.
 
 ## Architecture
@@ -172,3 +172,8 @@ Use `flutterfire configure` only when the Firebase project and target platforms 
 - When changing Firestore shape, update models, converters, rules, indexes, seed data, and migration notes together.
 - When changing an order status or business rule, update Customer UI, Admin UI, notification behavior, tests, and documentation together.
 - Record out-of-scope ideas as future work instead of silently expanding the release.
+
+
+## General support amendment — 2026-11-08
+
+Feature 009 supersedes order-only chat and Home order selection: Home opens general restaurant support, one history per Customer. Order Details retains separate per-order chat. Admin drawer Tin nhắn opens a shared inbox with Chung / Theo đơn filters, preview/time/unread rows and order-details navigation. Reuse light Poppins tokens and chat controls; general_chats stores general histories separately by UID with no expiry. No existing chat migration; deploy Firestore rules/indexes together with client. See specs/009-general-support-chat/{spec,plan,tasks,data-model}.md.

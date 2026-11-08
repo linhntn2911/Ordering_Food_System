@@ -12,6 +12,7 @@ abstract final class OrderChatModel {
       orderId: doc.id,
       orderCode: data['orderCode'] as String? ?? doc.id,
       customerId: data['customerId'] as String? ?? '',
+      customerName: data['customerName'] as String? ?? 'Khách hàng',
       issueType: ChatIssueType.values.byName(
         data['issueType'] as String? ?? 'other',
       ),

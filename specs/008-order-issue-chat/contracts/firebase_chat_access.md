@@ -8,10 +8,6 @@ Rules live in `firestore.rules` and `storage.rules`. Cases below are implemented
 function chatOrder(orderId) = get(/orders/$(orderId)).data
 function isChatParticipant(orderId) =
   signedIn() && currentUser().data.status == 'active'\n  && (chatOrder(orderId).customerId == request.auth.uid || isAdmin())
-function chatOpen(orderId) =
-  let o = chatOrder(orderId);
-  !(o.orderStatus in ['Completed', 'Cancelled', 'Rejected'])
-  || request.time < ((o.get('completedAt', null) != null ? o.completedAt : o.updatedAt) + duration.value(24, 'h'))
 function senderRole(orderId) = isAdmin() ? 'admin' : 'customer'
 ```
 
@@ -30,7 +26,7 @@ function senderRole(orderId) = isAdmin() ? 'admin' : 'customer'
 | C9 | customer-1 | Create message with an image path outside `order_chats/order-active/{messageId}/` | Deny |
 | C10 | customer-1 | Update or delete an existing message | Deny |
 | C11 | customer-1 | Send to `order-recent` (ended 2h ago) | Allow |
-| C12 | customer-1 / admin-1 | Send to `order-old` (ended 25h ago) | Deny |
+| C12 | customer-1 / admin-1 | Start and continue messages on old Completed, Cancelled and Rejected orders | Allow |
 | C13 | customer-1 / admin-1 | Read `order-old` conversation and messages | Allow |
 | C14 | customer-1 | Update metadata `customerId`, `issueType`, `openedByRole`, or `orderCode` | Deny |
 | C15 | customer-1 | Set own `unreadByCustomer` to false | Allow |
@@ -40,7 +36,7 @@ function senderRole(orderId) = isAdmin() ? 'admin' : 'customer'
 | C19 | customer-1 | Query `order_chats` where `customerId == customer-1` and `unreadByCustomer == true` | Allow |
 | C20 | customer-1 | Query `order_chats` without the `customerId` filter | Deny |
 
-Metadata updates are allowed only for keys `lastMessageId`, `lastMessageAt`, `lastMessagePreview`, `lastSenderRole`, `unreadByAdmin`, `unreadByCustomer`, `updatedAt`, and only while `chatOpen` except for clearing one's own unread flag (allowed after the window so a read-only conversation can be marked read).
+Metadata updates are allowed only for keys `lastMessageId`, `lastMessageAt`, `lastMessagePreview`, `lastSenderRole`, `unreadByAdmin`, `unreadByCustomer`, `updatedAt`, with participant, immutable-field and atomic message-advance validation; there is no time gate. Each participant may clear only their own unread flag.
 
 ## Storage cases (`order_chats/{orderId}/{messageId}/{index}.jpg`)
 
@@ -52,5 +48,10 @@ Metadata updates are allowed only for keys `lastMessageId`, `lastMessageAt`, `la
 | S4 | customer-2 | Upload or read under `order-active` | Deny |
 | S5 | admin-1 | Read any chat photo | Allow |
 | S6 | customer-1 | Overwrite or delete an existing photo | Deny |
-| S7 | customer-1 | Upload under `order-old` | Deny |
+| S7 | customer-1 | Upload under `order-old` | Allow |
 | S8 | Guest | Read a chat photo | Deny |
+
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.

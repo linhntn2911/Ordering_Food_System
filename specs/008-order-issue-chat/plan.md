@@ -6,7 +6,7 @@
 
 ## Summary
 
-Customers and Admins exchange text and photo messages about one order. Each order has at most one conversation, stored in `order_chats/{orderId}` with a `messages` subcollection; new image attachments are stored as HTTPS URLs, while existing Storage references remain readable. Sends run in a Firestore transaction with device-generated message IDs, so the first message from either side creates the conversation exactly once and retries never duplicate. A conversation becomes read-only 24 hours after the order ends; the rule is derived from the order's status and timestamps and enforced in both Firestore and Storage rules. Admins find conversations through a "Tin mới" badge and a "Có tin nhắn" filter on the existing Admin order list; Customers see unread dots on the order and the Orders tab. Push notifications are deferred until a trusted backend exists. One shared `OrderChatScreen` serves both roles.
+Customers and Admins exchange text and photo messages about one order. Each order has at most one conversation, stored in `order_chats/{orderId}` with a `messages` subcollection; new image attachments are stored as HTTPS URLs, while existing Storage references remain readable. Sends run in a Firestore transaction with device-generated message IDs, so the first message from either side creates the conversation exactly once and retries never duplicate. Chat has no sending deadline: both roles can start or continue a conversation after any terminal status. Firestore and Storage enforce participant authorization without time gates. Admins find conversations through a "Tin mới" badge and a "Có tin nhắn" filter on the existing Admin order list; Customers see unread dots on the order and the Orders tab. Push notifications are deferred until a trusted backend exists. One shared `OrderChatScreen` serves both roles.
 
 ## Technical Context
 
@@ -36,7 +36,7 @@ Customers and Admins exchange text and photo messages about one order. Each orde
 |---|---|---|
 | I. Specification before implementation | Pass | Clarified spec `specs/008-order-issue-chat/spec.md`; baseline FR-053 to FR-062 updated |
 | II. MVVM and Riverpod boundaries | Pass | View -> `OrderChatViewModel` (Riverpod `Notifier`) -> `OrderChatRepository` interface -> Firestore/Storage implementation; no Firebase calls in widgets |
-| III. Server-enforced integrity and security | Pass | Participant, sender, size, type, and 24-hour rules enforced in `firestore.rules` and `storage.rules` (contract C1-C20, S1-S8); no client FCM |
+| III. Server-enforced integrity and security | Pass | Participant, sender, size and type rules enforced in `firestore.rules` and `storage.rules` (contract C1-C20, S1-S8); no client FCM |
 | IV. Independently demonstrable stories | Pass | US1+US2 form the MVP; US3 and US4 add on independently (see tasks) |
 | V. Consistent, verifiable quality | Pass | Loading/empty/error/retry states defined; unit, widget, and rules tests planned; `flutter analyze` gate |
 | VI. Light-only Food Ninja design | Pass | Shared tokens and widgets; no new theme |
@@ -127,3 +127,25 @@ tests/firestore_rules/order_chat_storage.test.mjs
 ## Implementation details
 
 The latest message ID links each message to its parent write in Firestore rules. Firestore validates new HTTPS references and existing-format Storage paths. The UI loads external images when opened and reads legacy images through authenticated Firebase Storage.
+
+## Home support amendment — 2026-11-08
+
+Add HomeOrderSupportButton to Home Scaffold with 96px scroll clearance. Push OrderChatOrderSelectionScreen above MainShell. An auto-dispose Riverpod provider uses OrderHistoryRepository, watches authentication, ignores the Orders filter, filters ownership, sorts newest first and exposes an unmodifiable list. Views render state and navigation only. Pass documentId to the existing chat screen; preserve server authorization without closing rules. LoginArgs(returnToCaller: true) returns Guests to selection. No dependencies, schema, indexes, seed or rules changes: reuse owner-scoped reads and existing chat writes.
+
+Validate ownership, sorting, filter independence, login, loading/empty/error/retry, internal-ID routing, narrow width and text scale 1.3; run Home/chat regression tests, analyzer and full Flutter tests.
+
+### Home amendment convergence
+
+FR-018 maps to T058 and Home layout tests; FR-019 maps to T057 and ownership/sort/filter/internal-ID tests; FR-020 maps to T057 and guest/loading/error/retry/empty tests. No required Home-entry implementation gap found. Existing full-suite failures and T055 manual device validation remain outstanding. No rules/schema migration required.
+
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.
+
+Implementation: remove deadline gates from Firestore/Storage, repository, ViewModel, providers, entry and composer. Remove expiry state/helper. Replace expiry tests with successful first-send/reply tests on historical orders and retain access-denial tests. Deploy both rules files with the client before using unlimited chat against production. No dependencies added.
+
+
+## General support amendment — 2026-11-08
+
+Feature 009 supersedes order-only chat and Home order selection: Home opens general restaurant support, one history per Customer. Order Details retains separate per-order chat. Admin drawer Tin nhắn opens a shared inbox with Chung / Theo đơn filters, preview/time/unread rows and order-details navigation. Reuse light Poppins tokens and chat controls; general_chats stores general histories separately by UID with no expiry. No existing chat migration; deploy Firestore rules/indexes together with client. See specs/009-general-support-chat/{spec,plan,tasks,data-model}.md.

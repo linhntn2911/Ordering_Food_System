@@ -39,17 +39,9 @@ service firebase.storage {
           && (user.role == 'admin' || chatOrder().customerId == request.auth.uid);
       }
 
-      function chatOpen() {
-        let order = chatOrder();
-        let completedAt = order.get('completedAt', null);
-        return !(order.orderStatus in ['Completed', 'Cancelled', 'Rejected'])
-          || request.time < (completedAt != null ? completedAt : order.updatedAt)
-            + duration.value(24, 'h');
-      }
-
       allow get: if request.auth != null && participant();
       allow create: if resource == null
-        && request.auth != null && participant() && chatOpen()
+        && request.auth != null && participant()
         && fileName in ['0.jpg', '1.jpg', '2.jpg']
         && request.resource.size > 0
         && request.resource.size < 5 * 1024 * 1024

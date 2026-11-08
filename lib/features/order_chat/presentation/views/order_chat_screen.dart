@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../auth/presentation/viewmodels/auth_providers.dart';
 import '../../../auth/presentation/views/login_view.dart';
 import '../../../order/presentation/widgets/order_status_chip.dart';
+import '../../../order/presentation/views/admin_order_details_screen.dart';
 import '../../domain/entities/chat_failure.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/chat_role.dart';
@@ -107,12 +108,13 @@ class _ChatConversationState extends ConsumerState<_ChatConversation> {
   @override
   Widget build(BuildContext context) {
     final session = widget.session;
+    final general = ref.watch(generalChatModeProvider);
     final chatProvider = orderChatStreamProvider(session.orderId);
     final orderProvider = chatOrderProvider(session.orderId);
     final stateProvider = orderChatViewModelProvider(session);
     final state = ref.watch(stateProvider);
     final model = ref.read(stateProvider.notifier);
-    final order = ref.watch(orderProvider);
+    final order = general ? null : ref.watch(orderProvider);
     final chat = ref.watch(chatProvider);
     final query = chatMessagesProvider((
       orderId: session.orderId,
@@ -129,7 +131,7 @@ class _ChatConversationState extends ConsumerState<_ChatConversation> {
       }
     });
 
-    final foodOrder = order.value;
+    final foodOrder = order?.value;
     final wrongOwner =
         session.role == ChatRole.customer &&
         foodOrder != null &&
@@ -156,7 +158,7 @@ class _ChatConversationState extends ConsumerState<_ChatConversation> {
       _readSnapshot = null;
     }
 
-    final error = chat.error ?? messages.error ?? order.error;
+    final error = chat.error ?? messages.error ?? order?.error;
     if (error != null) {
       return _ChatFrame(
         child: _ChatProblem(
@@ -170,13 +172,14 @@ class _ChatConversationState extends ConsumerState<_ChatConversation> {
       );
     }
     if (messages case AsyncData(:final value)) _messages = value;
-    if (foodOrder == null || chat is! AsyncData || _messages == null) {
+    if ((!general && foodOrder == null) ||
+        chat is! AsyncData ||
+        _messages == null) {
       return const _ChatFrame(
         child: Center(child: CircularProgressIndicator()),
       );
     }
 
-    final closed = state.expired || !ref.watch(chatOpenProvider(foodOrder));
     final entries = _messages!;
     final pendingId = state.messageId;
     final showPending =
@@ -204,36 +207,51 @@ class _ChatConversationState extends ConsumerState<_ChatConversation> {
       onAddImageUrl: model.addImageUrl,
       onSend: model.send,
       sending: state.sending,
-      closed: closed,
       canSend: !state.sending && state.draft.canSend,
     );
 
     return _ChatFrame(
-      orderCode: foodOrder.orderCode,
+      orderCode: general ? null : foodOrder!.orderCode,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final padding = AppSpacing.screenHorizontalFor(constraints.maxWidth);
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: padding,
-                  vertical: AppSpacing.p4,
-                ),
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  spacing: AppSpacing.p8,
-                  children: [
-                    OrderStatusChip(status: foodOrder.status),
-                    if (chat.value case final OrderChat conversation)
-                      Text(
-                        conversation.issueType.label,
-                        style: Theme.of(context).textTheme.bodySmall,
+              if (!general)
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: padding,
+                    vertical: AppSpacing.p4,
+                  ),
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: AppSpacing.p8,
+                    children: [
+                      OrderStatusChip(status: foodOrder!.status),
+                      TextButton(
+                        onPressed: () => session.role == ChatRole.admin
+                            ? Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (_) => AdminOrderDetailsScreen(
+                                    initialOrder: foodOrder,
+                                  ),
+                                ),
+                              )
+                            : Navigator.of(context).pushNamed(
+                                AppRoutes.orderDetail,
+                                arguments: {'orderId': session.orderId},
+                              ),
+                        child: const Text('Chi tiết đơn'),
                       ),
-                  ],
+                      if (chat.value case final OrderChat conversation)
+                        Text(
+                          conversation.issueType.label,
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                    ],
+                  ),
                 ),
-              ),
               Expanded(
                 child: visible.isEmpty
                     ? Center(
@@ -304,11 +322,12 @@ class _ChatConversationState extends ConsumerState<_ChatConversation> {
                                       ? 'Bạn'
                                       : message.senderRole == ChatRole.admin
                                       ? 'Ngô Chicken'
-                                      : foodOrder.customerName,
+                                      : (general
+                                            ? chat.value?.customerName ??
+                                                  'Khách hàng'
+                                            : foodOrder!.customerName),
                                   failure: failed ? state.error : null,
-                                  onRetry: failed && !closed
-                                      ? model.send
-                                      : null,
+                                  onRetry: failed ? model.send : null,
                                 ),
                               ],
                             ),
@@ -330,20 +349,12 @@ class _ChatConversationState extends ConsumerState<_ChatConversation> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      if (closed)
-                        const Text(
-                          'Cuộc trò chuyện đã đóng. Bạn có thể báo vấn đề trong 24 giờ sau khi đơn kết thúc.',
-                          key: ValueKey('chat-closed'),
-                        ),
-                      if (state.error != null && !closed && pendingId == null)
+                      if (state.error != null && pendingId == null)
                         Text(
                           state.error!,
                           style: const TextStyle(color: AppColors.error),
                         ),
-                      if (!closed ||
-                          state.draft.text.isNotEmpty ||
-                          state.draft.imageUrls.isNotEmpty)
-                        composer,
+                      composer,
                     ],
                   ),
                 ),
@@ -356,21 +367,23 @@ class _ChatConversationState extends ConsumerState<_ChatConversation> {
   }
 }
 
-class _ChatFrame extends StatelessWidget {
+class _ChatFrame extends ConsumerWidget {
   const _ChatFrame({required this.child, this.orderCode});
 
   final Widget child;
   final String? orderCode;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context, WidgetRef ref) => Scaffold(
     appBar: AppBar(
       leading: BackButton(onPressed: () => _leaveChat(context)),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Trao đổi về đơn',
+          Text(
+            ref.watch(generalChatModeProvider)
+                ? 'Hỗ trợ chung'
+                : 'Trao đổi về đơn',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

@@ -23,6 +23,7 @@ import '../features/order/presentation/views/admin_order_list_screen.dart';
 import '../features/order/presentation/views/sales_report_screen.dart';
 import '../features/order_chat/domain/entities/chat_role.dart';
 import '../features/order_chat/presentation/views/order_chat_screen.dart';
+import '../features/order_chat/presentation/views/admin_messages_screen.dart';
 import '../features/order_history/presentation/views/order_history_view.dart';
 import '../features/order_tracking/presentation/views/order_detail_screen.dart';
 import '../features/order_tracking/presentation/views/order_tracking_timeline_screen.dart';
@@ -48,6 +49,7 @@ abstract final class AppRoutes {
   static const String adminOrders = '/admin/orders';
   static const String adminSalesReport = '/admin/sales-report';
   static const String adminBroadcast = '/admin/broadcast';
+  static const String adminMessages = '/admin/messages';
 
   // Customer features from Member 3 (Hong Anh)
   static const String cart = '/cart';
@@ -125,6 +127,8 @@ abstract final class AppRoutes {
         return _adminRoute(const SalesReportScreen());
       case adminBroadcast:
         return _adminRoute(const AdminBroadcastScreen());
+      case adminMessages:
+        return _adminRoute(const AdminMessagesScreen());
       case cart:
         return MaterialPageRoute(builder: (_) => const CartScreen());
       case checkout:

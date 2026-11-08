@@ -1,0 +1,3 @@
+# Design decisions
+
+Reuse the existing repository interface and message UI through a general collection binding and scoped provider dependencies. This preserves order contracts and lets authentication replace the scope/draft on account changes. Use customer UID as general document ID for deterministic first-send convergence. Share no stored history between kinds. A single Admin inbox queries the chosen binding with bounded initial limit 100 and explicit load-more. No dependency or framework generation changes. Keep existing push deferral: unread state and real-time streams are available, no client FCM sending.

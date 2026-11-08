@@ -66,18 +66,18 @@ Path: `order_chats/{orderId}/{messageId}/{index}.jpg`, `index` in `0..2`.
 | `OrderChat` | `orderId`, `orderCode`, `customerId`, `issueType`, `openedByRole`, `lastMessageAt`, `lastMessagePreview`, `lastSenderRole`, `unreadByAdmin`, `unreadByCustomer` | Immutable, equatable |
 | `ChatMessage` | `id`, `senderId`, `senderRole`, `text`, `imagePaths`, `createdAt?`, `isPending` | `createdAt` null or estimated while pending |
 | `ChatDraft` | `text`, `imageUrls` (HTTPS URLs, max 3) | `validate()` checks content, text length, photo count, and photo size |
-| `ChatWindow` | pure function `isOpen({orderStatus, completedAt, updatedAt, now})` | Mirrors rules (R5) |
 
-## Open window (R5)
+## Availability (R5)
 
-```
-terminal = orderStatus in {Completed, Cancelled, Rejected}
-endedAt  = completedAt ?? updatedAt
-open     = !terminal || now < endedAt + 24h
-```
+Authorized participants can start and continue chat regardless of order status or timestamps. There is no deadline or stored closure state.
 
 ## State transitions
 
-Conversation: `absent -> exists` on the first message from either side (transaction, R2). There is no stored status; `open -> read-only` happens implicitly when the window above ends.
+Conversation: `absent -> exists` on the first message from either side (transaction, R2). There is no stored status or automatic read-only transition.
 
 Message (client-side only): `draft -> sending -> sent`, with `sending -> failed -> (retry) sending`.
+
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.

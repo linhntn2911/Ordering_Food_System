@@ -39,6 +39,10 @@ export async function chatEnvironment({ storage = false } = {}) {
       [recent, 'Completed', 2, owner],
       [old, 'Completed', 25, owner],
       ['old-cancelled', 'Cancelled', 25, owner],
+      ['old-rejected', 'Rejected', 24 * 365, owner],
+      [old + '-admin', 'Completed', 25, owner],
+      ['old-cancelled-admin', 'Cancelled', 25, owner],
+      ['old-rejected-admin', 'Rejected', 24 * 365, owner],
       ['recent-rejected', 'Rejected', 2, owner],
       ['disabled-owner', 'Preparing', 0, disabledCustomer],
     ]) {

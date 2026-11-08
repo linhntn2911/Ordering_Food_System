@@ -25,4 +25,5 @@ abstract interface class OrderChatRepository {
   Future<Uint8List> photoBytes(String storagePath);
   Stream<List<OrderChat>> watchAdminChats({int limit = 100});
   Stream<bool> watchCustomerHasUnread(String customerId);
+  Stream<int> watchAdminUnreadCount();
 }

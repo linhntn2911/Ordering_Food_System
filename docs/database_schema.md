@@ -124,4 +124,9 @@ Sales reports are derived from completed orders and order items. No independent 
 
 ## Order-issue chat
 
-The order_chats collection uses the order ID as its document ID. It stores the order code, customer ID, issue type, opening role, latest message ID, time, preview, sender role and both unread flags. Its messages subcollection stores sender UID and role, trimmed text, attachment references and server time. The client stores up to three HTTPS image URLs in imagePaths. Legacy Storage paths at order_chats/{orderId}/{messageId}/{index}.jpg remain readable. Existing orders need no migration. The rules derive the 24-hour window from completedAt or updatedAt for terminal orders.
+The order_chats collection uses the order ID as its document ID. It stores the order code, customer ID, issue type, opening role, latest message ID, time, preview, sender role and both unread flags. Its messages subcollection stores sender UID and role, trimmed text, attachment references and server time. The client stores up to three HTTPS image URLs in imagePaths. Legacy Storage paths at order_chats/{orderId}/{messageId}/{index}.jpg remain readable. Existing orders need no migration. Order chat does not expire. Rules enforce participant authorization independently of order status and timestamps; no schema migration is required.
+
+
+## General support amendment — 2026-11-08
+
+Feature 009 supersedes order-only chat and Home order selection: Home opens general restaurant support, one history per Customer. Order Details retains separate per-order chat. Admin drawer Tin nhắn opens a shared inbox with Chung / Theo đơn filters, preview/time/unread rows and order-details navigation. Reuse light Poppins tokens and chat controls; general_chats stores general histories separately by UID with no expiry. No existing chat migration; deploy Firestore rules/indexes together with client. See specs/009-general-support-chat/{spec,plan,tasks,data-model}.md.

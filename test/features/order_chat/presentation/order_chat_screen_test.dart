@@ -129,15 +129,15 @@ void main() {
     },
   );
 
-  testWidgets('closed chat displays history and replaces the composer', (
+  testWidgets('historical chat displays history and keeps the composer', (
     tester,
   ) async {
     repository.chat = chatFixture();
     repository.messages = [_reply()];
     await tester.pumpWidget(_app(repository, closed: true));
     await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('chat-closed')), findsOneWidget);
-    expect(find.byKey(const ValueKey('chat-composer')), findsNothing);
+    expect(find.byKey(const ValueKey('chat-closed')), findsNothing);
+    expect(find.byKey(const ValueKey('chat-composer')), findsOneWidget);
     expect(find.text('Nhà hàng đã nhận được tin nhắn'), findsOneWidget);
   });
 

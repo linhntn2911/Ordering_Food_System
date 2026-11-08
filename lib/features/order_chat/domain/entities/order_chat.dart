@@ -14,6 +14,7 @@ class OrderChat {
     required this.lastSenderRole,
     required this.unreadByAdmin,
     required this.unreadByCustomer,
+    this.customerName = 'Khách hàng',
   });
 
   final String orderId;
@@ -27,6 +28,7 @@ class OrderChat {
   final ChatRole lastSenderRole;
   final bool unreadByAdmin;
   final bool unreadByCustomer;
+  final String customerName;
 
   bool unreadFor(ChatRole role) =>
       role == ChatRole.admin ? unreadByAdmin : unreadByCustomer;

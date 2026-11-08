@@ -1,3 +1,4 @@
+<!-- Sync impact: 1.3.0 → 1.4.0; explicit user-approved general restaurant support plus order chat, no expiry. Baseline/spec 009/plan/tasks/design/schema updated; core security/MVVM principles unchanged. -->
 <!-- Sync Impact Report: 1.2.0 to 1.3.0. Expanded Product and Technology Constraints for order-issue chat. No principles or sections added or removed. No deferred placeholders. -->
 # Food Ordering System Constitution
 
@@ -29,7 +30,7 @@ All Customer and Admin screens use one shared light theme derived from the Pixel
 
 ## Product and Technology Constraints
 
-The release is a single-restaurant Flutter mobile application with Guest, Customer, and pre-provisioned Admin experiences. It uses COD only and excludes payment gateways, driver accounts, GPS tracking, general-purpose chat, multi-restaurant marketplace behavior, and complex promotions. Customers and active Admins may exchange messages in an order-scoped issue conversation within the approved sending window.
+The release is a single-restaurant Flutter mobile application with Guest, Customer, and pre-provisioned Admin experiences. It uses COD only and excludes payment gateways, driver accounts, GPS tracking, peer-to-peer chat, multi-restaurant marketplace behavior, and complex promotions. Customers and active Admins may exchange restaurant-support messages in one general conversation per Customer and separate conversations per order, with no automatic expiry.
 
 Firebase Authentication provides identity, Cloud Firestore is the shared database, Firebase Cloud Messaging provides push notifications, Firebase Storage supports uploaded images, Riverpod manages state and dependencies, MVVM separates responsibilities, and SharedPreferences stores only non-sensitive local configuration.
 
@@ -41,4 +42,4 @@ The project follows constitution -> specify -> clarify when needed -> plan -> ch
 
 This constitution overrides informal conventions and sample-code patterns. Amendments require an explicit rationale, version change, and updates to affected specifications, plans, tasks, and migration notes. Reviewers must verify architectural boundaries, security, scope, screen ownership, and test evidence before accepting a feature.
 
-**Version**: 1.3.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-11-05
+**Version**: 1.4.0 | **Ratified**: 2026-10-17 | **Last Amended**: 2026-11-08

@@ -4,26 +4,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-import '../../../order/domain/entities/order_status.dart';
 import '../../domain/entities/chat_failure.dart';
 import '../../domain/entities/chat_issue_type.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/chat_role.dart';
-import '../../domain/entities/chat_window.dart';
 import '../../domain/entities/order_chat.dart';
 import '../../domain/repositories/order_chat_repository.dart';
 import '../models/chat_message_model.dart';
 import '../models/order_chat_model.dart';
 
 class FirestoreOrderChatRepository implements OrderChatRepository {
-  FirestoreOrderChatRepository(this._db, this._auth, this._storage);
+  FirestoreOrderChatRepository(
+    this._db,
+    this._auth,
+    this._storage, {
+    this.general = false,
+  });
+
+  final bool general;
 
   final FirebaseFirestore _db;
   final FirebaseAuth _auth;
   final FirebaseStorage _storage;
 
   CollectionReference<Map<String, dynamic>> get _chats =>
-      _db.collection('order_chats');
+      _db.collection(general ? 'general_chats' : 'order_chats');
   DocumentReference<Map<String, dynamic>> _order(String id) =>
       _db.collection('orders').doc(id);
 
@@ -73,6 +78,13 @@ class FirestoreOrderChatRepository implements OrderChatRepository {
       .mapErrors();
 
   @override
+  Stream<int> watchAdminUnreadCount() => _chats
+      .where('unreadByAdmin', isEqualTo: true)
+      .snapshots()
+      .map((snapshot) => snapshot.size)
+      .mapErrors();
+
+  @override
   String newMessageId(String orderId) =>
       _chats.doc(orderId).collection('messages').doc().id;
 
@@ -99,10 +111,12 @@ class FirestoreOrderChatRepository implements OrderChatRepository {
           }
           return;
         }
-        final order = (await transaction.get(_order(orderId))).data();
+        final source = general
+            ? _db.collection('users').doc(orderId)
+            : _order(orderId);
+        final order = (await transaction.get(source)).data();
         if (order == null) throw ChatFailure.permissionDenied;
         final previous = await transaction.get(chat);
-        if (!_isOpen(order)) throw ChatFailure.closed;
         final now = FieldValue.serverTimestamp();
         final update = <String, dynamic>{
           'lastMessageId': messageId,
@@ -121,12 +135,16 @@ class FirestoreOrderChatRepository implements OrderChatRepository {
           transaction.update(chat, update);
         } else {
           transaction.set(chat, {
-            'orderId': orderId,
-            'orderCode': order['orderCode'] ?? orderId,
-            'customerId': order['customerId'],
-            'issueType':
-                (senderRole == ChatRole.admin ? ChatIssueType.other : issueType)
-                    ?.name,
+            if (!general) 'orderId': orderId,
+            if (!general) 'orderCode': order['orderCode'] ?? orderId,
+            if (general) 'customerName': order['fullName'] ?? 'Khách hàng',
+            'customerId': general ? orderId : order['customerId'],
+            if (!general)
+              'issueType':
+                  (senderRole == ChatRole.admin
+                          ? ChatIssueType.other
+                          : issueType)
+                      ?.name,
             'openedByRole': senderRole.name,
             'createdAt': now,
             'unreadByAdmin': false,
@@ -143,7 +161,7 @@ class FirestoreOrderChatRepository implements OrderChatRepository {
         });
       });
     } on FirebaseException catch (error) {
-      throw await _writeFailure(orderId, error);
+      throw _mapFailure(error);
     }
   }
 
@@ -181,33 +199,6 @@ class FirestoreOrderChatRepository implements OrderChatRepository {
       throw _mapFailure(error);
     }
   }
-
-  Future<ChatFailure> _writeFailure(
-    String orderId,
-    FirebaseException error,
-  ) async {
-    final failure = _mapFailure(error);
-    if (failure == ChatFailure.permissionDenied) {
-      try {
-        final order = (await _order(
-          orderId,
-        ).get(const GetOptions(source: Source.server))).data();
-        if (order != null && !_isOpen(order)) return ChatFailure.closed;
-      } on FirebaseException {
-        // The original error still describes the rejected operation.
-      }
-    }
-    return failure;
-  }
-
-  bool _isOpen(Map<String, dynamic> order) => ChatWindow.isOpen(
-    orderStatus: OrderStatus.parse(order['orderStatus']),
-    completedAt: (order['completedAt'] as Timestamp?)?.toDate(),
-    updatedAt:
-        (order['updatedAt'] as Timestamp?)?.toDate() ??
-        DateTime.fromMillisecondsSinceEpoch(0),
-    now: DateTime.now(),
-  );
 }
 
 ChatFailure _mapFailure(Object error) => switch (error) {

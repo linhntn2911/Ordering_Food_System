@@ -187,6 +187,20 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "general_chats",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "unreadByCustomer",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": []

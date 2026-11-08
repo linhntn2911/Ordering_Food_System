@@ -16,6 +16,7 @@ enum AdminDestination {
   orders,
   salesReport,
   broadcasts,
+  messages,
 }
 
 class AdminDrawer extends StatelessWidget {
@@ -38,6 +39,7 @@ class AdminDrawer extends StatelessWidget {
       AdminDestination.orders => AppRoutes.adminOrders,
       AdminDestination.salesReport => AppRoutes.adminSalesReport,
       AdminDestination.broadcasts => AppRoutes.adminBroadcast,
+      AdminDestination.messages => AppRoutes.adminMessages,
     };
 
     if (destination == AdminDestination.dashboard) {
@@ -145,6 +147,14 @@ class AdminDrawer extends StatelessWidget {
                   vertical: AppSpacing.md,
                 ),
                 children: [
+                  _DrawerItem(
+                    key: const ValueKey('admin-drawer-messages'),
+                    icon: Icons.chat_bubble_outline_rounded,
+                    title: 'Tin nhắn',
+                    subtitle: 'Hỗ trợ chung và theo đơn',
+                    isSelected: currentDestination == AdminDestination.messages,
+                    onTap: () => _navigate(context, AdminDestination.messages),
+                  ),
                   _DrawerItem(
                     key: const ValueKey('admin-drawer-dashboard'),
                     icon: Icons.dashboard_rounded,

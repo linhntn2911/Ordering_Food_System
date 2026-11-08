@@ -1,0 +1,11 @@
+# Implementation Plan: General support
+
+Reuse the existing chat repository interface, domain message types, ViewModel, composer and conversation screen. Parameterize repository collection and conversation kind through explicit providers, without inventing orders for general chat. Separate general_chats/{customerUid}/messages from order_chats. Pass conversation kind through scoped providers; all cached draft/read/message state must be isolated by scope and account. General screen authenticates before binding customer UID. Admin inbox uses independent streams by kind, limit 100 then increments, protected route and drawer entry. Existing order chat gets order-details action. Home button uses general unread stream. No dependencies added.
+
+Constitution amendment 1.4.0 permits restaurant general support while retaining COD/single restaurant/security/light Vietnamese MVVM boundaries. Security rules reuse validated message/atomic metadata logic across both collections with owner, active account and sender enforcement. Add general unread composite index; no seed data required because parents are lazy-created. Migration: none. Deploy Firestore rules/indexes with client. Storage rules unchanged for general chat (HTTPS links only).
+
+Validation: Flutter analyzer, chat tests plus general login/separation/inbox/unread tests; emulator first-send/reply/race/retry/read-marker/ownership/forgery/content cases alongside order regression. Full-suite baseline failures recorded separately.
+
+
+### Dashboard unread shortcut
+Add watchAdminUnreadCount() to the shared repository interface; Firestore implementation queries only unreadByAdmin == true without limit and maps snapshot size. Both collections use standard single-field indexes already enabled; no schema, rules or composite-index change. Auto-dispose providers guard active Admin sessions and combine both stream counts as AsyncValue, without clearing read state. Reusable AdminMessagesButton renders count/loading/error, exposes retry, and navigates to existing route. Place a labelled button in its own right-aligned row below Dashboard header to preserve narrow-width layout. Validate sum, >100 counts, live updates, auth guard, fallback states, routing and 320px/1.3 text.

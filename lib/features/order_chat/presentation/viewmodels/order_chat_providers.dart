@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,13 +9,26 @@ import '../../data/repositories/firestore_order_chat_repository.dart';
 import '../../domain/entities/chat_failure.dart';
 import '../../domain/entities/chat_message.dart';
 import '../../domain/entities/chat_role.dart';
-import '../../domain/entities/chat_window.dart';
 import '../../domain/entities/order_chat.dart';
 import '../../domain/repositories/order_chat_repository.dart';
 
 export 'order_chat_view_model.dart' show orderChatViewModelProvider;
 
 typedef ChatSession = ({String orderId, String userId, ChatRole role});
+
+final generalChatModeProvider = Provider<bool>(
+  (ref) => false,
+  dependencies: [],
+);
+
+final generalChatRepositoryProvider = Provider<OrderChatRepository>(
+  (ref) => FirestoreOrderChatRepository(
+    ref.watch(firebaseFirestoreProvider),
+    ref.watch(firebaseAuthProvider),
+    ref.watch(firebaseStorageProvider),
+    general: true,
+  ),
+);
 
 Duration? _retryChatRead(int retryCount, Object error) =>
     error == ChatFailure.permissionDenied
@@ -35,28 +47,12 @@ final orderChatStreamProvider = StreamProvider.autoDispose
     .family<OrderChat?, String>(
       (ref, id) => ref.watch(orderChatRepositoryProvider).watchChat(id),
       retry: _retryChatRead,
+      dependencies: [orderChatRepositoryProvider],
     );
 
 final chatOrderProvider = StreamProvider.autoDispose.family<FoodOrder, String>(
   (ref, id) => ref.watch(orderRepositoryProvider).watchOrder(id),
 );
-
-final chatOpenProvider = Provider.autoDispose.family<bool, FoodOrder>((
-  ref,
-  order,
-) {
-  final deadline = ChatWindow.closesAt(
-    orderStatus: order.status,
-    completedAt: order.completedAt,
-    updatedAt: order.updatedAt,
-  );
-  if (deadline == null) return true;
-  final remaining = deadline.difference(DateTime.now());
-  if (remaining <= Duration.zero) return false;
-  final timer = Timer(remaining, ref.invalidateSelf);
-  ref.onDispose(timer.cancel);
-  return true;
-});
 
 final chatMessagesProvider = StreamProvider.autoDispose
     .family<List<ChatMessage>, ({String orderId, int limit})>(
@@ -64,6 +60,7 @@ final chatMessagesProvider = StreamProvider.autoDispose
           .watch(orderChatRepositoryProvider)
           .watchMessages(query.orderId, limit: query.limit),
       retry: _retryChatRead,
+      dependencies: [orderChatRepositoryProvider],
     );
 
 final customerUnreadChatProvider = StreamProvider.autoDispose
@@ -76,4 +73,5 @@ final chatPhotoProvider = FutureProvider.autoDispose
     .family<Uint8List, ({String path, String userId})>(
       (ref, photo) =>
           ref.watch(orderChatRepositoryProvider).photoBytes(photo.path),
+      dependencies: [orderChatRepositoryProvider],
     );

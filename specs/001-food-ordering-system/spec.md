@@ -11,7 +11,7 @@
 
 The application supports food ordering from one restaurant, Ngô Chicken, which sells fried chicken, rice, noodles, snacks, combos, and drinks. Guests can browse the menu. Registered customers can manage a cart, delivery addresses, COD orders, reviews, favorites, and notifications, and can chat with the restaurant about a problem with one of their orders. Pre-provisioned administrators manage the menu, process orders, and answer order-issue chats from the same mobile application through role-based navigation.
 
-The first release uses Cash on Delivery only. It does not include an online payment gateway, a driver application, live GPS tracking, general-purpose or pre-sale chat, multi-restaurant support, or complex voucher rules. Chat exists only as an order-issue conversation attached to a specific order (User Story 11).
+The first release uses Cash on Delivery only. It does not include an online payment gateway, a driver application, live GPS tracking, peer-to-peer chat, multi-restaurant support, or complex voucher rules. Chat supports general restaurant questions and separate order-issue conversations (User Story 11 and feature 009).
 
 ## Actors
 
@@ -193,12 +193,12 @@ As a Customer, I want to message the restaurant about a problem with one of my o
 
 **Acceptance Scenarios**:
 
-1. **Given** a Customer owns an order that is active or reached a terminal status less than 24 hours ago, **When** the Customer opens chat from Order Details and sends a first message, **Then** one conversation is created for that order and the message appears in it.
+1. **Given** an owned historical order, **When** an authorized participant opens or sends chat, **Then** chat can be started or continued without a deadline, preserving its existing history.
 2. **Given** a conversation already exists for the order, **When** the Customer opens chat again, **Then** the existing conversation opens instead of a second one being created.
 3. **Given** an open conversation, **When** either side sends a message with text, photos, or both, **Then** the other side sees it without manual refresh, or sees an unread badge if elsewhere in the app.
 4. **Given** a Customer message is unread by Admins, **When** an Admin views the Admin Order List, **Then** the order shows a "new message" badge and appears under the "Has messages" filter.
 5. **Given** an Admin needs to contact the Customer about an order (for example an out-of-stock item or an unclear address), **When** the Admin opens chat from Admin Order Details, **Then** a conversation for that order is created or opened and the Customer sees an unread badge.
-6. **Given** an order reached `Completed`, `Cancelled`, or `Rejected` more than 24 hours ago, **When** either side opens its conversation, **Then** the history is readable but no new message can be sent.
+6. **Given** an owned historical order, **When** an authorized participant opens or sends chat, **Then** chat can be started or continued without a deadline, preserving its existing history.
 7. **Given** a Guest, another Customer, or a disabled account, **When** they try to read or write a conversation or view its photos, **Then** the app and Firebase rules deny it.
 8. **Given** the device is offline or a send or photo upload fails, **When** the user sends a message, **Then** the message shows a pending or failed state with a retry action, is never duplicated after retry, and never shows a missing photo.
 
@@ -217,8 +217,8 @@ As a Customer, I want to message the restaurant about a problem with one of my o
 - Delivery distance cannot be resolved, falls exactly on a fee-band boundary, or exceeds the 8 km service radius.
 - A disabled account or temporarily locked account attempts to reuse an existing local session.
 - A Customer and an Admin both start a conversation for the same order at nearly the same time; only one conversation may exist per order.
-- A Customer tries to report an issue on an order that reached a terminal status more than 24 hours ago.
-- The 24-hour chat window closes while a user is typing; the unsent text and photos must not be silently lost and the user is told the conversation has closed.
+- A Customer reports an issue on an old terminal order; chat is still available.
+- Order completion, cancellation or rejection does not interrupt chat drafts or sending.
 - A chat photo upload partially succeeds; a message must not reference a missing file.
 - A conversation link is opened after the account was disabled or by a different account.
 
@@ -301,16 +301,16 @@ As a Customer, I want to message the restaurant about a problem with one of my o
 
 #### Order-Issue Chat
 
-- **FR-053**: A Customer MUST be able to start an order-issue conversation from Order Details for their own order while the order is active or within 24 hours after it reaches `Completed`, `Cancelled`, or `Rejected`.
+- **FR-053**: An active Customer MUST be able to start or open chat for their own order at any time, including after completion, cancellation or rejection.
 - **FR-054**: New conversations MUST automatically use the default issue type `other`.
 - **FR-055**: The system MUST keep at most one conversation per order; opening chat again for the same order MUST open the existing conversation.
-- **FR-056**: An Admin MUST be able to start or open the conversation for any order from Admin Order Details. The Admin Order List MUST show a "new message" badge on orders with messages unread by Admins and MUST offer a "Has messages" filter; there is no separate support inbox screen.
+- **FR-056**: An Admin MUST be able to start or open the conversation for any order from Admin Order Details. The Admin Order List MUST show a "new message" badge on orders with messages unread by Admins and MUST offer a "Has messages" filter; Admin also has a Tin nhắn inbox with Chung / Theo đơn filters.
 - **FR-057**: A message MUST contain text of up to 1,000 characters, up to three direct HTTPS image links, or both, and MUST NOT be empty. Sent messages MUST NOT be editable or deletable by clients.
 - **FR-058**: New messages MUST appear for both participants in real time. Each side MUST see an unread indicator (Customer: on the order and the Orders tab; Admin: on the order in the Admin Order List and Admin Order Details) that clears only for the person who opens the conversation.
 - **FR-059**: Chat push notifications are deferred until the trusted notification backend exists (FR-040); until then the client MUST NOT send FCM messages and new messages are signalled by real-time updates and unread indicators.
-- **FR-060**: A conversation MUST become read-only 24 hours after its order reaches `Completed`, `Cancelled`, or `Rejected`, and MUST remain readable by both participants afterwards. There is no manual resolve or reopen.
+- **FR-060**: Authorized participants MUST be able to start or continue order chat indefinitely, regardless of order status or elapsed time. No automatic closing or reopening is required.
 - **FR-061**: Images in a conversation MUST be viewable full screen by both participants.
-- **FR-062**: Firestore and Storage rules MUST allow a conversation, its messages, and its images to be read or written only by the owning Customer and active Admins, MUST bind each message's sender UID and role to the authenticated user, and MUST reject new messages after the 24-hour window.
+- **FR-062**: Server rules MUST restrict conversations, messages and attachments to the owning active Customer and active Admins, bind sender UID and role to the account, and impose no time limit.
 
 #### Reporting and Local Configuration
 
@@ -337,9 +337,9 @@ As a Customer, I want to message the restaurant about a problem with one of my o
 - **BR-015**: Orders beyond 8 km or without a determinable delivery distance are not accepted.
 - **BR-016**: Self-registration always assigns `Customer`; Admin accounts are pre-provisioned and protected from client modification.
 - **BR-017**: Five consecutive failed sign-in attempts trigger a 15-minute lockout enforced by a trusted authentication layer.
-- **BR-018**: Chat exists only as an order-issue conversation attached to one order; there is no general or pre-sale chat and no voice or video calling.
+- **BR-018**: Chat supports restaurant-related general questions and separate order-issue conversations; peer messaging and voice/video calling are excluded.
 - **BR-019**: Each order has at most one conversation, whose participants are the order's Customer and the restaurant's Admins acting as one support role.
-- **BR-020**: Messages can be sent only while the order is active or within 24 hours after its terminal status; afterwards the conversation is read-only.
+- **BR-020**: Authorized participants may send messages at any time after an order is created, including after a terminal status, without expiry.
 - **BR-021**: Chat messages and their images are immutable once sent and use server timestamps.
 
 ### Required Technical Constraints
@@ -370,7 +370,7 @@ As a Customer, I want to message the restaurant about a problem with one of my o
 - **NFR-007 Accessibility**: Interactive controls MUST have readable contrast, semantic labels, and touch targets of at least 48 logical pixels where practical.
 - **NFR-008 Consistency**: Colors, typography, spacing, radius, and shared components MUST come from centralized theme and token files.
 - **NFR-009 Visual fidelity**: Customer and Admin screens MUST follow `docs/design_system.md`, including the `#53E88B -> #15BE77` primary gradient, Poppins type scale, 4-point spacing grid, and light-only surfaces.
-- **NFR-010 App shell**: Customer screens MUST share a bottom navigation bar with Home, Cart, Orders, and Profile; the Food Ninja Chat tab is out of scope, and order-issue chat is reached from Order Details rather than a bottom tab. Tabs whose feature is not yet delivered MUST show a "feature in development" state rather than an unresponsive control (see `specs/002-browse-menu/spec.md`).
+- **NFR-010 App shell**: Customer screens MUST share a bottom navigation bar with Home, Cart, Orders, and Profile; the Food Ninja Chat tab is out of scope, and order-issue chat is reached from Order Details or Home through order selection. Tabs whose feature is not yet delivered MUST show a "feature in development" state rather than an unresponsive control (see `specs/002-browse-menu/spec.md`).
 
 ## Key Entities
 
@@ -386,7 +386,7 @@ As a Customer, I want to message the restaurant about a problem with one of my o
 - **Review**: Customer UID, order ID, order item ID, menu item ID, rating, comment, media URLs, anonymous flag, edit state, timestamps.
 - **Notification**: Recipient UID, order ID, event type, title, body, read flag, deep-link data, timestamp.
 - **DeviceToken**: UID, token, platform, enabled flag, last-seen timestamp.
-- **SupportConversation**: Order ID (one per order), order code snapshot, Customer UID, issue type, opened-by role, last-message preview and timestamp, Customer and Admin unread state, timestamps. Open or read-only is derived from the order's status and terminal time.
+- **SupportConversation**: Order ID (one per order), order code snapshot, Customer UID, issue type, opened-by role, last-message preview and timestamp, Customer and Admin unread state, timestamps. Chat remains open regardless of order status or age.
 - **ChatMessage**: Conversation ID, sender UID, sender role (`customer` or `admin`), optional text, zero to three image URLs, client message ID for idempotent retry, server timestamp.
 
 ## Screen Inventory and Team Allocation
@@ -418,7 +418,7 @@ Screen complexity is based on meaningful data state, validation, navigation, asy
 | Member 5 | Add or Edit Menu Item | High | Validated form, options, image upload |
 | Member 5 | Category Management | Medium | Ordered CRUD and publication rules |
 | Member 5 | Sales Report | Medium | Date range, metrics, top items, zero state |
-| To be assigned | Order Issue Chat (Customer and Admin) | High | Real-time text and photo messages, unread state, pending/failed sends, 24-hour read-only rule |
+| To be assigned | Order Issue Chat (Customer and Admin) | High | Real-time text and photo messages, unread state, pending/failed sends, unlimited order support |
 
 The owner of the order-issue chat screen is decided during planning; it also adds chat entry points and unread badges to Order Details, Admin Order List, and Admin Order Details. This screen is an addition and does not change the existing per-member minimum. Each member owns at least three Medium-or-higher screens. Shared widgets, Firebase setup, rules, test infrastructure, and integration work remain team responsibilities and do not replace individual screen ownership.
 
@@ -466,3 +466,16 @@ This document completes the `specify` stage. Before implementation, the team mus
 5. `tasks` - create dependency-ordered, story-scoped tasks with exact file paths and member ownership.
 6. `analyze` - check consistency among specification, plan, and tasks.
 7. `implement` and `converge` - implement by story and repeat verification until no gaps remain.
+
+## Home order-support amendment — 2026-11-08
+
+Home offers a floating “Nhắn nhà hàng” button opening general support directly, one history per Customer. Order Details retains separate order chat; Admin Tin nhắn has Chung / Theo đơn filters. Feature 009 supersedes the former order selector.
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.
+
+
+## General support amendment — 2026-11-08
+
+Approved feature 009 permits restaurant-related general questions. Home opens one general history per Customer; order-specific histories remain in Order Details. Admin has one Tin nhắn screen with Chung / Theo đơn filters. Both histories have no time limit. This supersedes order-only scope, Home order selection, and the no-support-inbox restriction; all access control and message limits remain. See specs/009-general-support-chat/spec.md.

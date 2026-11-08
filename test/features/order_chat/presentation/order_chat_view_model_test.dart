@@ -91,19 +91,15 @@ void main() {
     expect(repository.delivered.values.single.issue, ChatIssueType.other);
   });
 
-  test(
-    'closed order preserves the draft and does not attempt a send',
-    () async {
-      await start(customer, closed: true);
-      final provider = orderChatViewModelProvider(customer);
-      final model = container.read(provider.notifier);
-      model.setText('Vẫn giữ nội dung');
-      expect(model.addImageUrl(_photoUrl), isNull);
-      await model.send();
-      expect(repository.sends, isEmpty);
-      expect(container.read(provider).expired, isTrue);
-      expect(container.read(provider).draft.text, 'Vẫn giữ nội dung');
-      expect(container.read(provider).draft.imageUrls, hasLength(1));
-    },
-  );
+  test('historical order accepts a message and clears the draft', () async {
+    await start(customer, closed: true);
+    final provider = orderChatViewModelProvider(customer);
+    final model = container.read(provider.notifier);
+    model.setText('Vẫn giữ nội dung');
+    expect(model.addImageUrl(_photoUrl), isNull);
+    await model.send();
+    expect(repository.sends, hasLength(1));
+    expect(container.read(provider).draft.text, isEmpty);
+    expect(container.read(provider).draft.imageUrls, isEmpty);
+  });
 }

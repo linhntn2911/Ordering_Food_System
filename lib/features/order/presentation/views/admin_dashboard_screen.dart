@@ -9,6 +9,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/admin_drawer.dart';
+import '../../../order_chat/presentation/widgets/admin_messages_button.dart';
 import '../../../category/presentation/viewmodels/category_management_view_model.dart';
 import '../../../category/presentation/views/category_management_screen.dart';
 import '../../../menu/presentation/views/admin_menu_item_list_screen.dart';
@@ -61,6 +62,11 @@ class AdminDashboardScreen extends ConsumerWidget {
                           ref.invalidate(adminOrdersProvider);
                           ref.invalidate(categoriesProvider);
                         },
+                      ),
+                      const SizedBox(height: AppSpacing.p12),
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: AdminMessagesButton(),
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       Text(
@@ -176,9 +182,13 @@ class _TopBar extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.xxs),
-                  Text(
-                    'Bảng điều khiển quản trị',
-                    style: AppTextStyles.bodySmall,
+                  Expanded(
+                    child: Text(
+                      'Bảng điều khiển quản trị',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.bodySmall,
+                    ),
                   ),
                 ],
               ),

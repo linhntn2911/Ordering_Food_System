@@ -331,3 +331,21 @@ Shared UI components belong under `lib/core/widgets/`. Feature screens must not 
 ## Attribution
 
 Keep Pixel True attribution in the repository README or an About/Credits screen according to the UI kit's distribution terms. Do not present the original Food Ninja artwork as an independently authored design system.
+
+## Home order support — 2026-11-08
+
+Home adds a circular 56px floating chat button using the shared primary gradient, tooltip “Nhắn nhà hàng”, above MainShell navigation. Reserve 96px at the end of Home scroll content. Open a full-screen selector using standard responsive padding, Poppins, light tokens and public order code/date/status rows. Handle login/loading/empty/error/retry; login returns to selection. Selecting an owned order opens existing chat by document ID, without a sending deadline. Bottom navigation remains unchanged.
+
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.
+
+
+## General support amendment — 2026-11-08
+
+Feature 009 supersedes order-only chat and Home order selection: Home opens general restaurant support, one history per Customer. Order Details retains separate per-order chat. Admin drawer Tin nhắn opens a shared inbox with Chung / Theo đơn filters, preview/time/unread rows and order-details navigation. Reuse light Poppins tokens and chat controls; general_chats stores general histories separately by UID with no expiry. No existing chat migration; deploy Firestore rules/indexes together with client. See specs/009-general-support-chat/{spec,plan,tasks,data-model}.md.
+
+
+## Admin Dashboard messages shortcut — 2026-11-09
+A right-aligned labelled Tin nhắn button below the top header opens the inbox. Use shared primary-soft background, primary-end icon/text, minimum 48px touch height and standard radii. Badge uses error fill/surface text and caps display at 99+; omit at zero. Loading uses a small progress indicator, failure an accessible warning with a retry action. Keep navigation enabled. Use Poppins and support 320px/text scale 1.3.

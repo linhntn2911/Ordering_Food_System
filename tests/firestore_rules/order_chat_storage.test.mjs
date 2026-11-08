@@ -50,13 +50,13 @@ test('S6 Photos cannot be overwritten or deleted', async () => {
   }
 });
 
-test('S7 Closed orders are read-only', async () => {
+test('S7 Historical orders allow participant image reads and creates', async () => {
   await env.withSecurityRulesDisabled(async (context) => {
     await upload(ref(context.storage(), 'order_chats/order-old/photo/0.jpg'), 100);
   });
   for (const uid of [owner, admin]) {
     await assertSucceeds(getMetadata(photo(uid, { order: old })));
-    await assertFails(upload(photo(uid, { order: old, file: '1.jpg' })));
+    await assertSucceeds(upload(photo(uid, { order: old, message: uid, file: '1.jpg' })));
   }
 });
 

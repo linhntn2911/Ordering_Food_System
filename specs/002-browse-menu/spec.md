@@ -180,3 +180,12 @@ Từ bất kỳ món nào đang hiển thị khi duyệt, người dùng có th�
 - Chưa có ảnh món; mọi món dùng ảnh thay thế cho tới khi Admin tải ảnh lên (User Story 7 gốc).
 - Kích thước trang đầu hợp lý là khoảng 20 món; con số chính xác được quyết định ở bước lập kế hoạch.
 - Câu về quyền đọc trong `docs/database_schema.md` ("Published and available items are publicly readable") cần được điều chỉnh ở bước lập kế hoạch để các món đã đăng bán thuộc danh mục đã đăng bán đọc được công khai bất kể tình trạng còn/hết hàng.
+
+## Home order support — 2026-11-08
+
+Home adds a circular 56px floating chat button using the shared primary gradient, tooltip “Hỗ trợ đơn hàng”, above MainShell navigation. Reserve 96px at the end of Home scroll content. Open a full-screen selector using standard responsive padding, Poppins, light tokens and public order code/date/status rows. Handle login/loading/empty/error/retry; login returns to selection. Selecting an owned order opens existing chat by document ID, without a sending deadline. Bottom navigation remains unchanged.
+
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.

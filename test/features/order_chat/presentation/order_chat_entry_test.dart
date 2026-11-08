@@ -104,18 +104,14 @@ void main() {
     expect(find.text('Chat firestore-doc'), findsOneWidget);
   });
 
-  testWidgets(
-    'closed order with no conversation shows the 24-hour explanation',
-    (tester) async {
-      final repository = FakeOrderChatRepository();
-      addTearDown(repository.close);
-      await tester.pumpWidget(app(repository, closed: true));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const ValueKey('order-chat-open')), findsNothing);
-      expect(
-        find.textContaining('24 giờ sau khi đơn kết thúc'),
-        findsOneWidget,
-      );
-    },
-  );
+  testWidgets('historical order with no conversation still offers chat', (
+    tester,
+  ) async {
+    final repository = FakeOrderChatRepository();
+    addTearDown(repository.close);
+    await tester.pumpWidget(app(repository, closed: true));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('order-chat-open')), findsOneWidget);
+    expect(find.textContaining('24 giờ sau khi đơn kết thúc'), findsNothing);
+  });
 }

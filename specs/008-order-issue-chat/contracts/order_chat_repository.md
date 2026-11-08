@@ -46,7 +46,6 @@ abstract interface class OrderChatRepository {
 
 | Type | When | UI message (vi) |
 |---|---|---|
-| `closed` | Rules reject because the 24-hour window ended | "Cuộc trò chuyện đã đóng" |
 | `permissionDenied` | Not a participant or disabled account | "Bạn không có quyền xem cuộc trò chuyện này" |
 | `unavailable` | Network / offline | "Không gửi được. Kiểm tra kết nối và thử lại" |
 | `unknown` | Anything else | "Đã có lỗi, vui lòng thử lại" |
@@ -56,3 +55,8 @@ abstract interface class OrderChatRepository {
 - Emits through controllable streams (`emitChat`, `emitMessages`).
 - Records `sendMessage` calls and can be told to fail the next N calls with a given `ChatFailure`.
 - `sendMessage` with an already-recorded `messageId` is a no-op (mirrors R3).
+
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.

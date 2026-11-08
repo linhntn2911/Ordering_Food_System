@@ -14,7 +14,7 @@
 
 - Q: Where do Admins find conversations? → A: No separate inbox screen. Orders with unread Customer messages show a "new message" badge in the Admin order list and Admin order details, and the Admin order list gets a "Has messages" filter.
 - Q: Can messages include photos in the first release? → A: Yes. A message may carry up to three direct HTTPS image links, with or without text.
-- Q: How does a conversation close? → A: Automatically. It becomes read-only 24 hours after the order reaches Completed, Cancelled, or Rejected. There is no manual "Resolved" status and no reopening.
+- Q: How does a conversation close? → A: It does not expire automatically. Authorized participants can continue messaging indefinitely.
 - Decision: Push notifications for chat are deferred until the project has the trusted notification backend required by the baseline (FR-040). Until then, new messages are signalled in the app by real-time updates and unread badges.
 
 ## User Scenarios & Testing *(mandatory)*
@@ -31,8 +31,8 @@ A Customer who has a problem with one of their orders (a missing or wrong item, 
 
 1. **Given** a signed-in Customer owns an order that is still in progress, **When** they open the order, choose "Message the restaurant", and send a first message, **Then** a conversation is created for that order and the message is shown in it.
 2. **Given** a conversation already exists for the order, **When** the Customer opens chat from the order again, **Then** the existing conversation opens and no second conversation is created.
-3. **Given** an order reached Completed, Cancelled, or Rejected less than 24 hours ago, **When** the Customer opens it, **Then** chat is still available for sending.
-4. **Given** an order reached Completed, Cancelled, or Rejected more than 24 hours ago and has no conversation, **When** the Customer opens it, **Then** chat is not offered and the screen explains that issues can be reported up to 24 hours after the order ends.
+3. **Given** an owned historical order, **When** an authorized participant opens or sends chat, **Then** chat can be started or continued without a deadline, preserving its existing history.
+4. **Given** an owned historical order, **When** an authorized participant opens or sends chat, **Then** chat can be started or continued without a deadline, preserving its existing history.
 5. **Given** the Customer is writing a message, **When** it has no text and no photo, or the text is longer than 1,000 characters, **Then** it cannot be sent and the limit is shown.
 6. **Given** the Customer attaches an image link, **When** the link is invalid, already attached, or exceeds the three-link limit, **Then** the app refuses it.
 7. **Given** the device is offline or sending fails, **When** the Customer sends a message, **Then** the message is marked as pending or failed with a retry action, and retrying never produces a duplicate message.
@@ -72,26 +72,26 @@ While handling an order, an Admin needs the Customer's input (for example an ite
 
 ---
 
-### User Story 4 - Conversation closes automatically (Priority: P2)
+### User Story 4 - Continue support for historical orders (Priority: P2)
 
-A conversation stops accepting new messages 24 hours after its order ends, so old orders do not stay open forever, while the history remains readable by both sides.
+Order chat remains available indefinitely so Customers and Admins can continue support for historical orders.
 
-**Why this priority**: Keeps the restaurant's workload bounded, but the conversation is usable before the closing rule exists.
+**Why this priority**: Support can continue whenever a Customer needs help with a historical order.
 
-**Independent Test**: Use an order that reached Completed more than 24 hours ago and has a conversation; confirm both sides can still read it and neither side can send a new message.
+**Independent Test**: Use old Completed, Cancelled and Rejected orders; verify both roles can start a conversation and send subsequent messages while preserving history.
 
 **Acceptance Scenarios**:
 
-1. **Given** an order reached Completed, Cancelled, or Rejected more than 24 hours ago, **When** either side opens its conversation, **Then** the message box is replaced by a notice that the conversation is closed.
-2. **Given** a closed conversation, **When** either side opens it, **Then** the full message history, including photos, is still readable.
-3. **Given** the 24-hour window ends while someone is writing, **When** they try to send, **Then** the message is not sent, the typed text and attached photos are kept on screen, and they are told the conversation has closed.
+1. **Given** an owned historical order, **When** an authorized participant opens or sends chat, **Then** chat can be started or continued without a deadline, preserving its existing history.
+2. **Given** an existing conversation, **When** either side opens it, **Then** history and photos remain readable and new messages can be sent.
+3. **Given** an owned historical order, **When** an authorized participant opens or sends chat, **Then** chat can be started or continued without a deadline, preserving its existing history.
 
 ---
 
 ### Edge Cases
 
 - An external image becomes unavailable. The message remains visible and the viewer displays an image error.
-- The order's status changes while the conversation is open: the status shown next to the messages updates, and the 24-hour closing countdown starts when the order ends.
+- Order status changes update the chat header without interrupting message composition or sending.
 - A conversation link is opened by someone who is no longer allowed to see the order (signed out, different account, disabled account): access is denied and the user lands on a safe screen.
 - A Guest opens a conversation link: they are asked to sign in and, after signing in as the owning Customer, reach the conversation.
 - A Customer or Admin account is disabled while a conversation is open: they can no longer send messages.
@@ -101,27 +101,27 @@ A conversation stops accepting new messages 24 hours after its order ends, so ol
 
 ### Functional Requirements
 
-- **FR-001**: A signed-in Customer MUST be able to start a conversation from their own order while the order is in progress or within 24 hours after it reaches Completed, Cancelled, or Rejected.
+- **FR-001**: An active Customer MUST be able to start or open chat for their own order at any time, including after completion, cancellation or rejection.
 - **FR-002**: New conversations MUST automatically use the default issue type `other`. Customers and Admins can send the first valid message directly. Existing conversations retain their recorded issue type.
 - **FR-003**: Each order MUST have at most one conversation; opening chat for an order that already has one MUST open the existing conversation.
 - **FR-004**: An Admin MUST be able to start or open the conversation for any order from the Admin order details.
-- **FR-005**: The Admin order list MUST show a "new message" badge on orders whose conversation has messages unread by Admins, and MUST offer a "Has messages" filter; there is no separate inbox screen.
+- **FR-005**: The Admin order list MUST show a "new message" badge on orders whose conversation has messages unread by Admins, and MUST offer a "Has messages" filter; Admin additionally has the shared inbox defined in feature 009.
 - **FR-006**: A message MUST contain text of up to 1,000 characters, up to three photos, or both, and MUST NOT be empty.
 - **FR-007**: New attachments MUST be direct HTTPS image URLs of at most 2,048 characters. The app MUST store the links with the message and display an error if an image cannot be loaded.
 - **FR-008**: Photos MUST be viewable in a full-screen viewer by both participants.
 - **FR-009**: Sent messages MUST NOT be editable or deletable by Customers or Admins.
 - **FR-010**: New messages MUST appear for the other participant without manual refresh, in the order they were sent, using the server's time.
 - **FR-011**: Each side MUST see an unread indicator for a conversation with messages they have not read (for the Customer, on the order and on the Orders tab; for Admins, on the order in the Admin order list and details). The indicator MUST clear only for the person who opens the conversation.
-- **FR-012**: A conversation MUST stop accepting new messages 24 hours after its order reaches Completed, Cancelled, or Rejected, and MUST remain readable by both sides afterwards.
-- **FR-013**: Only the order's Customer and active Admins MUST be able to read or send messages and access their attachment references in a conversation; this MUST be enforced by the server, including the 24-hour closing rule, and not only by hiding screens.
+- **FR-012**: Authorized participants MUST be able to start or continue order chat indefinitely, regardless of order status or elapsed time. No automatic closing or reopening is required.
+- **FR-013**: Server rules MUST restrict conversations, messages and attachments to the owning active Customer and active Admins, bind sender UID and role to the account, and impose no time limit.
 - **FR-014**: A message's sender and role MUST be taken from the signed-in account and MUST NOT be choosable by the sender.
 - **FR-015**: A message that fails to send MUST stay visible with a retry action, and a retry MUST NOT create a duplicate message or duplicate photos.
-- **FR-016**: Chat MUST be reachable only from an order; there MUST NOT be a general chat tab, chat unrelated to an order, or voice or video calling.
+- **FR-016**: Order chat stays attached to its order and is reached from Order Details or Admin Theo đơn inbox. Home opens separate general restaurant support under feature 009; there is no Customer Chat tab or voice/video calling.
 - **FR-017**: Chat push notifications are out of scope for this feature until the trusted notification backend exists; the client MUST NOT send push notifications itself.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Conversation**: Belongs to exactly one order and its Customer. Holds the issue type, who started it (Customer or Admin), the latest message preview and time, and per-side unread state. Open or closed is derived from the order's status and end time, not stored separately.
+- **Conversation**: Belongs to exactly one order and its Customer. Holds the issue type, who started it (Customer or Admin), the latest message preview and time, and per-side unread state. Chat does not expire; no closed state is stored.
 - **Message**: Belongs to one conversation. Holds the sender, the sender's role (Customer or Admin), optional text, zero to three photos, and the server time it was sent.
 - **Photo attachment**: Belongs to one message. Holds a reference to the stored image, which only the conversation's participants can view.
 
@@ -131,7 +131,7 @@ A conversation stops accepting new messages 24 hours after its order ends, so ol
 
 - **SC-001**: A Customer can go from opening an order to sending their first issue message with a photo in under 1 minute.
 - **SC-002**: Under normal network conditions, a text message from either side appears for the other side within 5 seconds, and a message with one photo within 10 seconds.
-- **SC-003**: In access tests, 100% of attempts by a Guest, a different Customer, or a disabled account to read messages, access attachment references, or send messages in someone else's conversation are rejected, as are 100% of attempts to send after the 24-hour window.
+- **SC-003**: All Guest, other-Customer and disabled-account access attempts are rejected; authorized participants can start and continue chat for historical orders of every terminal status.
 - **SC-004**: Retrying a failed message 3 times results in exactly 1 delivered message with each link recorded once.
 - **SC-005**: In a team demo, an Admin can find and answer a newly reported issue using only the Admin order list, without being told where to look.
 
@@ -141,7 +141,20 @@ A conversation stops accepting new messages 24 hours after its order ends, so ol
 - Admins act as one shared "restaurant" side: any active Admin can read and answer any conversation, and Customers see replies labelled "Ngô Chicken" rather than an individual Admin's name.
 - External hosts control access to and availability of image content. A person who already has the URL may be able to view it. Earlier Firebase Storage attachments remain readable under their existing rules.
 - Messages and attachment references are kept for as long as the order they belong to is kept.
-- The 24-hour window after an order ends matches the baseline (BR-020) and is long enough to report delivery problems.
+Order chat remains available indefinitely so Customers and Admins can continue support for historical orders.
 - No automatic replies, chatbot, translation, message search, or manual "resolved" status are included.
 - Text uses the app's existing Vietnamese-first wording and the light-only design system.
 - When the trusted notification backend is added later, chat push notifications can be enabled without changing how conversations work.
+
+## Home support shortcut amendment — superseded by feature 009
+
+FR-018–020 and SC-006 of the original Home order selector are retired. Home now opens general restaurant support directly; order conversations remain in Order Details and Admin Theo đơn inbox. See specs/009-general-support-chat/spec.md for the active requirements.
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.
+
+
+## General support amendment — 2026-11-08
+
+Feature 009 supersedes order-only chat and Home order selection: Home opens general restaurant support, one history per Customer. Order Details retains separate per-order chat. Admin drawer Tin nhắn opens a shared inbox with Chung / Theo đơn filters, preview/time/unread rows and order-details navigation. Reuse light Poppins tokens and chat controls; general_chats stores general histories separately by UID with no expiry. No existing chat migration; deploy Firestore rules/indexes together with client. See specs/009-general-support-chat/{spec,plan,tasks,data-model}.md.

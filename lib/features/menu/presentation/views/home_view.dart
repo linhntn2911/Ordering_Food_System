@@ -9,6 +9,7 @@ import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_loading_view.dart';
 import '../../../../core/widgets/offline_banner.dart';
 import '../../../auth/presentation/viewmodels/auth_providers.dart';
+import '../../../order_chat/presentation/widgets/home_order_support_button.dart';
 import '../../domain/entities/menu_failure.dart';
 import '../../domain/entities/menu_item.dart';
 import '../viewmodels/home_menu_state.dart';
@@ -126,6 +127,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final isSignedIn = ref.watch(authStateProvider).value != null;
 
     return Scaffold(
+      floatingActionButton: const HomeOrderSupportButton(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final padding = AppSpacing.screenHorizontalFor(constraints.maxWidth);
@@ -175,7 +177,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 sliver: const SliverToBoxAdapter(
                   child: SafeArea(
                     top: false,
-                    child: SizedBox(height: AppSpacing.p24),
+                    child: SizedBox(height: AppSpacing.p24 * 4),
                   ),
                 ),
               ),

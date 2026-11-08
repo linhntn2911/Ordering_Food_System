@@ -238,3 +238,17 @@ Task: "Implement ChatComposer widget in lib/features/order_chat/presentation/wid
 ## Image link attachments
 
 - [X] Replace the image picker with an HTTPS link dialog, validate links in the client and rules, and preserve viewing of existing Storage attachments.
+
+## Phase 9: Home support shortcut (US5)
+
+- [X] T056 [US5] Amend baseline, feature spec, plan and design for FR-018–020.
+- [X] T057 [US5] Add authenticated immutable order-selection provider and selection screen with login/loading/empty/error/retry.
+- [X] T058 [US5] Add gradient Home support button, scroll clearance and existing chat routing.
+- [X] T059 [US5] Test selection access/states/navigation and Home regressions; format, analyze and run Flutter tests; record convergence.
+
+
+## Phase 10: Unlimited order chat (supersedes Phase 6)
+
+- [X] T060 Update specs, plan, contracts and requirements-quality review for unlimited chat.
+- [X] T061 Remove client and Firebase time gates while retaining participant authorization.
+- [X] T062 Update domain, ViewModel, widget and rules tests for historical orders; format/analyze/run focused suites and document deployment needs.

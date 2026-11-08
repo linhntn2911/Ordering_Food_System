@@ -127,14 +127,17 @@ test('C11 A recent terminal order accepts messages', async () => {
   await assertSucceeds(write(admin, { order: 'recent-rejected' }));
 });
 
-test('C12 Both sides are denied after 24 hours', async () => {
+test('C12 Both sides can start and continue chat on old terminal orders', async () => {
   for (const uid of [owner, admin]) {
-    await assertFails(write(uid, { order: old }));
-    await assertFails(write(uid, { order: 'old-cancelled' }));
+    for (const base of [old, 'old-cancelled', 'old-rejected']) {
+      const order = uid === admin ? base + '-admin' : base;
+      await assertSucceeds(write(uid, { order, id: 'start-' + uid }));
+      await assertSucceeds(write(uid, { order, id: 'reply-' + uid, existing: true }));
+    }
   }
 });
 
-test('C13 Expired history remains readable and its unread flag can be cleared', async () => {
+test('C13 Historical chat remains readable, writable and can be marked read', async () => {
   await env.withSecurityRulesDisabled(async (context) => {
     await setDoc(chat(context.firestore(), old), { customerId: owner, unreadByAdmin: true });
     await setDoc(message(context.firestore(), old), { text: 'History' });
@@ -144,7 +147,7 @@ test('C13 Expired history remains readable and its unread flag can be cleared', 
     await assertSucceeds(getDoc(message(db(uid), old)));
   }
   await assertSucceeds(updateDoc(chat(db(admin), old), { unreadByAdmin: false }));
-  await assertFails(write(admin, { order: old, id: 'late', existing: true }));
+  await assertSucceeds(write(admin, { order: old, id: 'late', existing: true }));
 });
 
 test('C14 Parent identity fields are immutable', async () => {

@@ -111,5 +111,9 @@ class FakeOrderChatRepository implements OrderChatRepository {
       Stream.value(adminChats.take(limit).toList());
 
   @override
+  Stream<int> watchAdminUnreadCount() =>
+      Stream.value(adminChats.where((chat) => chat.unreadByAdmin).length);
+
+  @override
   Stream<bool> watchCustomerHasUnread(String customerId) => Stream.value(false);
 }

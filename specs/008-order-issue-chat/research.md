@@ -28,11 +28,11 @@ All Technical Context unknowns are resolved below. Each entry records the decisi
 - **Rationale**: Meets FR-007 (no message with a missing photo). Storing paths instead of download URLs keeps reads behind Storage rules; the Storage SDK checks authorization and returns bytes to the app.
 - **Alternatives considered**: Storing download URLs (rejected: token URLs bypass rules if leaked); writing the message first and patching photos later (rejected: a message could appear without its photos).
 
-## R5 - 24-hour closing rule
+## R5 - Unlimited order support (revised 2026-11-08)
 
-- **Decision**: A conversation is open when the order status is not `Completed`, `Cancelled`, or `Rejected`, or when the request time is before `endedAt + 24h`, where `endedAt = completedAt ?? updatedAt` of the order. The same rule exists twice: as a pure Dart domain function for the UI, and in Firestore and Storage rules for enforcement.
-- **Rationale**: The current order rules only allow `updatedAt` to change during status transitions, so for a terminal order `updatedAt` is the terminal time; `completedAt` is preferred when present. No extra stored status is needed (spec: "derived, not stored").
-- **Alternatives considered**: A stored `closedAt` set by a scheduled job (rejected: needs a backend); trusting the client clock (rejected: rules must enforce FR-013).
+- **Decision**: Chat remains open for authorized participants indefinitely, regardless of order status or timestamps.
+- **Rationale**: The latest human instruction removes automatic closure; historical support must remain available.
+- **Implementation**: Remove all client deadline state and timers and both server time gates. Keep ownership and active-account authorization. No expiry field or migration is needed.
 
 ## R6 - Unread indicators and the Admin "Has messages" filter
 
@@ -75,3 +75,8 @@ All Technical Context unknowns are resolved below. Each entry records the decisi
 ## Dependencies
 
 No new packages. Uses existing `cloud_firestore`, `firebase_storage`, `firebase_auth`, `image_picker`, and `flutter_riverpod`.
+
+
+## Unlimited order chat amendment — 2026-11-08
+
+Approved rule: the owning active Customer and active Admins can start or continue order chat at any time, including after Completed, Cancelled or Rejected. There is no automatic expiry, read-only transition, resolve or reopen. This supersedes all earlier sending-window requirements. Ownership, active-account checks, immutable messages, one conversation per order, validation and retry deduplication remain required. No new schema or migration is needed. Chat remains order-scoped.

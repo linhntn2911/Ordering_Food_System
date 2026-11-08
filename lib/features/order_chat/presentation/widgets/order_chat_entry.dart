@@ -16,20 +16,9 @@ class OrderChatEntry extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final order = ref.watch(chatOrderProvider(orderId));
     final conversation = ref.watch(orderChatStreamProvider(orderId));
     final isAdmin = role == ChatRole.admin;
-    final currentOrder = order.value;
     final chat = conversation.value;
-    if (!isAdmin &&
-        currentOrder != null &&
-        conversation is AsyncData &&
-        chat == null &&
-        !ref.watch(chatOpenProvider(currentOrder))) {
-      return const Text(
-        'Bạn có thể báo vấn đề trong 24 giờ sau khi đơn kết thúc.',
-      );
-    }
     return Align(
       alignment: Alignment.centerLeft,
       child: OutlinedButton.icon(
