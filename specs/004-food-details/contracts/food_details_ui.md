@@ -22,7 +22,7 @@
    - "Topping" (`titleMedium`): danh sách chọn nhiều (`detail-topping-<id>`), mỗi dòng gồm tên và "+x ₫".
    - Khi hết hàng: các dòng hiển thị mờ, không chọn được, có nhãn ngữ nghĩa "không khả dụng".
 4. ~~**Ghi chú**~~: đã bỏ (spec, Làm rõ 2026-11-01); màn hình không có ô `detail-note`.
-5. **Đánh giá**: tiêu đề "Đánh giá" (`titleLarge`) kèm số lượt; mỗi thẻ đánh giá (`review-<id>`) gồm "Khách hàng" hoặc "Khách hàng ẩn danh", `RatingStars` cỡ nhỏ, ngày `dd/MM/yyyy`, nhãn "Đã chỉnh sửa", nội dung tối đa 4 dòng kèm "Xem thêm", hàng ảnh thu nhỏ 64 dp (`review-<id>-image-<i>`). Cuối danh sách là nút "Xem thêm đánh giá" (`detail-more-reviews`) khi `hasMore`, hoặc chỉ báo tải khi `isLoadingMore`.
+5. **Đánh giá**: tiêu đề "Đánh giá" (`titleLarge`) kèm số lượt; mỗi thẻ đánh giá (`review-<id>`) gồm "Khách hàng", `RatingStars` cỡ nhỏ, ngày `dd/MM/yyyy`, nhãn "Đã chỉnh sửa", nội dung tối đa 4 dòng kèm "Xem thêm", hàng ảnh thu nhỏ 64 dp (`review-<id>-image-<i>`). Cuối danh sách là nút "Xem thêm đánh giá" (`detail-more-reviews`) khi `hasMore`, hoặc chỉ báo tải khi `isLoadingMore`.
 6. **Thanh dưới cố định** (nền trắng, bóng `AppShadows.card`, `SafeArea`):
    - Bộ chọn số lượng (`detail-quantity-minus`, `detail-quantity`, `detail-quantity-plus`); nút trừ vô hiệu ở 1, nút cộng vô hiệu ở 99.
    - Nút gradient `AppGradients.primary` "Thêm vào giỏ" kèm giá tạm tính (`detail-add-to-cart`), cao ≥ 48 dp.

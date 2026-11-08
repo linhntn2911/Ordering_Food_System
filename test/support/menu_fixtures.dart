@@ -54,7 +54,6 @@ Review review(
   int rating = 5,
   String comment = 'Ngon',
   List<String> imageUrls = const [],
-  bool isAnonymous = false,
   bool isEdited = false,
   DateTime? createdAt,
 }) {
@@ -63,7 +62,6 @@ Review review(
     rating: rating,
     comment: comment,
     imageUrls: imageUrls,
-    isAnonymous: isAnonymous,
     isEdited: isEdited,
     createdAt: createdAt ?? DateTime(2026, 10, 18),
   );

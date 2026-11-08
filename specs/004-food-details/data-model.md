@@ -15,7 +15,6 @@ Dùng các trường sẵn có: `name`, `description`, `imageUrl`, `basePrice`, 
 | `rating` | int | 1–5 |
 | `comment` | string | Có thể rỗng; ≤ 500 ký tự (FR-028 gốc) |
 | `imageUrls` | array<string> | ≤ 3 phần tử |
-| `isAnonymous` | bool | |
 | `isEdited` | bool | |
 | `createdAt` | timestamp | Thời gian máy chủ |
 | `updatedAt` | timestamp | Thời gian máy chủ |
@@ -74,11 +73,10 @@ Phương thức:
 | `rating` | `int` (1–5) |
 | `comment` | `String` |
 | `imageUrls` | `List<String>` (≤ 3) |
-| `isAnonymous` | `bool` |
 | `isEdited` | `bool` |
 | `createdAt` | `DateTime` |
 
-- `String get authorLabel => isAnonymous ? 'Khách hàng ẩn danh' : 'Khách hàng'`.
+- `String get authorLabel => 'Khách hàng'`.
 
 ### `ReviewModel` (data)
 

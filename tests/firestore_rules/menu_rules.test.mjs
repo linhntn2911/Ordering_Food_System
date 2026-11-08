@@ -120,7 +120,6 @@ beforeEach(async () => {
       rating: 5,
       comment: 'Ngon',
       imageUrls: [],
-      isAnonymous: false,
       isEdited: false,
       createdAt: Timestamp.fromMillis(1_700_000_000_000),
       updatedAt: Timestamp.fromMillis(1_700_000_000_000),
@@ -263,7 +262,6 @@ describe('review rules', () => {
         rating: 5,
         comment: '',
         imageUrls: [],
-        isAnonymous: false,
         isEdited: false,
       }),
     );

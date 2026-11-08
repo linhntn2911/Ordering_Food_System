@@ -9,7 +9,6 @@ Map<String, dynamic> _reviewData([Map<String, dynamic> overrides = const {}]) {
     'rating': 4,
     'comment': 'Gà giòn, sốt vừa miệng.',
     'imageUrls': ['https://example.com/a.jpg'],
-    'isAnonymous': true,
     'isEdited': true,
     'createdAt': Timestamp.fromDate(_createdAt),
     'updatedAt': Timestamp.fromDate(_createdAt),
@@ -26,10 +25,9 @@ void main() {
       expect(review.rating, 4);
       expect(review.comment, 'Gà giòn, sốt vừa miệng.');
       expect(review.imageUrls, ['https://example.com/a.jpg']);
-      expect(review.isAnonymous, isTrue);
       expect(review.isEdited, isTrue);
       expect(review.createdAt.toUtc(), _createdAt);
-      expect(review.authorLabel, 'Khách hàng ẩn danh');
+      expect(review.authorLabel, 'Khách hàng');
     });
 
     for (final rating in <Object?>[0, 6, 4.5, '5', null]) {
@@ -56,14 +54,12 @@ void main() {
       final data = _reviewData()
         ..remove('comment')
         ..remove('imageUrls')
-        ..remove('isAnonymous')
         ..remove('isEdited');
 
       final review = ReviewModel.fromMap('r', data).toEntity();
 
       expect(review.comment, isEmpty);
       expect(review.imageUrls, isEmpty);
-      expect(review.isAnonymous, isFalse);
       expect(review.isEdited, isFalse);
       expect(review.authorLabel, 'Khách hàng');
     });

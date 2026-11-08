@@ -19,7 +19,7 @@
 
 ### Phiên 2026-10-20
 
-- H: Đánh giá không ẩn danh hiển thị danh tính người viết thế nào? → Đ: Luôn hiển thị "Khách hàng", không hiển thị tên; đánh giá ẩn danh vẫn ghi "Khách hàng ẩn danh". (Ban đầu chọn tên che một phần "Linh N.", sau đổi sang phương án này để không phải thêm dữ liệu và không lộ tên.)
+- H: Đánh giá không ẩn danh hiển thị danh tính người viết thế nào? → Đ: Luôn hiển thị "Khách hàng", không hiển thị tên. (Lần 4: bỏ hẳn cờ ẩn danh và nhãn "Khách hàng ẩn danh"; mọi đánh giá đều hiển thị "Khách hàng". Ban đầu chọn tên che một phần "Linh N.", sau đổi sang phương án này để không phải thêm dữ liệu và không lộ tên.)
 - H: Nút "Thêm vào giỏ" có lưu vào giỏ thật không? → Đ: Không. Làm đủ phần chọn (tùy chọn, số lượng, ghi chú, giá tạm tính); nút "Thêm vào giỏ" chỉ báo "Tính năng đang được phát triển" cho tới khi có tính năng Giỏ hàng (FR-011 gốc).
 - H: "Tóm tắt đánh giá" gồm những gì? → Đ: Chỉ điểm trung bình (một chữ số thập phân), dãy 5 ngôi sao và số lượt đánh giá; không có thanh phân bố theo số sao.
 - H: Lựa chọn của người dùng có được giữ khi mở lại cùng món? → Đ: Không; mỗi lần mở chi tiết đều về mặc định (size giá thấp nhất, không topping, số lượng 1, ghi chú trống).
@@ -87,8 +87,7 @@ Người dùng đọc các đánh giá gần nhất của món (số sao, nội 
 1. **Giả sử** món có đánh giá, **Khi** người dùng cuộn tới phần "Đánh giá", **Thì** thấy tối đa 5 đánh giá mới nhất, mỗi đánh giá gồm tên người đánh giá, số sao (1–5), nội dung (nếu có), tối đa 3 ảnh thu nhỏ (nếu có), ngày đánh giá và nhãn "Đã chỉnh sửa" nếu đánh giá đã được sửa.
 2. **Giả sử** món có hơn 5 đánh giá, **Khi** người dùng chạm "Xem thêm đánh giá", **Thì** tải thêm 10 đánh giá kế tiếp theo thứ tự mới nhất trước, đến khi hết.
 3. **Giả sử** món chưa có đánh giá, **Khi** người dùng xem phần "Đánh giá", **Thì** thấy "Chưa có đánh giá cho món này".
-4. **Giả sử** người đánh giá chọn ẩn danh, **Khi** đánh giá hiển thị, **Thì** tên hiển thị là "Khách hàng ẩn danh".
-5. **Giả sử** người đánh giá không chọn ẩn danh, **Khi** đánh giá hiển thị, **Thì** tên hiển thị là "Khách hàng"; tên thật của người viết không bao giờ được hiển thị.
+4. **Giả sử** đánh giá đã được lưu, **Khi** đánh giá hiển thị, **Thì** tên hiển thị luôn là "Khách hàng"; tên thật của người viết không bao giờ được hiển thị. Không có tùy chọn ẩn danh.
 6. **Giả sử** nội dung đánh giá dài, **Khi** hiển thị, **Thì** chỉ hiện tối đa 4 dòng kèm "Xem thêm" để mở rộng tại chỗ.
 7. **Giả sử** người dùng chạm một ảnh thu nhỏ, **Khi** ảnh mở, **Thì** ảnh được xem lớn toàn màn hình và đóng được để quay lại đúng vị trí.
 8. **Giả sử** không tải được đánh giá, **Khi** phần "Đánh giá" hiển thị, **Thì** chỉ phần này báo lỗi kèm "Thử lại"; thông tin món phía trên vẫn hiển thị bình thường.
@@ -136,8 +135,8 @@ Từ chi tiết món, người dùng chọn số lượng, nhập ghi chú và t
 - **FR-004**: Giá tạm tính PHẢI bằng (giá cơ bản + giá cộng thêm của size + tổng giá cộng thêm của topping) × số lượng, và cập nhật ngay khi lựa chọn thay đổi.
 - **FR-005**: Món hết hàng PHẢI vẫn xem được đầy đủ thông tin nhưng không chọn được tùy chọn, số lượng hay thêm vào giỏ, kèm lý do "Hết hàng".
 - **FR-006**: Màn hình PHẢI hiển thị tối đa 5 đánh giá mới nhất của món, và cho tải thêm theo lượt 10 đánh giá.
-- **FR-007**: Mỗi đánh giá PHẢI hiển thị tên người đánh giá theo quy tắc: ẩn danh → "Khách hàng ẩn danh"; không ẩn danh → "Khách hàng"; số sao 1–5 bằng biểu tượng kèm chữ cho trình đọc màn hình, nội dung (nếu có), tối đa 3 ảnh, ngày đánh giá và nhãn "Đã chỉnh sửa" khi có.
-- **FR-008**: Màn hình PHẢI KHÔNG hiển thị mã người dùng, số điện thoại, email hay bất kỳ dữ liệu cá nhân nào của người đánh giá ngoài nhãn "Khách hàng" hoặc "Khách hàng ẩn danh".
+- **FR-007**: Mỗi đánh giá PHẢI hiển thị tên người đánh giá là "Khách hàng"; số sao 1–5 bằng biểu tượng kèm chữ cho trình đọc màn hình, nội dung (nếu có), tối đa 3 ảnh, ngày đánh giá và nhãn "Đã chỉnh sửa" khi có.
+- **FR-008**: Màn hình PHẢI KHÔNG hiển thị mã người dùng, số điện thoại, email hay bất kỳ dữ liệu cá nhân nào của người đánh giá ngoài nhãn "Khách hàng".
 - **FR-009**: Màn hình PHẢI có các trạng thái: đang tải, có dữ liệu, món không còn được bán, lỗi kèm "Thử lại", và nhãn ngoại tuyến; phần đánh giá có trạng thái tải, trống và lỗi riêng không ảnh hưởng phần thông tin món; khi ngoại tuyến phần đánh giá hiện đánh giá đã lưu và "Xem thêm đánh giá" báo cần kết nối mạng.
 - **FR-010**: Thay đổi của món (đăng bán, còn/hết hàng, giá, tên, mô tả, ảnh, tùy chọn, tóm tắt đánh giá) PHẢI phản ánh lên màn hình đang mở mà không cần mở lại.
 - **FR-011**: Khi tùy chọn đang chọn bị nhà hàng xóa, lựa chọn đó PHẢI bị bỏ, giá tạm tính được tính lại và người dùng được báo ngắn.
@@ -152,7 +151,7 @@ Từ chi tiết món, người dùng chọn số lượng, nhập ghi chú và t
 - **Món (Menu Item)**: Dùng lại thực thể của tính năng 002 (tên, mô tả, ảnh, giá cơ bản, size, topping, còn hàng, điểm và số lượt đánh giá, trạng thái đăng bán).
 - **Tùy chọn (Option)**: Size hoặc topping, gồm tên và giá cộng thêm không âm.
 - **Lựa chọn tạm (Item Selection)**: Size đang chọn, các topping đang chọn, số lượng, ghi chú và giá tạm tính. Chỉ tồn tại khi màn hình đang mở.
-- **Đánh giá (Review)**: Số sao, nội dung, tối đa 3 ảnh, cờ ẩn danh, cờ đã chỉnh sửa, thời điểm tạo, món được đánh giá. Không chứa tên hiển thị của người viết. Chỉ đọc trong tính năng này.
+- **Đánh giá (Review)**: Số sao, nội dung, tối đa 3 ảnh, cờ đã chỉnh sửa, thời điểm tạo, món được đánh giá. Không chứa tên hiển thị của người viết. Chỉ đọc trong tính năng này.
 
 ## Tiêu chí thành công (Success Criteria) *(bắt buộc)*
 
@@ -160,7 +159,7 @@ Từ chi tiết món, người dùng chọn số lượng, nhập ghi chú và t
 
 - **SC-001**: Thông tin món (ảnh hoặc ảnh thay thế, tên, giá, tình trạng, tóm tắt đánh giá) hiện trong vòng 2 giây sau khi chạm món, với kết nối bình thường.
 - **SC-002**: Giá tạm tính đúng trong 100% tổ hợp size × topping × số lượng của thực đơn mẫu.
-- **SC-003**: Trong kiểm thử chấp nhận, 0 trường hợp lộ dữ liệu cá nhân của người đánh giá ngoài nhãn "Khách hàng"/"Khách hàng ẩn danh", và 0 món chưa đăng bán mở được chi tiết.
+- **SC-003**: Trong kiểm thử chấp nhận, 0 trường hợp lộ dữ liệu cá nhân của người đánh giá ngoài nhãn "Khách hàng", và 0 món chưa đăng bán mở được chi tiết.
 - **SC-004**: Thay đổi giá hoặc tình trạng còn hàng từ nhà hàng hiện trên màn hình đang mở trong vòng 5 giây.
 - **SC-005**: Ít nhất 90% người tham gia kiểm thử trả lời đúng "món này có những size nào, giá bao nhiêu, còn hàng không" sau khi xem màn hình, không cần hướng dẫn.
 - **SC-006**: Màn hình đọc được đầy đủ, không tràn bố cục ở chiều rộng 320 điểm ảnh logic và cỡ chữ 1,3×.
@@ -168,7 +167,7 @@ Từ chi tiết món, người dùng chọn số lượng, nhập ghi chú và t
 ## Giả định (Assumptions)
 
 - Phạm vi chính là FR-009 của đặc tả gốc. Yêu thích (FR-010 gốc), lưu giỏ hàng (FR-011 gốc), viết/sửa/xóa đánh giá (FR-027 – FR-031 gốc) và phản hồi của nhà hàng nằm ngoài phạm vi.
-- Đánh giá được hiển thị từ một bản sao công khai của mỗi đánh giá, chỉ gồm thông tin hiển thị (số sao, nội dung, ảnh, cờ ẩn danh, cờ đã chỉnh sửa, thời điểm) và không chứa định danh khách hay đơn hàng. Bản gốc chứa định danh chỉ chủ đánh giá và Admin đọc được.
+- Đánh giá được hiển thị từ một bản sao công khai của mỗi đánh giá, chỉ gồm thông tin hiển thị (số sao, nội dung, ảnh, cờ đã chỉnh sửa, thời điểm) và không chứa định danh khách hay đơn hàng. Bản gốc chứa định danh chỉ chủ đánh giá và Admin đọc được.
 - **Phụ thuộc**: tính năng viết đánh giá (màn hình "Review Purchased Item" của Member 4) phải ghi bản sao công khai cùng lúc với đánh giá gốc và với điểm/số lượt trên món; nếu không, đánh giá sẽ không hiện ở chi tiết món. Tính năng này chỉ đọc bản sao công khai.
 - Tóm tắt đánh giá dùng điểm trung bình và số lượt đánh giá đã lưu sẵn trên món (do nhà hàng/hệ thống tin cậy cập nhật), không tính lại từ danh sách đánh giá.
 - Đánh giá là dữ liệu công khai chỉ đọc với Guest và Customer; quyền ghi thuộc hệ thống tin cậy như đặc tả gốc đã nêu.

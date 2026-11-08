@@ -11,7 +11,7 @@ Thay màn hình chi tiết tối thiểu của tính năng 002 bằng màn hình
 - Ảnh, tên, mô tả, giá hoặc khoảng giá, tình trạng còn/hết hàng và tóm tắt đánh giá (điểm, 5 sao, số lượt).
 - Chọn size và topping, số lượng 1–99, ghi chú ≤ 200 ký tự, giá tạm tính.
 - Nút "Thêm vào giỏ" chỉ báo "Tính năng đang được phát triển".
-- 5 đánh giá mới nhất, tải thêm theo lượt 10; người viết luôn hiển thị là "Khách hàng" hoặc "Khách hàng ẩn danh".
+- 5 đánh giá mới nhất, tải thêm theo lượt 10; người viết luôn hiển thị là "Khách hàng"; không có tùy chọn ẩn danh.
 
 Về kỹ thuật:
 

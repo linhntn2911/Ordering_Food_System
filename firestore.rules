@@ -85,7 +85,7 @@ service cloud.firestore {
         && reviewId == request.auth.uid + '_' + data.orderId
         && data.keys().hasOnly([
           'customerId', 'orderId', 'menuItemIds', 'rating', 'comment',
-          'imageUrls', 'isAnonymous', 'isEdited', 'createdAt', 'updatedAt'
+          'imageUrls', 'isEdited', 'createdAt', 'updatedAt'
         ])
         && data.customerId == request.auth.uid
         && data.orderId is string
@@ -99,7 +99,6 @@ service cloud.firestore {
         && (data.rating > 2 || data.comment.size() > 0)
         && data.imageUrls is list
         && data.imageUrls.size() <= 3
-        && data.isAnonymous == false
         && data.isEdited == false
         && data.createdAt == request.time
         && data.updatedAt == request.time
@@ -191,10 +190,9 @@ service cloud.firestore {
           && request.resource.data.comment
             == get(/databases/$(database)/documents/reviews/$(reviewId)).data.comment
           && request.resource.data.keys().hasOnly([
-            'rating', 'comment', 'imageUrls', 'isAnonymous', 'isEdited',
+            'rating', 'comment', 'imageUrls', 'isEdited',
             'createdAt', 'updatedAt'
           ])
-          && request.resource.data.isAnonymous == false
           && request.resource.data.isEdited == false
           && request.resource.data.createdAt == request.time
           && request.resource.data.updatedAt == request.time;

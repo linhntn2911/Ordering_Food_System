@@ -384,13 +384,12 @@ void main() {
           isEdited: true,
           createdAt: DateTime(2026, 10, 18),
         ),
-        review('r2', isAnonymous: true, createdAt: DateTime(2026, 10, 9)),
+        review('r2', createdAt: DateTime(2026, 10, 9)),
       ]);
       await tester.pump();
       await tester.pump();
 
-      expect(find.text('Khách hàng'), findsOneWidget);
-      expect(find.text('Khách hàng ẩn danh'), findsOneWidget);
+      expect(find.text('Khách hàng'), findsNWidgets(2));
       expect(find.text('18/10/2026'), findsOneWidget);
       expect(find.text('09/10/2026'), findsOneWidget);
       expect(find.text('Đã chỉnh sửa'), findsOneWidget);

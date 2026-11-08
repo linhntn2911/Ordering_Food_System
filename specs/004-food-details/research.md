@@ -7,7 +7,7 @@ Mỗi mục ghi theo dạng: Quyết định, Lý do, Phương án đã cân nh�
 ## R1. Đọc đánh giá công khai mà không lộ dữ liệu cá nhân (FR-007, FR-008, SC-003)
 
 - **Quyết định**:
-  - Thêm subcollection công khai `menu_items/{menuItemId}/reviews/{reviewId}`. Mỗi tài liệu chỉ gồm trường hiển thị: `rating`, `comment`, `imageUrls`, `isAnonymous`, `isEdited`, `createdAt`, `updatedAt`. `reviewId` trùng id của tài liệu `reviews/{reviewId}` gốc.
+  - Thêm subcollection công khai `menu_items/{menuItemId}/reviews/{reviewId}`. Mỗi tài liệu chỉ gồm trường hiển thị: `rating`, `comment`, `imageUrls`, `isEdited`, `createdAt`, `updatedAt`. `reviewId` trùng id của tài liệu `reviews/{reviewId}` gốc.
   - Rules cho phép đọc subcollection khi món cha đọc được công khai (`get()` món cha: `isPublished && isCategoryPublished`) hoặc người đọc là Admin. Không ai được ghi từ client.
   - Thu hẹp rules của collection gốc `reviews`: chỉ chủ đánh giá (`customerId == auth.uid`) hoặc Admin được đọc.
   - Hệ thống tin cậy (tính năng viết đánh giá của Member 4) ghi tài liệu gốc và bản công khai trong cùng một batch, xóa cả hai khi xóa đánh giá.
@@ -71,7 +71,7 @@ Mỗi mục ghi theo dạng: Quyết định, Lý do, Phương án đã cân nh�
   - Widget dùng chung mới `RatingStars` (`lib/core/widgets/rating_stars.dart`): 5 sao, hỗ trợ nửa sao cho điểm trung bình, có nhãn ngữ nghĩa "Đánh giá x trên 5".
   - Ngày đánh giá định dạng `dd/MM/yyyy` theo giờ thiết bị bằng hàm thuần `formatReviewDate` (`lib/core/utils/date_format.dart`), không thêm gói `intl`.
   - Xem ảnh đánh giá: hộp thoại toàn màn hình với `PageView` vuốt qua các ảnh của cùng đánh giá và `InteractiveViewer` để phóng to; đóng quay lại đúng vị trí.
-  - Tên người đánh giá: "Khách hàng ẩn danh" khi `isAnonymous`, ngược lại "Khách hàng" (Clarification Q1).
+  - Tên người đánh giá: luôn "Khách hàng" (Clarification Q1, lần 4: đã bỏ cờ ẩn danh).
   - "Thêm vào giỏ" khi món còn hàng: SnackBar `ComingSoonView.message`.
 - **Lý do**: Dùng lại token, `FoodImagePlaceholder`, `SoldOutLabel`, `formatVnd`; không thêm phụ thuộc.
 

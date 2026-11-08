@@ -250,7 +250,7 @@ The large promotional mockup shadows present in the Start Here page are not copi
 - White content block with top radius `radiusDialog`, overlapping the image by `24`: sold-out label, name (`headlineMedium`, never clipped), rating summary, price (`price` style at `titleLarge` size), offline banner, description folded at six lines.
 - Options: "Chọn size" rows with radio icons (single choice) and "Topping" rows with checkbox icons (multiple choice); extra price `+x ₫` on the right; disabled rows use `textMuted`/`border` and say "không khả dụng" to screen readers.
 - Note field with `radiusInput`, a `200` character counter and a `primaryEnd` focus border.
-- Reviews: white cards with radius `radiusCard`, author "Khách hàng" or "Khách hàng ẩn danh" (never a name), small stars, `dd/MM/yyyy` date, "Đã chỉnh sửa", comment folded at four lines, `64` image thumbnails opening a full-screen viewer.
+- Reviews: white cards with radius `radiusCard`, author "Khách hàng" (never a name), small stars, `dd/MM/yyyy` date, "Đã chỉnh sửa", comment folded at four lines, `64` image thumbnails opening a full-screen viewer.
 - Fixed bottom bar: white with `cardShadow`; quantity stepper (`48` buttons on `primarySoft`) and a gradient "Thêm vào giỏ · total" button. Sold-out items show a disabled grey "Hết hàng" button instead.
 
 ### Rating Stars

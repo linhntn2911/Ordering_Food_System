@@ -8,7 +8,6 @@ class ReviewModel {
     required this.rating,
     required this.comment,
     required this.imageUrls,
-    required this.isAnonymous,
     required this.isEdited,
     required this.createdAt,
   });
@@ -17,7 +16,6 @@ class ReviewModel {
   final int rating;
   final String comment;
   final List<String> imageUrls;
-  final bool isAnonymous;
   final bool isEdited;
   final DateTime createdAt;
 
@@ -37,7 +35,6 @@ class ReviewModel {
       rating: rating,
       comment: data['comment'] as String? ?? '',
       imageUrls: _imageUrls(data['imageUrls']),
-      isAnonymous: data['isAnonymous'] as bool? ?? false,
       isEdited: data['isEdited'] as bool? ?? false,
       createdAt: createdAt.toDate(),
     );
@@ -49,7 +46,6 @@ class ReviewModel {
       rating: rating,
       comment: comment,
       imageUrls: imageUrls,
-      isAnonymous: isAnonymous,
       isEdited: isEdited,
       createdAt: createdAt,
     );
