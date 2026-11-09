@@ -8,6 +8,9 @@ void main() {
     WidgetTester tester, {
     VoidCallback? onLoginTap,
     double width = 400,
+    int unreadNotificationCount = 0,
+    bool hasUnreadMessages = false,
+    VoidCallback? onMessagesTap,
   }) {
     tester.view.physicalSize = Size(width, 800);
     tester.view.devicePixelRatio = 1;
@@ -16,7 +19,13 @@ void main() {
       MaterialApp(
         theme: AppTheme.light,
         home: Scaffold(
-          body: HomeHeader(onNotificationsTap: () {}, onLoginTap: onLoginTap),
+          body: HomeHeader(
+            onNotificationsTap: () {},
+            onMessagesTap: onMessagesTap ?? () {},
+            onLoginTap: onLoginTap,
+            unreadNotificationCount: unreadNotificationCount,
+            hasUnreadMessages: hasUnreadMessages,
+          ),
         ),
       ),
     );
@@ -35,7 +44,47 @@ void main() {
     await pumpHeader(tester);
 
     expect(find.byKey(const ValueKey('home-login')), findsNothing);
+    expect(find.byKey(const ValueKey('home-messages')), findsOneWidget);
     expect(find.byKey(const ValueKey('home-notifications')), findsOneWidget);
+  });
+
+  testWidgets('message icon opens chat and shows its unread indicator', (
+    tester,
+  ) async {
+    var taps = 0;
+    await pumpHeader(
+      tester,
+      hasUnreadMessages: true,
+      onMessagesTap: () => taps++,
+    );
+
+    expect(find.byKey(const ValueKey('home-general-unread')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('home-messages')));
+    expect(taps, 1);
+  });
+
+  testWidgets('shows the unread notification count on the bell', (
+    tester,
+  ) async {
+    await pumpHeader(tester, unreadNotificationCount: 3);
+
+    expect(
+      find.byKey(const ValueKey('notification-unread-badge')),
+      findsOneWidget,
+    );
+    expect(find.text('3'), findsOneWidget);
+    expect(find.bySemanticsLabel('Có 3 thông báo chưa đọc'), findsOneWidget);
+  });
+
+  testWidgets('hides the badge when every notification is read', (
+    tester,
+  ) async {
+    await pumpHeader(tester);
+
+    expect(
+      find.byKey(const ValueKey('notification-unread-badge')),
+      findsNothing,
+    );
   });
 
   testWidgets('narrow screens show the login button as an icon', (

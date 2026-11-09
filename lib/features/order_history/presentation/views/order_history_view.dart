@@ -6,6 +6,8 @@ import 'package:ordering_food_system/core/theme/app_spacing.dart';
 import 'package:ordering_food_system/core/theme/app_text_styles.dart';
 import 'package:ordering_food_system/core/utils/navigation_extensions.dart';
 import 'package:ordering_food_system/features/auth/presentation/viewmodels/auth_providers.dart';
+import 'package:ordering_food_system/features/notifications/presentation/viewmodels/notification_provider.dart';
+import 'package:ordering_food_system/features/notifications/presentation/widgets/notification_badge_icon.dart';
 import 'package:ordering_food_system/features/order_history/presentation/viewmodels/order_history_viewmodel.dart';
 import 'package:ordering_food_system/features/order_history/presentation/widgets/order_history_card.dart';
 import 'package:ordering_food_system/features/review/presentation/viewmodels/review_provider.dart';
@@ -30,6 +32,7 @@ class OrderHistoryView extends ConsumerWidget {
     final filter = ref.watch(orderHistoryFilterProvider);
     final ordersAsync = ref.watch(orderHistoryListProvider);
     final reviewedIds = ref.watch(reviewedOrderIdsProvider);
+    final unreadNotificationCount = ref.watch(unreadCountProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -40,9 +43,14 @@ class OrderHistoryView extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            tooltip: 'Thông báo',
+            tooltip: unreadNotificationCount > 0
+                ? 'Thông báo, $unreadNotificationCount chưa đọc'
+                : 'Thông báo',
             onPressed: () => context.push(AppRoutes.notifications),
-            icon: const Icon(Icons.notifications_none_rounded),
+            icon: NotificationBadgeIcon(
+              unreadCount: unreadNotificationCount,
+              color: AppColors.textPrimary,
+            ),
           ),
           IconButton(
             tooltip: 'Đánh giá của tôi',
@@ -111,7 +119,9 @@ class OrderHistoryView extends ConsumerWidget {
                         const SizedBox(height: AppSpacing.s12),
                     itemBuilder: (context, index) => OrderHistoryCard(
                       order: orders[index],
-                      isReviewed: reviewedIds.contains(orders[index].orderId),
+                      isReviewed: reviewedIds.contains(
+                        orders[index].documentId ?? orders[index].orderId,
+                      ),
                     ),
                   ),
                 );

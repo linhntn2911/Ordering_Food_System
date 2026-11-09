@@ -6,6 +6,8 @@ import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../notifications/presentation/widgets/notification_badge_icon.dart';
+import '../../../order_chat/presentation/widgets/chat_unread_dot.dart';
 
 /// "Tìm món bạn yêu thích" title with the notification bell, plus a login
 /// button for guests. Signed-in users reach their profile from the
@@ -14,10 +16,17 @@ class HomeHeader extends StatelessWidget {
   const HomeHeader({
     super.key,
     required this.onNotificationsTap,
+    required this.onMessagesTap,
     this.onLoginTap,
+    this.unreadNotificationCount = 0,
+    this.hasUnreadMessages = false,
   });
 
   final VoidCallback onNotificationsTap;
+  final VoidCallback onMessagesTap;
+
+  final int unreadNotificationCount;
+  final bool hasUnreadMessages;
 
   /// Shows the login button when not null.
   final VoidCallback? onLoginTap;
@@ -50,12 +59,48 @@ class HomeHeader extends StatelessWidget {
             boxShadow: [AppShadows.card],
           ),
           child: IconButton(
+            key: const ValueKey('home-messages'),
+            tooltip: hasUnreadMessages
+                ? 'Tin nhắn, có tin chưa đọc'
+                : 'Tin nhắn',
+            onPressed: onMessagesTap,
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  size: 24,
+                  color: AppColors.primaryEnd,
+                ),
+                if (hasUnreadMessages)
+                  const Positioned(
+                    top: -3,
+                    right: -3,
+                    child: ChatUnreadDot(key: ValueKey('home-general-unread')),
+                  ),
+              ],
+            ),
+            constraints: const BoxConstraints.tightFor(
+              width: AppSpacing.minTouchTarget,
+              height: AppSpacing.minTouchTarget,
+            ),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.p12),
+        DecoratedBox(
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            shape: BoxShape.circle,
+            boxShadow: [AppShadows.card],
+          ),
+          child: IconButton(
             key: const ValueKey('home-notifications'),
-            tooltip: 'Thông báo',
+            tooltip: unreadNotificationCount > 0
+                ? 'Thông báo, $unreadNotificationCount chưa đọc'
+                : 'Thông báo',
             onPressed: onNotificationsTap,
-            icon: const Icon(
-              Icons.notifications_none_rounded,
-              size: 24,
+            icon: NotificationBadgeIcon(
+              unreadCount: unreadNotificationCount,
               color: AppColors.primaryEnd,
             ),
             constraints: const BoxConstraints.tightFor(

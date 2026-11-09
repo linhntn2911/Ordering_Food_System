@@ -52,6 +52,8 @@ class OrderDetailScreen extends ConsumerWidget {
                         ),
                         data: (order) {
                           if (order == null) return const _NotFoundState();
+                          final reviewOrderId =
+                              order.documentId ?? order.orderId;
                           return RefreshIndicator(
                             color: AppColors.primaryEnd,
                             onRefresh: () async => ref.invalidate(
@@ -145,7 +147,7 @@ class OrderDetailScreen extends ConsumerWidget {
                                   const SizedBox(height: AppSpacing.xl),
                                   GradientButton(
                                     label: order.status.isCompleted
-                                        ? (reviewedIds.contains(order.orderId)
+                                        ? (reviewedIds.contains(reviewOrderId)
                                               ? 'Đã đánh giá'
                                               : 'Viết đánh giá')
                                         : 'Theo dõi đơn hàng',
@@ -154,11 +156,11 @@ class OrderDetailScreen extends ConsumerWidget {
                                         : Icons.local_shipping_rounded,
                                     onPressed:
                                         order.status.isCompleted &&
-                                            reviewedIds.contains(order.orderId)
+                                            reviewedIds.contains(reviewOrderId)
                                         ? null
                                         : () => context.push(
                                             order.status.isCompleted
-                                                ? '${AppRoutes.writeReview}?orderId=${order.orderId}'
+                                                ? '${AppRoutes.writeReview}?orderId=$reviewOrderId'
                                                 : '${AppRoutes.orderTracking}?orderId=${order.orderId}',
                                           ),
                                   ),

@@ -81,6 +81,7 @@ service cloud.firestore {
     function validCustomerReview(reviewId) {
       let data = request.resource.data;
       let order = get(/databases/$(database)/documents/orders/$(data.orderId)).data;
+      let completedAt = order.get('completedAt', order.updatedAt);
       return signedIn()
         && reviewId == request.auth.uid + '_' + data.orderId
         && data.keys().hasOnly([
@@ -104,8 +105,35 @@ service cloud.firestore {
         && data.updatedAt == request.time
         && order.customerId == request.auth.uid
         && order.orderStatus == 'Completed'
-        && request.time < order.updatedAt + duration.value(30, 'd')
+        && completedAt is timestamp
+        && request.time < completedAt + duration.value(30, 'd')
         && !exists(/databases/$(database)/documents/reviews/$(reviewId));
+    }
+
+    function validPublicReview(menuItemId, reviewId) {
+      let data = request.resource.data;
+      let privateReview = getAfter(
+        /databases/$(database)/documents/reviews/$(reviewId)
+      ).data;
+      return signedIn()
+        && existsAfter(/databases/$(database)/documents/reviews/$(reviewId))
+        && privateReview.customerId == request.auth.uid
+        && privateReview.menuItemIds.hasAny([menuItemId])
+        && data.keys().hasOnly([
+          'rating', 'comment', 'imageUrls', 'isEdited',
+          'createdAt', 'updatedAt'
+        ])
+        && data.rating is int
+        && data.rating >= 1
+        && data.rating <= 5
+        && data.comment is string
+        && data.comment.size() <= 500
+        && (data.rating > 2 || data.comment.size() > 0)
+        && data.imageUrls is list
+        && data.imageUrls.size() <= 3
+        && data.isEdited == false
+        && data.createdAt == request.time
+        && data.updatedAt == request.time;
     }
 
     match /users/{userId} {
@@ -179,23 +207,7 @@ service cloud.firestore {
       // Written by the owner right after the private review with the same id.
       match /reviews/{reviewId} {
         allow get, list: if isAdmin() || isPubliclyVisibleItem(menuItemId);
-        allow create: if signedIn()
-          && exists(/databases/$(database)/documents/reviews/$(reviewId))
-          && get(/databases/$(database)/documents/reviews/$(reviewId)).data.customerId
-            == request.auth.uid
-          && get(/databases/$(database)/documents/reviews/$(reviewId)).data.menuItemIds
-            .hasAny([menuItemId])
-          && request.resource.data.rating
-            == get(/databases/$(database)/documents/reviews/$(reviewId)).data.rating
-          && request.resource.data.comment
-            == get(/databases/$(database)/documents/reviews/$(reviewId)).data.comment
-          && request.resource.data.keys().hasOnly([
-            'rating', 'comment', 'imageUrls', 'isEdited',
-            'createdAt', 'updatedAt'
-          ])
-          && request.resource.data.isEdited == false
-          && request.resource.data.createdAt == request.time
-          && request.resource.data.updatedAt == request.time;
+        allow create: if validPublicReview(menuItemId, reviewId);
         allow update, delete: if false;
       }
     }

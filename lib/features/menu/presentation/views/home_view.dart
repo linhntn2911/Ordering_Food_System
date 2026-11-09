@@ -9,7 +9,9 @@ import '../../../../core/widgets/app_error_view.dart';
 import '../../../../core/widgets/app_loading_view.dart';
 import '../../../../core/widgets/offline_banner.dart';
 import '../../../auth/presentation/viewmodels/auth_providers.dart';
-import '../../../order_chat/presentation/widgets/home_order_support_button.dart';
+import '../../../notifications/presentation/viewmodels/notification_provider.dart';
+import '../../../order_chat/presentation/viewmodels/admin_messages_view_model.dart';
+import '../../../order_chat/presentation/views/general_chat_screen.dart';
 import '../../domain/entities/menu_failure.dart';
 import '../../domain/entities/menu_item.dart';
 import '../viewmodels/home_menu_state.dart';
@@ -90,6 +92,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
     Navigator.of(context).pushNamed(AppRoutes.notifications);
   }
 
+  void _openMessages() {
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).push(MaterialPageRoute<void>(builder: (_) => const GeneralChatScreen()));
+  }
+
   /// Opens search over the whole screen, hiding the shell's tab bar.
   void _openSearch({bool openFilters = false}) {
     Navigator.of(context, rootNavigator: true).push(
@@ -125,9 +134,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
     final viewModel = ref.read(homeMenuViewModelProvider.notifier);
     // Guests and an unresolved auth state both get the login button.
     final isSignedIn = ref.watch(authStateProvider).value != null;
+    final unreadNotificationCount = isSignedIn
+        ? ref.watch(unreadCountProvider)
+        : 0;
+    final hasUnreadMessages =
+        ref.watch(generalChatUnreadProvider).value == true;
 
     return Scaffold(
-      floatingActionButton: const HomeOrderSupportButton(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final padding = AppSpacing.screenHorizontalFor(constraints.maxWidth);
@@ -152,7 +165,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
                       children: [
                         HomeHeader(
                           onNotificationsTap: _openNotifications,
+                          onMessagesTap: _openMessages,
                           onLoginTap: isSignedIn ? null : _openLogin,
+                          unreadNotificationCount: unreadNotificationCount,
+                          hasUnreadMessages: hasUnreadMessages,
                         ),
                         const SizedBox(height: AppSpacing.p20),
                         HomeSearchBar(

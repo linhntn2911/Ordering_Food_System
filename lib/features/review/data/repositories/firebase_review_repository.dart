@@ -44,11 +44,21 @@ class FirebaseReviewRepository implements ReviewRepository {
 
     final trimmedComment = comment.trim();
     try {
-      final itemsSnapshot = await firestore
-          .collection(FirestorePaths.orders)
-          .doc(orderId)
-          .collection('items')
-          .get();
+      final orderRef = firestore.collection(FirestorePaths.orders).doc(orderId);
+      final orderSnapshot = await orderRef.get();
+      final orderData = orderSnapshot.data();
+      if (orderData == null || orderData['customerId'] != uid) {
+        throw const ValidationFailure(
+          'Không tìm thấy đơn hàng của bạn. Vui lòng mở lại từ lịch sử đơn hàng.',
+        );
+      }
+      if (orderData['orderStatus'] != 'Completed') {
+        throw const ValidationFailure(
+          'Chỉ có thể đánh giá đơn hàng đã hoàn thành.',
+        );
+      }
+
+      final itemsSnapshot = await orderRef.collection('items').get();
       final menuItemIds = {
         for (final item in itemsSnapshot.docs)
           if ((item.data()['menuItemId'] as String?)?.isNotEmpty ?? false)
@@ -58,7 +68,9 @@ class FirebaseReviewRepository implements ReviewRepository {
         throw const ValidationFailure('Không tìm thấy món trong đơn hàng.');
       }
 
-      await reviewRef.set({
+      final timestamp = FieldValue.serverTimestamp();
+      final batch = firestore.batch();
+      batch.set(reviewRef, {
         'customerId': uid,
         'orderId': orderId,
         'menuItemIds': menuItemIds,
@@ -66,11 +78,10 @@ class FirebaseReviewRepository implements ReviewRepository {
         'comment': trimmedComment,
         'imageUrls': images,
         'isEdited': false,
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
+        'createdAt': timestamp,
+        'updatedAt': timestamp,
       });
 
-      final batch = firestore.batch();
       for (final menuItemId in menuItemIds) {
         final publicRef = firestore
             .collection(FirestorePaths.menuItems)
@@ -82,8 +93,8 @@ class FirebaseReviewRepository implements ReviewRepository {
           'comment': trimmedComment,
           'imageUrls': images,
           'isEdited': false,
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
+          'createdAt': timestamp,
+          'updatedAt': timestamp,
         });
       }
       await batch.commit();

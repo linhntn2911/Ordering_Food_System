@@ -178,7 +178,7 @@ class OrderHistoryCard extends StatelessWidget {
                             ? null
                             : () => context.push(
                                 order.status.isCompleted
-                                    ? '${AppRoutes.writeReview}?orderId=${order.orderId}'
+                                    ? '${AppRoutes.writeReview}?orderId=${order.documentId ?? order.orderId}'
                                     : '${AppRoutes.orderTracking}?orderId=${order.orderId}',
                               ),
                         style: ElevatedButton.styleFrom(
